@@ -24,7 +24,8 @@ namespace ScraperFramework.Configuration
             Container
                 .RegisterInstance(_config)
                 .RegisterInstance(new CancellationTokenSource())
-                .RegisterType<ICommandListener, CommandListener>();
+                .RegisterType<ICommandListener, CommandListener>()
+                .RegisterType<IController, Controller>();
 
             return Container.Resolve<IController>();
         }

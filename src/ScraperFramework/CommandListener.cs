@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
+using ScraperFramework.Attributes;
 
 namespace ScraperFramework
 {
@@ -28,16 +29,16 @@ namespace ScraperFramework
                 _httpListener.Prefixes.Add(prefix);
             }
 
-            Log.Information("HttpListener Started...");
             _httpListener.Start();
             _listenerTask = Task.Factory.StartNew(async () =>
             {
                 while (!cancelToken.IsCancellationRequested)
                 {
+                    Log.Information("Command Listener Waiting For Requests");
                     HttpListenerContext ctx = await _httpListener.GetContextAsync();
-
-                    Log.Information("Command Listener Recieved Request.");
+                    
                     HttpListenerRequest request = ctx.Request;
+                    Log.Information("Command Listener Recieved Request {0} {1}", request.HttpMethod, request.Url.Segments[1]);
 
                     string httpMethod = request.Url.Segments[1];
 
@@ -45,6 +46,12 @@ namespace ScraperFramework
 
                 }
             }, TaskCreationOptions.LongRunning);
+        }
+
+        [Command("GET", "/stats")]
+        private void GetStats()
+        {
+            Log.Information("Getting Stats");
         }
     }
 }
