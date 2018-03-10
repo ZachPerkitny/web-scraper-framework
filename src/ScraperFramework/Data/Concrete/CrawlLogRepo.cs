@@ -21,11 +21,6 @@ namespace ScraperFramework.Data.Concrete
 
         public void Insert(CrawlLog log)
         {
-            if (log == null)
-            {
-                throw new ArgumentNullException(nameof(log));
-            }
-
             using (Transaction transaction = _engine.GetTransaction())
             {
                 bool newEntity = log.ID == 0;

@@ -71,16 +71,6 @@ namespace ScraperFramework
                     string responseString = string.Empty;
                     try
                     {
-                        string body = string.Empty;
-                        if (ctx.Request.HasEntityBody)
-                        {
-                            using (StreamReader reader = new StreamReader(
-                                ctx.Request.InputStream, ctx.Request.ContentEncoding))
-                            {
-                                body = await reader.ReadToEndAsync();
-                            }
-                        }
-
                         object responseObj = await _requestHandler.Execute(ctx.Request);
                         responseString = JsonConvert.SerializeObject(responseObj);
                     }

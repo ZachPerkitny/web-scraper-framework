@@ -21,11 +21,6 @@ namespace ScraperFramework.Data.Concrete
 
         public void Insert(SearchTarget searchTarget)
         {
-            if (searchTarget == null)
-            {
-                throw new ArgumentNullException(nameof(searchTarget));
-            }
-
             using (Transaction transaction = _engine.GetTransaction())
             {
                 bool newEntity = searchTarget.ID == 0;

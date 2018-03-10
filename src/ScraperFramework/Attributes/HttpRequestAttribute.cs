@@ -2,7 +2,7 @@
 
 namespace ScraperFramework.Attributes
 {
-    class CommandAttribute : Attribute
+    class HttpRequestAttribute : Attribute
     {
         private static readonly string[] _supportedMethods = new[]
         {
@@ -17,7 +17,7 @@ namespace ScraperFramework.Attributes
 
         public string Template { get; private set; }
 
-        public CommandAttribute(string httpMethod, string template)
+        public HttpRequestAttribute(string httpMethod, string template)
         {
             if (httpMethod == null)
             {

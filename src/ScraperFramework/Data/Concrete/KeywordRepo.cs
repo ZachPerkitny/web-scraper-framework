@@ -21,11 +21,6 @@ namespace ScraperFramework.Data.Concrete
 
         public void Insert(string keyword)
         {
-            if (string.IsNullOrEmpty(keyword))
-            {
-                throw new ArgumentException(nameof(keyword));
-            }
-
             using (Transaction transaction = _engine.GetTransaction())
             {
                 Keyword entity = new Keyword

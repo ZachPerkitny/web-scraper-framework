@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScraperFramework", "src\Scr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Driver", "src\Driver\Driver.csproj", "{0B4D3909-E47C-426D-8C3A-A1541C5BA080}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScraper", "src\Scraper\WebScraper.csproj", "{438C12D7-A57A-420C-980D-E8107EF89CEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebScraper", "src\Scraper\WebScraper.csproj", "{438C12D7-A57A-420C-980D-E8107EF89CEF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestAPI", "src\RestAPI\RestAPI.csproj", "{1C22BCE9-8AB8-478A-877D-F0E208ECD265}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{438C12D7-A57A-420C-980D-E8107EF89CEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{438C12D7-A57A-420C-980D-E8107EF89CEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{438C12D7-A57A-420C-980D-E8107EF89CEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C22BCE9-8AB8-478A-877D-F0E208ECD265}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C22BCE9-8AB8-478A-877D-F0E208ECD265}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C22BCE9-8AB8-478A-877D-F0E208ECD265}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C22BCE9-8AB8-478A-877D-F0E208ECD265}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
