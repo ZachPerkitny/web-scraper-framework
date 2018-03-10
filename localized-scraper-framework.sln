@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScraperFramework", "ScraperFramework\ScraperFramework.csproj", "{A841E1FD-D468-49BF-84C9-C185C278C561}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScraperFramework", "src\ScraperFramework\ScraperFramework.csproj", "{A841E1FD-D468-49BF-84C9-C185C278C561}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Driver", "Driver\Driver.csproj", "{0B4D3909-E47C-426D-8C3A-A1541C5BA080}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Driver", "src\Driver\Driver.csproj", "{0B4D3909-E47C-426D-8C3A-A1541C5BA080}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScraper", "Scraper\WebScraper.csproj", "{438C12D7-A57A-420C-980D-E8107EF89CEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScraper", "src\Scraper\WebScraper.csproj", "{438C12D7-A57A-420C-980D-E8107EF89CEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

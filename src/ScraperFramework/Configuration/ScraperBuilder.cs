@@ -1,6 +1,14 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading;
+using DBreeze;
 using Unity;
+using Unity.Injection;
+using Unity.Lifetime;
+using ScraperFramework.Data;
+using ScraperFramework.Data.Concrete;
+using ScraperFramework.Services;
+using ScraperFramework.Services.Concrete;
 
 namespace ScraperFramework.Configuration
 {
@@ -24,7 +32,15 @@ namespace ScraperFramework.Configuration
             Container
                 .RegisterInstance(_config)
                 .RegisterInstance(new CancellationTokenSource())
-                .RegisterType<ICommandListener, CommandListener>()
+                .RegisterInstance<DBreezeEngine>(new DBreezeEngine(_config.DBreezeDataFolderName), new ContainerControlledLifetimeManager())
+                .RegisterMediator(new HierarchicalLifetimeManager())
+                .RegisterMediatorHandlers(Assembly.GetExecutingAssembly())
+                .RegisterType<ICrawlLogRepo, CrawlLogRepo>()
+                .RegisterType<IKeywordRepo, KeywordRepo>()
+                .RegisterType<ISearchTargetRepo, SearchTargetRepo>()
+                .RegisterType<IKeywordSearchTargetService, KeywordSearchTargetService>()
+                .RegisterType<IHttpRequestHandler, CommandListener>()
+                .RegisterType<IHttpServer, HttpServer>()
                 .RegisterType<IController, Controller>();
 
             return Container.Resolve<IController>();

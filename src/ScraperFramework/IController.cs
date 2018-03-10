@@ -2,15 +2,11 @@
 
 namespace ScraperFramework
 {
-    public interface IController
+    public interface IController : IDisposable
     {
         /// <summary>
         /// 
         /// </summary>
         void Start();
-        /// <summary>
-        /// 
-        /// </summary>
-        void Stop();
     }
 }

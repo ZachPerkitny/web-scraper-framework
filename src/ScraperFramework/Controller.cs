@@ -6,27 +6,42 @@ namespace ScraperFramework
 {
     class Controller : IController
     {
-        private readonly ICommandListener _commandListener;
+        private readonly IHttpServer _httpServer;
         private readonly CancellationTokenSource _cancellationTokenSource;
+        private bool _disposed = false;
 
-        public Controller(ICommandListener commandListener, CancellationTokenSource cancellationTokenSource)
+        public Controller(IHttpServer httpServer, CancellationTokenSource cancellationTokenSource)
         {
-            _commandListener = commandListener ?? throw new ArgumentNullException(nameof(commandListener));
+            _httpServer = httpServer ?? throw new ArgumentNullException(nameof(httpServer));
             _cancellationTokenSource = cancellationTokenSource ?? throw new ArgumentNullException(nameof(cancellationTokenSource));
         }
 
         public void Start()
         {
             Log.Information("Starting Command Listener");
-            _commandListener.Listen(new string[]
+            _httpServer.Listen(new string[]
             {
-                "http://*:8080/"
+                "http://localhost:5000/"
             }, _cancellationTokenSource.Token);
         }
 
-        public void Stop()
+        protected virtual void Dispose(bool disposing)
         {
-            _cancellationTokenSource.Cancel();
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _cancellationTokenSource.Cancel();
+                    _httpServer.Dispose();
+                }
+
+                _disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
     }
 }

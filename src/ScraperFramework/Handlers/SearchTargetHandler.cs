@@ -6,7 +6,6 @@ using ScraperFramework.Data.Entities;
 using ScraperFramework.Services;
 using MediatR;
 
-
 namespace ScraperFramework.Handlers
 {
     class SearchTargetRequest : IRequest<IEnumerable<SearchTarget>> { }

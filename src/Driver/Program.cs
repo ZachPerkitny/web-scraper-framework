@@ -21,15 +21,14 @@ namespace Driver
 
             var scraperBuilder = new ScraperBuilder(config =>
             {
-
+                config.DBreezeDataFolderName = @"C:\Users\Mr Zach\Documents\dbreeze";
             });
 
             IController controller = scraperBuilder.Build();
-
             controller.Start();
 
             Console.ReadLine();
-            controller.Stop();
+            controller.Dispose();
             Console.ReadLine();
         }
 

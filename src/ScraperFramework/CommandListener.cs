@@ -1,57 +1,83 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
-using System.Threading;
+using System.Reflection;
 using System.Threading.Tasks;
-using Serilog;
+using MediatR;
 using ScraperFramework.Attributes;
+using ScraperFramework.Data.Entities;
+using ScraperFramework.Exceptions;
+using ScraperFramework.Handlers;
 
 namespace ScraperFramework
 {
-    class CommandListener : ICommandListener
+    class CommandListener : IHttpRequestHandler
     {
-        private readonly HttpListener _httpListener;
-        private Task _listenerTask;
+        private readonly IMediator _mediator;
 
-        public CommandListener()
+        public CommandListener(IMediator mediator)
         {
-            _httpListener = new HttpListener();
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        public void Listen(string[] prefixes, CancellationToken cancelToken)
+        public async Task<object> Execute(HttpListenerRequest listenerRequest)
         {
-            if (prefixes == null || prefixes.Length == 0)
-            {
-                throw new ArgumentException("URL Prefixes are Required");
-            }
+            string template = listenerRequest.Url.Segments[1].Replace("/", "");
 
-            foreach (string prefix in prefixes)
+            MethodInfo method = GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
+            .Where(m => m.ReturnType.GetGenericTypeDefinition() == typeof(Task<>) && m.GetCustomAttributes().Any(attr =>
             {
-                _httpListener.Prefixes.Add(prefix);
-            }
+                return attr is CommandAttribute &&
+                    ((CommandAttribute)attr).HttpMethod == listenerRequest.HttpMethod &&
+                    ((CommandAttribute)attr).Template == template;
+            }))
+            .FirstOrDefault();
 
-            _httpListener.Start();
-            _listenerTask = Task.Factory.StartNew(async () =>
+            if (method != null)
             {
-                while (!cancelToken.IsCancellationRequested)
+                string[] strParameters = listenerRequest.Url.Segments
+                    .Skip(2).Select(p => p.Replace("/", "")).ToArray();
+
+                if (strParameters.Length != method.GetParameters().Length)
                 {
-                    Log.Information("Command Listener Waiting For Requests");
-                    HttpListenerContext ctx = await _httpListener.GetContextAsync();
-                    
-                    HttpListenerRequest request = ctx.Request;
-                    Log.Information("Command Listener Recieved Request {0} {1}", request.HttpMethod, request.Url.Segments[1]);
-
-                    string httpMethod = request.Url.Segments[1];
-
-                    Log.Information(httpMethod);
-
+                    throw new BadRequest("Expected {0} Parameters, Got {1}.", 
+                        method.GetParameters().Length, strParameters.Length);
                 }
-            }, TaskCreationOptions.LongRunning);
+
+                object[] parameters = method.GetParameters()
+                    .Select((p, i) => Convert.ChangeType(strParameters[i], p.ParameterType))
+                    .ToArray();
+
+                try
+                {
+                    Task task = (Task) method.Invoke(this, parameters);
+                    await task;
+                    return (object)((dynamic) task).Result;
+                }
+                catch (Exception)
+                {
+                    throw new InternalServerError();
+                }
+            }
+            else
+            {
+                throw new NotFound();
+            }
         }
 
-        [Command("GET", "/stats")]
-        private void GetStats()
+        [Command("GET", "keyword")]
+        private Task<Keyword> GetKeyword(int id)
         {
-            Log.Information("Getting Stats");
+            return _mediator.Send(new GetKeywordRequest
+            {
+                ID = id
+            });
+        }
+
+        [Command("POST", "keyword")]
+        private Task PostKeyword()
+        {
+
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace ScraperFramework
 {
-    public interface ICommandListener
+    public interface IHttpServer : IDisposable
     {
         /// <summary>
         /// 
