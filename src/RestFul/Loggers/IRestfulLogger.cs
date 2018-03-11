@@ -1,6 +1,6 @@
 ﻿namespace RestFul.Loggers
 {
-    public interface IRestfulLogger
+    public interface IRestFulLogger
     {
         /// <summary>
         /// 

@@ -1,33 +1,34 @@
 ﻿using System;
 using RestFul.Enum;
 using RestFul.Loggers;
+using RestFul.Serializer;
 
-namespace RestFul
+namespace RestFul.Configuration
 {
     public class RestFulSettings : IRestFulSettings
     {
-        public int ConcurrentRequests { get; private set; }
-
         public string Host { get; private set; }
+
+        public IRestFulLogger Logger { get; private set; }
 
         public int Port { get; private set; }
 
-        public bool UseHTTPs { get; private set; }
+        public ISerializer Serializer { get; private set; }
 
-        public IRestfulLogger Logger { get; private set; }
+        public bool UseHTTPs { get; private set; }  
 
         public RestFulSettings()
         {
-            ConcurrentRequests = Environment.ProcessorCount * 1;
             Host = "localhost";
             Logger = new NullLogger();
             Port = 8000;
+            Serializer = new JsonSerializer();
             UseHTTPs = false;
         }
 
-        public IRestFulSettings WithConcurrentRequests(int count)
+        public IRestFulSettings WithConsoleLogger(LogLevel logLevel)
         {
-            ConcurrentRequests = Environment.ProcessorCount * count;
+            Logger = new ConsoleLogger(logLevel);
             return this;
         }
 
@@ -43,13 +44,7 @@ namespace RestFul
             return this;
         }
 
-        public IRestFulSettings WithConsoleLogger(LogLevel logLevel)
-        {
-            Logger = new ConsoleLogger(logLevel);
-            return this;
-        }
-
-        public IRestFulSettings WithLogger(IRestfulLogger logger)
+        public IRestFulSettings WithLogger(IRestFulLogger logger)
         {
             Logger = logger;
             return this;
@@ -58,6 +53,12 @@ namespace RestFul
         public IRestFulSettings WithPort(int port)
         {
             Port = port;
+            return this;
+        }
+
+        public IRestFulSettings WithSerializer(ISerializer serializer)
+        {
+            Serializer = serializer;
             return this;
         }
     }

@@ -3,7 +3,7 @@ using RestFul.Enum;
 
 namespace RestFul.Loggers
 {
-    class ConsoleLogger : IRestfulLogger
+    class ConsoleLogger : IRestFulLogger
     {
         public LogLevel MinimumLogLevel { get; set; }
 

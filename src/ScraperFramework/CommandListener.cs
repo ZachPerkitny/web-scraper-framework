@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MediatR;
 using RestFul.Attributes;
 using RestFul.Enum;
+using RestFul.Http;
 using ScraperFramework.Data.Entities;
 using ScraperFramework.Handlers;
 
@@ -19,21 +20,15 @@ namespace ScraperFramework
         }
 
         [RestRoute(HttpMethod = HttpMethod.GET, Path = "/keywords")]
-        public Task<Keyword> GetKeyword(int id)
+        public Task GetKeyword(IHttpContext context)
         {
-            return _mediator.Send(new GetKeywordRequest
-            {
-                ID = id
-            });
+            return Task.FromResult(5);
         }
 
         [RestRoute(HttpMethod = HttpMethod.POST, Path = "/keywords")]
-        public Task PostKeyword()
+        public Task PostKeyword(IHttpContext context)
         {
-            return _mediator.Send(new PostKeywordRequest
-            {
-
-            });
+            return Task.FromResult(5);
         }
     }
 }

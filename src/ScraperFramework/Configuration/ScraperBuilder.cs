@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Threading;
 using DBreeze;
 using RestFul;
+using Restful.Serilog;
+using Serilog;
 using Unity;
 using Unity.Lifetime;
 using ScraperFramework.Data;
@@ -33,8 +35,8 @@ namespace ScraperFramework.Configuration
                 .RegisterInstance(_config)
                 .RegisterInstance(new CancellationTokenSource())
                 .RegisterInstance(new DBreezeEngine(_config.DBreezeDataFolderName), new ContainerControlledLifetimeManager())
-                .RegisterInstance<IRestFulServer>(new RestFulServer((settings) => 
-                    settings.WithConcurrentRequests(4).WithConsoleLogger()))
+                .RegisterInstance(RestFulServer.Create((settings)
+                    => settings.WithConcurrentRequests(4).WithLogger(new SerilogLogger(Log.Logger))))
                 .RegisterMediator(new HierarchicalLifetimeManager())
                 .RegisterMediatorHandlers(Assembly.GetExecutingAssembly())
                 .RegisterType<ICrawlLogRepo, CrawlLogRepo>()

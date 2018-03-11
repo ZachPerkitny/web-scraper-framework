@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Restful.Serilog\Restful.Serilog.csproj" />
     <ProjectReference Include="..\RestFul\RestFul.csproj" />
   </ItemGroup>
 

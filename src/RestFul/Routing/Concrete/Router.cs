@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using RestFul.Attributes;
+using RestFul.Exceptions;
 using RestFul.Extensions;
 using RestFul.Http;
 using RestFul.Loggers;
@@ -15,7 +16,7 @@ namespace RestFul.Routing.Concrete
 
         public HashSet<IRoute> Routes { get; private set; }
 
-        private readonly IRestfulLogger _logger;
+        private readonly IRestFulLogger _logger;
 
         static Router()
         {
@@ -26,7 +27,7 @@ namespace RestFul.Routing.Concrete
             }
         }
 
-        public Router(IRestfulLogger logger)
+        public Router(IRestFulLogger logger)
         {
             _logger = logger;
             Routes = new HashSet<IRoute>();
@@ -34,18 +35,13 @@ namespace RestFul.Routing.Concrete
 
         public void Route(IHttpContext httpContext)
         {
-            List<IRoute> toExecute = GetRoutesForContext(httpContext);
-
-            if (toExecute.Count == 0)
+            IRoute route = GetRouteForContext(httpContext);
+            if (route == null)
             {
-
-                return;
+                throw new APIException("Not Found", Enum.HttpStatusCode.NotFound);
             }
 
-            foreach (var route in toExecute)
-            {
-
-            }
+            route.Invoke(httpContext);
         }
 
         public void ScanAssemblies()
@@ -78,13 +74,16 @@ namespace RestFul.Routing.Concrete
             {
                 _logger.Debug("Registering Route {0} {1}", routeAttr.HttpMethod, routeAttr.Path);
                 Route route = new Route(method, routeAttr.HttpMethod, routeAttr.Path);
-                Routes.Add(route);
+                if (!Routes.Add(route))
+                {
+                    throw new DuplicateRouteException("Duplicate Route {0}", route);
+                }
             }
         }
 
-        public List<IRoute> GetRoutesForContext(IHttpContext httpContext)
+        public IRoute GetRouteForContext(IHttpContext httpContext)
         {
-            return Routes.Where(route => route.Matches(httpContext)).ToList();
+            return Routes.FirstOrDefault(route => route.Matches(httpContext));
         }
     }
 }

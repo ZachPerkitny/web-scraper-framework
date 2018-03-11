@@ -18,6 +18,11 @@ namespace RestFul.Routing
         /// <summary>
         /// 
         /// </summary>
+        void Invoke(IHttpContext httpContext);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         bool Matches(IHttpContext httpContext);
     }

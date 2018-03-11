@@ -46,6 +46,6 @@ namespace RestFul.Routing
         /// </summary>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-        List<IRoute> GetRoutesForContext(IHttpContext httpContext);
+        IRoute GetRouteForContext(IHttpContext httpContext);
     }
 }

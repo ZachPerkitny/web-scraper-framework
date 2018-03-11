@@ -9,6 +9,19 @@ namespace RestFul.Http.Concrete
 {
     class HttpRequest : IHttpRequest
     {
+        public string Path { get; private set; }
+
+        private readonly HttpListenerRequest _httpListenerRequest;
+        private string _data;
+        private bool _convertedHttpMethod;
+        private HttpMethod _httpMethod;
+
+        public HttpRequest(HttpListenerRequest httpListenerRequest)
+        {
+            _httpListenerRequest = httpListenerRequest;
+            Path = httpListenerRequest.RawUrl.Split(new[] { '?' }, 2)[0];
+        }
+
         public string[] AcceptTypes
         {
             get { return _httpListenerRequest.AcceptTypes; }
@@ -85,19 +98,6 @@ namespace RestFul.Http.Concrete
         public Stream InputStream
         {
             get { return _httpListenerRequest.InputStream; }
-        }
-
-        public string Path { get; private set; }
-
-        private readonly HttpListenerRequest _httpListenerRequest;
-        private string _data;
-        private bool _convertedHttpMethod;
-        private HttpMethod _httpMethod;
-
-        public HttpRequest(HttpListenerRequest httpListenerRequest)
-        {
-            _httpListenerRequest = httpListenerRequest;
-            Path = httpListenerRequest.RawUrl.Split(new[] { '?' }, 2)[0];
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using RestFul.Enum;
+using RestFul.Extensions;
 using RestFul.Http;
 
 namespace RestFul.Routing.Concrete
@@ -10,13 +12,18 @@ namespace RestFul.Routing.Concrete
 
         public string Path { get; private set; }
 
-        public MethodInfo Method { get; private set; }
+        public Action<IHttpContext> Method { get; private set; }
 
         public Route(MethodInfo method, HttpMethod httpMethod, string path)
         {
-            Method = method;
+            Method = CreateRouteAction(method);
             Path = path;
             HttpMethod = httpMethod;
+        }
+
+        public void Invoke(IHttpContext httpContext)
+        {
+            Method.Invoke(httpContext);
         }
 
         public bool Matches(IHttpContext httpContext)
@@ -51,6 +58,16 @@ namespace RestFul.Routing.Concrete
         public override int GetHashCode()
         {
             return ToString().GetHashCode();
+        }
+
+        private Action<IHttpContext> CreateRouteAction(MethodInfo method)
+        {
+            method.IsValidRoute(true);
+
+            //if (method.IsStatic || method.ReflectedType == null)
+            //{
+                return (Action<IHttpContext>)method.CreateDelegate(typeof(Action<IHttpContext>));
+            //}
         }
     }
 }

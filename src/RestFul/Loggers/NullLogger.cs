@@ -1,6 +1,6 @@
 ﻿namespace RestFul.Loggers
 {
-    class NullLogger : IRestfulLogger
+    class NullLogger : IRestFulLogger
     {
         public void Debug(string format, params object[] args) { }
 

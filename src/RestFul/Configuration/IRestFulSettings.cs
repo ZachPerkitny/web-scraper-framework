@@ -1,15 +1,11 @@
 ﻿using RestFul.Enum;
 using RestFul.Loggers;
+using RestFul.Serializer;
 
-namespace RestFul
+namespace RestFul.Configuration
 {
     public interface IRestFulSettings
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        int ConcurrentRequests { get; }
-
         /// <summary>
         /// 
         /// </summary>
@@ -18,7 +14,7 @@ namespace RestFul
         /// <summary>
         /// 
         /// </summary>
-        IRestfulLogger Logger { get; }
+        IRestFulLogger Logger { get; }
 
         /// <summary>
         /// 
@@ -28,14 +24,18 @@ namespace RestFul
         /// <summary>
         /// 
         /// </summary>
+        ISerializer Serializer { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         bool UseHTTPs { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="count"></param>
         /// <returns></returns>
-        IRestFulSettings WithConcurrentRequests(int count);
+        IRestFulSettings WithConsoleLogger(LogLevel logLevel = LogLevel.Debug);
 
         /// <summary>
         /// 
@@ -48,14 +48,14 @@ namespace RestFul
         /// 
         /// </summary>
         /// <returns></returns>
-        IRestFulSettings WithConsoleLogger(LogLevel logLevel = LogLevel.Debug);
+        IRestFulSettings WithHttps();
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>
-        IRestFulSettings WithLogger(IRestfulLogger logger);
+        IRestFulSettings WithLogger(IRestFulLogger logger);
 
         /// <summary>
         /// 
@@ -67,7 +67,8 @@ namespace RestFul
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="serializer"></param>
         /// <returns></returns>
-        IRestFulSettings WithHttps();
+        IRestFulSettings WithSerializer(ISerializer serializer);
     }
 }

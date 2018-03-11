@@ -8,6 +8,13 @@ namespace RestFul.Http.Concrete
 {
     class HttpResponse : IHttpResponse
     {
+        private readonly HttpListenerResponse _httpListenerResponse;
+
+        public HttpResponse(HttpListenerResponse httpListenerResponse)
+        {
+            _httpListenerResponse = httpListenerResponse;
+        }
+
         public Encoding ContentEncoding {
             get { return _httpListenerResponse.ContentEncoding; }
             set { _httpListenerResponse.ContentEncoding = value; }
@@ -50,13 +57,6 @@ namespace RestFul.Http.Concrete
         public Stream OutputStream
         {
             get { return _httpListenerResponse.OutputStream; }
-        }
-
-        private readonly HttpListenerResponse _httpListenerResponse;
-
-        public HttpResponse(HttpListenerResponse httpListenerResponse)
-        {
-            _httpListenerResponse = httpListenerResponse;
         }
 
         public void Abort()
