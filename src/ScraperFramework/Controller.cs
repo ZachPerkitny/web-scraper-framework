@@ -1,28 +1,26 @@
 ﻿using System;
 using System.Threading;
+using RestFul;
 using Serilog;
 
 namespace ScraperFramework
 {
     class Controller : IController
     {
-        private readonly IHttpServer _httpServer;
+        private readonly IRestFulServer _restFulServer;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private bool _disposed = false;
 
-        public Controller(IHttpServer httpServer, CancellationTokenSource cancellationTokenSource)
+        public Controller(IRestFulServer restFulServer, CancellationTokenSource cancellationTokenSource)
         {
-            _httpServer = httpServer ?? throw new ArgumentNullException(nameof(httpServer));
+            _restFulServer = restFulServer ?? throw new ArgumentNullException(nameof(restFulServer));
             _cancellationTokenSource = cancellationTokenSource ?? throw new ArgumentNullException(nameof(cancellationTokenSource));
         }
 
         public void Start()
         {
-            Log.Information("Starting Command Listener");
-            _httpServer.Listen(new string[]
-            {
-                "http://localhost:5000/"
-            }, _cancellationTokenSource.Token);
+            Log.Information("Starting Rest API");
+            _restFulServer.Start();
         }
 
         protected virtual void Dispose(bool disposing)
@@ -32,7 +30,6 @@ namespace ScraperFramework
                 if (disposing)
                 {
                     _cancellationTokenSource.Cancel();
-                    _httpServer.Dispose();
                 }
 
                 _disposed = true;

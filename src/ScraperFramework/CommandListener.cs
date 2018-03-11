@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
 using MediatR;
-using ScraperFramework.Attributes;
+using RestFul.Attributes;
+using RestFul.Enum;
 using ScraperFramework.Data.Entities;
-using ScraperFramework.Exceptions;
 using ScraperFramework.Handlers;
 
 namespace ScraperFramework
 {
-    class CommandListener : HttpRequestHandler
+    [RestController]
+    class CommandListener
     {
         private readonly IMediator _mediator;
 
@@ -17,22 +18,17 @@ namespace ScraperFramework
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
-        [HttpRequest("GET", "keyword")]
-        private Task<Keyword> GetKeyword(int id)
+        [RestRoute(HttpMethod = HttpMethod.GET, Path = "/keywords")]
+        public Task<Keyword> GetKeyword(int id)
         {
-            if (id < 0)
-            {
-                throw new BadRequest("Invalid ID.");
-            }
-
             return _mediator.Send(new GetKeywordRequest
             {
                 ID = id
             });
         }
 
-        [HttpRequest("POST", "keyword")]
-        private Task PostKeyword()
+        [RestRoute(HttpMethod = HttpMethod.POST, Path = "/keywords")]
+        public Task PostKeyword()
         {
             return _mediator.Send(new PostKeywordRequest
             {

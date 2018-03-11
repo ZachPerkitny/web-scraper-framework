@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Driver", "src\Driver\Driver
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebScraper", "src\Scraper\WebScraper.csproj", "{438C12D7-A57A-420C-980D-E8107EF89CEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestAPI", "src\RestAPI\RestAPI.csproj", "{1C22BCE9-8AB8-478A-877D-F0E208ECD265}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestFul", "src\RestFul\RestFul.csproj", "{1C22BCE9-8AB8-478A-877D-F0E208ECD265}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

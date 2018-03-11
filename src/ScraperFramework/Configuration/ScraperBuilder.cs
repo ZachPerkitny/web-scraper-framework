@@ -2,8 +2,8 @@
 using System.Reflection;
 using System.Threading;
 using DBreeze;
+using RestFul;
 using Unity;
-using Unity.Injection;
 using Unity.Lifetime;
 using ScraperFramework.Data;
 using ScraperFramework.Data.Concrete;
@@ -32,15 +32,16 @@ namespace ScraperFramework.Configuration
             Container
                 .RegisterInstance(_config)
                 .RegisterInstance(new CancellationTokenSource())
-                .RegisterInstance<DBreezeEngine>(new DBreezeEngine(_config.DBreezeDataFolderName), new ContainerControlledLifetimeManager())
+                .RegisterInstance(new DBreezeEngine(_config.DBreezeDataFolderName), new ContainerControlledLifetimeManager())
+                .RegisterInstance<IRestFulServer>(new RestFulServer((settings) => 
+                    settings.WithConcurrentRequests(4).WithConsoleLogger()))
                 .RegisterMediator(new HierarchicalLifetimeManager())
                 .RegisterMediatorHandlers(Assembly.GetExecutingAssembly())
                 .RegisterType<ICrawlLogRepo, CrawlLogRepo>()
                 .RegisterType<IKeywordRepo, KeywordRepo>()
                 .RegisterType<ISearchTargetRepo, SearchTargetRepo>()
                 .RegisterType<IKeywordSearchTargetService, KeywordSearchTargetService>()
-                .RegisterType<IHttpRequestHandler, CommandListener>()
-                .RegisterType<IHttpServer, HttpServer>()
+                .RegisterType<CommandListener>()
                 .RegisterType<IController, Controller>();
 
             return Container.Resolve<IController>();
