@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebScraper", "src\Scraper\W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestFul", "src\RestFul\RestFul.csproj", "{1C22BCE9-8AB8-478A-877D-F0E208ECD265}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restful.Serilog", "Restful.Serilog\Restful.Serilog.csproj", "{49476814-C554-44E9-A941-0FA4BAAA5CB3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restful.Serilog", "src\Restful.Serilog\Restful.Serilog.csproj", "{49476814-C554-44E9-A941-0FA4BAAA5CB3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
