@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace ScraperFramework.Data
 {
-    internal static class DBreezeConfig
+    internal static class DBreezeInitialization
     {
         /// <summary>
         /// Indicates whether DBreeze has been configured.

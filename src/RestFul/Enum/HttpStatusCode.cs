@@ -139,10 +139,190 @@
         /// </summary>
         NotFound = 404,
 
+        /// <summary>
+        /// 
+        /// </summary>
+        MethodNotAllowed = 405,
 
         /// <summary>
         /// 
         /// </summary>
-        InternalServerError = 500
+        NotAcceptable = 406,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ProxyAuthenticationRequired = 407,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        RequestTimeout = 408,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Conflict = 409,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Gone = 410,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        LengthRequired = 411,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        PreconditionFailed = 412,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        PayloadTooLarge = 413,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        RequestUriTooLong = 414,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        UnsupportedMediaType = 415,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        RequestedRangeNotSatisfiable = 416,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ExpectationFailed = 417,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ImATeapot = 418,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        MisdirectedRequest = 421,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        UnprocessableEntity = 422,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Locked = 423,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        FailedDependency = 424,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        UpgradeRequired = 426,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        PreconditionRequired = 428,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        TooManyRequests = 429,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        RequestHeaderFieldsTooLarge = 431,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ConnectionClosedWithoutResponse = 444,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        UnavailableForLegalReasons = 451,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ClientClosedRequest = 499,
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        InternalServerError = 500,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        NotImplemented = 501,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        BadGateway = 502,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ServiceUnavailable = 503,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        GatewayTimeout = 504,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        HttpVersionNotSupported = 505,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        VariantAlsoNegotiates = 506,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        InsufficientStorage = 507,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        LoopDetected = 508,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        NotExtended = 510,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        NetworkAuthenticationRequired = 511,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        NetworkConnectTimeoutError = 599
     }
 }

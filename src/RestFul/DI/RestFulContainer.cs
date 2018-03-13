@@ -83,9 +83,8 @@ namespace RestFul.DI
                         .Select(p =>
                         {
                             return typeof(RestFulContainer)
-                                .GetMethod("Resolve", new Type[0])
-                                .MakeGenericMethod(p.ParameterType)
-                                .Invoke(this, new object[0]);
+                                .GetMethod("Resolve", new Type[] { typeof(Type) })
+                                .Invoke(this, new object[] { p.ParameterType });
                         })
                         .ToArray();
 
