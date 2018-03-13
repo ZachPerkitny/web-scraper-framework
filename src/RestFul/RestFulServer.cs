@@ -4,10 +4,8 @@ using RestFul.Configuration;
 using RestFul.Enum;
 using RestFul.Exceptions;
 using RestFul.Http;
-using RestFul.Http.Concrete;
 using RestFul.Loggers;
 using RestFul.Routing;
-using RestFul.Routing.Concrete;
 using RestFul.Serializer;
 
 namespace RestFul
@@ -28,14 +26,8 @@ namespace RestFul
         private bool _starting;
         private Task _httpListenerTask;
 
-        public static IRestFulServer Create(Action<IRestFulSettings> configure)
-        {
-            IRestFulSettings settings = new RestFulSettings();
-            configure?.Invoke(settings);
-            return new RestFulServer(settings);
-        }
-
-        public RestFulServer(IRestFulSettings settings)
+        public RestFulServer(IRestFulSettings settings, IRestFulLogger logger, ISerializer serializer,
+            IHttpListener httpListener, IRouter router)
         {
             _uriBuilder = new UriBuilder
             {
@@ -44,10 +36,10 @@ namespace RestFul
                 Scheme = (settings.UseHTTPs) ? "https" : "http"
             };
 
-            _logger = settings.Logger;
-            _serializer = settings.Serializer;
-            _httpListener = new HttpListener();
-            _router = new Router(_logger);
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            _httpListener = httpListener ?? throw new ArgumentNullException(nameof(httpListener));
+            _router = router ?? throw new ArgumentNullException(nameof(router));
         }
 
         public void Start()

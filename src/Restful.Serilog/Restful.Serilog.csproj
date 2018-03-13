@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\RestFul\RestFul.csproj" />
+    <ProjectReference Include="..\RestFul\RestFul.csproj" />
   </ItemGroup>
 
 </Project>

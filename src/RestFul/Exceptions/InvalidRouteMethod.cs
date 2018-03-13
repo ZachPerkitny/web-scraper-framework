@@ -2,12 +2,15 @@
 
 namespace RestFul.Exceptions
 {
-    class InvalidRouteMethod : Exception
+    class InvalidRouteMethod : RestFulException
     {
         public InvalidRouteMethod(string message)
             : base(message) { }
 
         public InvalidRouteMethod(string format, params object[] args)
-            : this(string.Format(format, args)) { }
+            : base(format, args) { }
+
+        public InvalidRouteMethod(string message, Exception innerException)
+            : base(message, innerException) { }
     }
 }

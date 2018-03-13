@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using RestFul.DI;
 using RestFul.Enum;
 using RestFul.Extensions;
 using RestFul.Http;
@@ -14,11 +15,14 @@ namespace RestFul.Routing.Concrete
 
         public Action<IHttpContext> Method { get; private set; }
 
-        public Route(MethodInfo method, HttpMethod httpMethod, string path)
+        private readonly IContainer _container;
+
+        public Route(MethodInfo method, HttpMethod httpMethod, string path, IContainer container)
         {
             Method = CreateRouteAction(method);
             Path = path;
             HttpMethod = httpMethod;
+            _container = container;
         }
 
         public void Invoke(IHttpContext httpContext)
@@ -62,12 +66,8 @@ namespace RestFul.Routing.Concrete
 
         private Action<IHttpContext> CreateRouteAction(MethodInfo method)
         {
-            method.IsValidRoute(true);
-
-            //if (method.IsStatic || method.ReflectedType == null)
-            //{
-                return (Action<IHttpContext>)method.CreateDelegate(typeof(Action<IHttpContext>));
-            //}
+            //method.IsValidRoute(true);
+            throw new NotImplementedException();
         }
     }
 }

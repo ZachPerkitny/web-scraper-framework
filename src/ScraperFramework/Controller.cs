@@ -2,18 +2,21 @@
 using System.Threading;
 using RestFul;
 using Serilog;
+using ScraperFramework.Configuration;
 
 namespace ScraperFramework
 {
     class Controller : IController
     {
         private readonly IRestFulServer _restFulServer;
+        private readonly ScraperConfig _config;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private bool _disposed = false;
 
-        public Controller(IRestFulServer restFulServer, CancellationTokenSource cancellationTokenSource)
+        public Controller(IRestFulServer restFulServer, ScraperConfig config, CancellationTokenSource cancellationTokenSource)
         {
             _restFulServer = restFulServer ?? throw new ArgumentNullException(nameof(restFulServer));
+            _config = config;
             _cancellationTokenSource = cancellationTokenSource ?? throw new ArgumentNullException(nameof(cancellationTokenSource));
         }
 
