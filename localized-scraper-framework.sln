@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScraperFramework", "src\Scr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Driver", "src\Driver\Driver.csproj", "{0B4D3909-E47C-426D-8C3A-A1541C5BA080}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebScraper", "src\Scraper\WebScraper.csproj", "{438C12D7-A57A-420C-980D-E8107EF89CEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebScraper", "src\WebScraper\WebScraper.csproj", "{438C12D7-A57A-420C-980D-E8107EF89CEF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestFul", "src\RestFul\RestFul.csproj", "{1C22BCE9-8AB8-478A-877D-F0E208ECD265}"
 EndProject

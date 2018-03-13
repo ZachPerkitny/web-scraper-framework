@@ -17,6 +17,7 @@ namespace ScraperFramework.Data.Concrete
         public SearchTargetRepo(DBreezeEngine engine)
         {
             _engine = engine ?? throw new ArgumentNullException(nameof(engine));
+            DBreezeConfig.SetupUtils();
         }
 
         public void Insert(SearchTarget searchTarget)
@@ -94,8 +95,12 @@ namespace ScraperFramework.Data.Concrete
                 foreach (var row in rows)
                 {
                     DBreezeObject<SearchTarget> obj = row.ObjectGet<SearchTarget>();
-                    SearchTarget entity = obj.Entity;
-                    entities.Add(entity);
+
+                    if (obj != null)
+                    {
+                        SearchTarget entity = obj.Entity;
+                        entities.Add(entity);
+                    } 
                 }
 
                 return entities;

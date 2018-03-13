@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using RestFul.Configuration;
 using RestFul.Enum;
-using RestFul.Exceptions;
 using RestFul.Http;
 using RestFul.Loggers;
 using RestFul.Result;
@@ -67,20 +66,12 @@ namespace RestFul
                     while (IsListening)
                     {
                         HttpContext context = await _httpListener.GetContextAsync();
+                        _logger.Information("Received Request {0} {1}", context.Request.HttpMethod,
+                            context.Request.Path);
                         try
                         {
                             IResult result = _router.Route(context);
                             result.Execute(context);
-                        }
-                        catch (APIException ex)
-                        {
-                            context.Response.StatusCode = ex.StatusCode;
-                            byte[] response = _serializer.Serialize(new
-                            {
-                                ex.Detail,
-                                ex.StatusCode
-                            });
-                            context.Response.SendResponse(response);
                         }
                         catch (Exception)
                         {

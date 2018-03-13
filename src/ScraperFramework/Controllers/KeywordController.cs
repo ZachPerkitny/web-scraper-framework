@@ -30,7 +30,25 @@ namespace ScraperFramework.Controllers
         [RestRoute(HttpMethod = HttpMethod.POST)]
         public IResult PostKeyword(HttpContext context)
         {
-            return new RedirectResult("http://localhost:8000/keywords-5");
+            if (!context.Request.HasEntityBody)
+            {
+                return new EmptyResult(HttpStatusCode.BadRequest);
+            }
+
+            IEnumerable<string> keywords = null;
+            try
+            {
+                keywords = context.Serializer.Deserialize<IEnumerable<string>>(
+                    context.Request.DataBody);
+            }
+            catch(Exception)
+            {
+                return new EmptyResult(HttpStatusCode.BadRequest);
+            }
+
+            _keywordRepo.InsertMany(keywords);
+
+            return new EmptyResult(HttpStatusCode.NoContent);
         }
     }
 }

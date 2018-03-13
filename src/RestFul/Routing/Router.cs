@@ -4,13 +4,14 @@ using System.Linq;
 using System.Reflection;
 using RestFul.Attributes;
 using RestFul.DI;
+using RestFul.Enum;
 using RestFul.Exceptions;
 using RestFul.Extensions;
 using RestFul.Http;
 using RestFul.Loggers;
 using RestFul.Result;
 
-namespace RestFul.Routing.Concrete
+namespace RestFul.Routing
 {
     class Router : IRouter
     {
@@ -42,7 +43,7 @@ namespace RestFul.Routing.Concrete
             IRoute route = GetRouteForContext(httpContext);
             if (route == null)
             {
-                throw new APIException("Not Found", Enum.HttpStatusCode.NotFound);
+                return new EmptyResult(HttpStatusCode.NotFound);
             }
 
             return route.Invoke(httpContext);

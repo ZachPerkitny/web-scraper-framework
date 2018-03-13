@@ -3,7 +3,7 @@
 namespace RestFul.Exceptions
 {
     /// <summary>
-    /// 
+    /// Base RestFul Exception
     /// </summary>
     public class RestFulException : Exception
     {

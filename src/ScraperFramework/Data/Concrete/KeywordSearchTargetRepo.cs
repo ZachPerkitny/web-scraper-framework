@@ -17,6 +17,7 @@ namespace ScraperFramework.Data.Concrete
         public KeywordSearchTargetRepo(DBreezeEngine engine)
         {
             _engine = engine ?? throw new ArgumentNullException(nameof(engine));
+            DBreezeConfig.SetupUtils();
         }
 
         public void Insert(KeywordSearchTarget keywordSearchTarget)

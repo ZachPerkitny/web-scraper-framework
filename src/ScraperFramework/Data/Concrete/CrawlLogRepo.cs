@@ -17,6 +17,7 @@ namespace ScraperFramework.Data.Concrete
         public CrawlLogRepo(DBreezeEngine engine)
         {
             _engine = engine ?? throw new ArgumentNullException(nameof(engine));
+            DBreezeConfig.SetupUtils();
         }
 
         public void Insert(CrawlLog log)

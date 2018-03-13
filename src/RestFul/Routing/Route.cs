@@ -6,7 +6,7 @@ using RestFul.Extensions;
 using RestFul.Http;
 using RestFul.Result;
 
-namespace RestFul.Routing.Concrete
+namespace RestFul.Routing
 {
     class Route : IRoute
     {

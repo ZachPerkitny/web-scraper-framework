@@ -2,7 +2,6 @@
 using RestFul.Http;
 using RestFul.Loggers;
 using RestFul.Routing;
-using RestFul.Routing.Concrete;
 using RestFul.Serializer;
 
 namespace RestFul.Configuration

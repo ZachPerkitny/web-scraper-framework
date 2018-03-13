@@ -17,6 +17,7 @@ namespace ScraperFramework.Data.Concrete
         public KeywordRepo(DBreezeEngine engine)
         {
             _engine = engine ?? throw new ArgumentNullException(nameof(engine));
+            DBreezeConfig.SetupUtils();
         }
 
         public void Insert(string keyword)
@@ -50,7 +51,33 @@ namespace ScraperFramework.Data.Concrete
 
         public void InsertMany(IEnumerable<string> keywords)
         {
-            throw new NotImplementedException();
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                foreach (string keyword in keywords)
+                {
+                    Keyword entity = new Keyword
+                    {
+                        ID = transaction.ObjectGetNewIdentity<int>(_table),
+                        Value = keyword
+                    };
+
+                    // TODO(zvp): this is not dry
+                    transaction.ObjectInsert(_table, new DBreezeObject<Keyword>
+                    {
+                        NewEntity = true,
+                        Entity = entity,
+                        Indexes = new List<DBreezeIndex>
+                        {
+                            new DBreezeIndex(1, entity.ID)
+                            {
+                                PrimaryIndex = true
+                            }
+                        }
+                    });
+                }
+
+                transaction.Commit();
+            }
         }
 
         public Keyword Select(int keywordID)
@@ -80,8 +107,11 @@ namespace ScraperFramework.Data.Concrete
                 foreach (var row in rows)
                 {
                     DBreezeObject<Keyword> obj = row.ObjectGet<Keyword>();
-                    Keyword entity = obj.Entity;
-                    entities.Add(entity);
+                    if (obj != null)
+                    {
+                        Keyword entity = obj.Entity;
+                        entities.Add(entity);
+                    } 
                 }
 
                 return entities;
@@ -93,7 +123,7 @@ namespace ScraperFramework.Data.Concrete
             using (Transaction transaction = _engine.GetTransaction())
             {
                 transaction
-                    .RemoveKey<byte[]>(_table, 1.ToIndex(keywordID));
+                    .RemoveKey(_table, 1.ToIndex(keywordID));
 
                 transaction.Commit();
             }
