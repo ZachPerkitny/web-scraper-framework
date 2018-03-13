@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using RestFul.Http;
+using RestFul.Result;
 
 namespace RestFul.Routing
 {
@@ -17,7 +18,7 @@ namespace RestFul.Routing
         /// context
         /// </summary>
         /// <param name="httpContext"></param>
-        void Route(IHttpContext httpContext);
+        IResult Route(IHttpContext httpContext);
 
         /// <summary>
         /// 
@@ -39,7 +40,7 @@ namespace RestFul.Routing
         /// 
         /// </summary>
         /// <param name="method"></param>
-        void Register(MethodInfo method);
+        void Register(MethodInfo method, string basePath);
 
         /// <summary>
         /// 

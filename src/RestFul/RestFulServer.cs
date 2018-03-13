@@ -5,6 +5,7 @@ using RestFul.Enum;
 using RestFul.Exceptions;
 using RestFul.Http;
 using RestFul.Loggers;
+using RestFul.Result;
 using RestFul.Routing;
 using RestFul.Serializer;
 
@@ -68,7 +69,8 @@ namespace RestFul
                         IHttpContext context = await _httpListener.GetContextAsync();
                         try
                         {
-                            _router.Route(context);
+                            IResult result = _router.Route(context);
+                            result.Execute(context, _serializer);
                         }
                         catch (APIException ex)
                         {

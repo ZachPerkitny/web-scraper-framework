@@ -1,4 +1,5 @@
 ﻿using RestFul.Http;
+using RestFul.Serializer;
 
 namespace RestFul.Result
 {
@@ -8,6 +9,6 @@ namespace RestFul.Result
         /// 
         /// </summary>
         /// <returns></returns>
-        void Execute(IHttpContext context);
+        void Execute(IHttpContext context, ISerializer serializer);
     }
 }

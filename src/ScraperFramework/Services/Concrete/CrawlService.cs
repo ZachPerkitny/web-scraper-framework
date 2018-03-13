@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ScraperFramework.Data;
 using ScraperFramework.Data.Entities;
+using ScraperFramework.Pocos;
 
 namespace ScraperFramework.Services.Concrete
 {
@@ -16,6 +17,7 @@ namespace ScraperFramework.Services.Concrete
 
         private readonly Dictionary<int, Dictionary<int, int>> _keywordCrawlCounts = 
             new Dictionary<int, Dictionary<int, int>>();
+        private bool _filledCache;
 
         public CrawlService(IKeywordRepo keywordRepo, ISearchTargetRepo searchTargetRepo, ICrawlLogRepo crawlLogRepo)
         {
@@ -24,15 +26,15 @@ namespace ScraperFramework.Services.Concrete
             _crawlLogRepo = crawlLogRepo ?? throw new ArgumentNullException(nameof(crawlLogRepo));
         }
 
-        public IEnumerable<Keyword> GetKeywordsToCrawl(int count, int searchTargetId)
+        public IEnumerable<CrawlDescription> GetKeywordsToCrawl(int count)
         {
-            if (_keywordCrawlCounts[searchTargetId] == null)
+            if (!_filledCache)
             {
-                FillCache(searchTargetId);
+                FillCache();
             }
 
             // select random count keywords
-            var toBeCrawled = new List<Keyword>();
+            var toBeCrawled = new List<CrawlDescription>();
 
             return toBeCrawled;
         }
@@ -45,26 +47,31 @@ namespace ScraperFramework.Services.Concrete
 
         public void LogCrawl(CrawlLog crawlLog)
         {
-            if (_keywordCrawlCounts[crawlLog.SearchTargetID] == null)
+            if (!_filledCache)
             {
-                FillCache(crawlLog.SearchTargetID);
+                FillCache();
             }
 
             _crawlLogRepo.Insert(crawlLog);
             _keywordCrawlCounts[crawlLog.SearchTargetID][crawlLog.KeywordID] += 1;
         }
 
-        private void FillCache(int searchTargetId)
+        private void FillCache()
         {
-            IEnumerable<Keyword> keywords = _keywordRepo.SelectAll();
-
-            _keywordCrawlCounts[searchTargetId] = new Dictionary<int, int>();
-
-            foreach (var keyword in keywords)
+            IEnumerable<SearchTarget> searchTargets = _searchTargetRepo.SelectAll();
+            foreach (var searchTarget in searchTargets)
             {
-                int crawlCount = _crawlLogRepo.SelectMany(searchTargetId, keyword.ID).Count();
-                _keywordCrawlCounts[searchTargetId].Add(keyword.ID, crawlCount);
+                IEnumerable<Keyword> keywords = _keywordRepo.SelectAll();
+
+                _keywordCrawlCounts[searchTarget.ID] = new Dictionary<int, int>();
+
+                foreach (var keyword in keywords)
+                {
+                    int crawlCount = _crawlLogRepo.SelectMany(searchTarget.ID, keyword.ID).Count();
+                    _keywordCrawlCounts[searchTarget.ID].Add(keyword.ID, crawlCount);
+                }
             }
+            _filledCache = true;
         }
     }
 }

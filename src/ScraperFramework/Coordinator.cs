@@ -6,15 +6,18 @@ using ScraperFramework.Configuration;
 
 namespace ScraperFramework
 {
-    class Controller : IController
+    class Coordinator : ICoordinator
     {
+        private readonly IScraperQueue _scraperQueue;
         private readonly IRestFulServer _restFulServer;
         private readonly ScraperConfig _config;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private bool _disposed = false;
 
-        public Controller(IRestFulServer restFulServer, ScraperConfig config, CancellationTokenSource cancellationTokenSource)
+        public Coordinator(IScraperQueue scraperQueue, IRestFulServer restFulServer, ScraperConfig config, 
+            CancellationTokenSource cancellationTokenSource)
         {
+            _scraperQueue = scraperQueue ?? throw new ArgumentNullException(nameof(scraperQueue));
             _restFulServer = restFulServer ?? throw new ArgumentNullException(nameof(restFulServer));
             _config = config;
             _cancellationTokenSource = cancellationTokenSource ?? throw new ArgumentNullException(nameof(cancellationTokenSource));

@@ -7,6 +7,6 @@ namespace ScraperFramework.Configuration
     {
         IUnityContainer Container { get; }
 
-        IController Build();
+        ICoordinator Build();
     }
 }

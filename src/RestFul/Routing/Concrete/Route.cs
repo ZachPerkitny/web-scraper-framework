@@ -4,6 +4,7 @@ using RestFul.DI;
 using RestFul.Enum;
 using RestFul.Extensions;
 using RestFul.Http;
+using RestFul.Result;
 
 namespace RestFul.Routing.Concrete
 {
@@ -13,21 +14,21 @@ namespace RestFul.Routing.Concrete
 
         public string Path { get; private set; }
 
-        public Action<IHttpContext> Method { get; private set; }
+        public Func<IHttpContext, IResult> Method { get; private set; }
 
         private readonly IContainer _container;
 
         public Route(MethodInfo method, HttpMethod httpMethod, string path, IContainer container)
         {
-            Method = CreateRouteAction(method);
+            Method = CreateRouteFunc(method);
             Path = path;
             HttpMethod = httpMethod;
             _container = container;
         }
 
-        public void Invoke(IHttpContext httpContext)
+        public IResult Invoke(IHttpContext httpContext)
         {
-            Method.Invoke(httpContext);
+            return Method.Invoke(httpContext);
         }
 
         public bool Matches(IHttpContext httpContext)
@@ -64,10 +65,20 @@ namespace RestFul.Routing.Concrete
             return ToString().GetHashCode();
         }
 
-        private Action<IHttpContext> CreateRouteAction(MethodInfo method)
+        private Func<IHttpContext, IResult> CreateRouteFunc(MethodInfo method)
         {
-            //method.IsValidRoute(true);
-            throw new NotImplementedException();
+            method.IsValidRoute(true);
+            
+            if (method.IsStatic || method.ReflectedType == null)
+            {
+                return (context) => (IResult)method.Invoke(null, new object[] { context });
+            }
+
+            return (context) =>
+            {
+                object instance = _container.Resolve(method.ReflectedType);
+                return (IResult)method.Invoke(instance, new object[] { context });
+            };
         }
     }
 }

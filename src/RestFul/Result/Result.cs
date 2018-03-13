@@ -1,6 +1,7 @@
 ﻿using System;
 using RestFul.Enum;
 using RestFul.Http;
+using RestFul.Serializer;
 
 namespace RestFul.Result
 {
@@ -21,7 +22,7 @@ namespace RestFul.Result
             Response = response;
         }
 
-        public void Execute(IHttpContext context)
+        public void Execute(IHttpContext context, ISerializer serializer)
         {
             if (context == null)
             {
@@ -32,7 +33,12 @@ namespace RestFul.Result
 
             if (Response != null)
             {
-                
+                byte[] serializedResponse = serializer.Serialize(Response);
+                context.Response.SendResponse(serializedResponse);
+            }
+            else
+            {
+                context.Response.Send();
             }
         }
     }

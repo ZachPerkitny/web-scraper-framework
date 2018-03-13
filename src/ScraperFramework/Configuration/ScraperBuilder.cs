@@ -7,6 +7,7 @@ using Restful.Serilog;
 using Serilog;
 using Unity;
 using Unity.Lifetime;
+using ScraperFramework.Controllers;
 using ScraperFramework.Data;
 using ScraperFramework.Data.Concrete;
 using ScraperFramework.Services;
@@ -29,7 +30,7 @@ namespace ScraperFramework.Configuration
             setup.Invoke(_config);
         }
 
-        public IController Build()
+        public ICoordinator Build()
         {
             Container
                 .RegisterInstance(_config)
@@ -38,14 +39,16 @@ namespace ScraperFramework.Configuration
                 .RegisterInstance(RestfulServerFactory.Create(c => 
                 {
                     c.Register<IRestFulLogger>((_) => new SerilogLogger(Log.Logger));
+                    c.Register((_) => new KeywordController(Container.Resolve<IKeywordRepo>()));
                 }))
                 .RegisterType<ICrawlLogRepo, CrawlLogRepo>()
                 .RegisterType<IKeywordRepo, KeywordRepo>()
                 .RegisterType<ISearchTargetRepo, SearchTargetRepo>()
-                .RegisterType<IKeywordSearchTargetService, KeywordSearchTargetService>()
-                .RegisterType<IController, Controller>();
+                .RegisterType<ICrawlService, CrawlService>()
+                .RegisterType<IScraperQueue, ScraperQueue>()
+                .RegisterType<ICoordinator, Coordinator>();
 
-            return Container.Resolve<IController>();
+            return Container.Resolve<ICoordinator>();
         }
     }
 }

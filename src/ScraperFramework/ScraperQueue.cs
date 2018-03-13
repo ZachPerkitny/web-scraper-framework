@@ -1,13 +1,21 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using ScraperFramework.Pocos;
+using ScraperFramework.Services;
 
 namespace ScraperFramework
 {
     class ScraperQueue : IScraperQueue
     {
+        private const int KEYWORD_COUNT = 5000;
+
+        private readonly ICrawlService _crawlService;
         private readonly Queue<CrawlDescription> _queue = new Queue<CrawlDescription>();
         private readonly object _locker = new object();
+
+        public ScraperQueue(ICrawlService crawlService)
+        {
+            _crawlService = crawlService;
+        }
 
         public CrawlDescription Dequeue()
         {
@@ -24,24 +32,14 @@ namespace ScraperFramework
 
         private void RequestMoreCrawlDescriptions()
         {
-            //Task<IEnumerable<CrawlDescription>> getKeywordsTask = _mediator.Send(new RefillRequest
-            //{
-            //    NumOfKeywords = 5000 // whatever
-            //});
-
-            //getKeywordsTask.Wait();
-
-            //if (getKeywordsTask.Status == TaskStatus.Faulted)
-            //{
-            //    // log it
-            //    return;
-            //}
-
-            //IEnumerable<CrawlDescription> crawlDescriptions = getKeywordsTask.Result;
-            //foreach (var crawl in crawlDescriptions)
-            //{
-            //    _queue.Enqueue(crawl);
-            //}
+            IEnumerable<CrawlDescription> crawlDescriptions = _crawlService.GetKeywordsToCrawl(KEYWORD_COUNT);
+            lock (_locker)
+            {
+                foreach (var crawl in crawlDescriptions)
+                {
+                    _queue.Enqueue(crawl);
+                }
+            }
         }
     }
 }

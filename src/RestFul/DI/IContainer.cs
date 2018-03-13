@@ -25,6 +25,13 @@ namespace RestFul.DI
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="serviceType"></param>
+        /// <returns></returns>
+        object Resolve(Type serviceType);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         TService Resolve<TService>() where TService : class;

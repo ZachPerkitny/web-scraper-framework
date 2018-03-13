@@ -66,16 +66,14 @@ namespace RestFul.DI
                 return this;
             }
         }
-
-        public TService Resolve<TService>() where TService : class
+    
+        public object Resolve(Type serviceType)
         {
             lock (_locker)
             {
-                Type serviceType = typeof(TService);
-
                 if (_instances.ContainsKey(serviceType))
                 {
-                    return (TService)_instances[serviceType];
+                    return _instances[serviceType];
                 }
                 else if (_registrations.ContainsKey(serviceType))
                 {
@@ -91,13 +89,13 @@ namespace RestFul.DI
                         })
                         .ToArray();
 
-                    TService instance = (TService)constructor.Invoke(args);
+                    object instance = constructor.Invoke(args);
                     _instances.Add(serviceType, instance);
                     return instance;
                 }
-                else if(_creators.ContainsKey(serviceType))
+                else if (_creators.ContainsKey(serviceType))
                 {
-                    TService instance = ((Func<IContainer, TService>)_creators[serviceType]).Invoke(this);
+                    object instance = ((Func<IContainer, object>)_creators[serviceType]).Invoke(this);
                     _instances.Add(serviceType, instance);
                     return instance;
                 }
@@ -106,6 +104,11 @@ namespace RestFul.DI
                     throw new RestFulException("Unable to Resolve Instance of Type {0}", serviceType.Name);
                 }
             }
+        }
+
+        public TService Resolve<TService>() where TService : class
+        {
+            return (TService)Resolve(typeof(TService));
         }
 
         private bool IsRegistered(Type serviceType)

@@ -6,8 +6,8 @@ namespace ScraperFramework.Data.Entities
     {
         public int ID { get; set; }
 
-        public SearchTarget SearchTarget { get; set; }
+        public int SearchTargetID { get; set; }
 
-        public Keyword Keyword { get; set; }
+        public int KeywordID { get; set; }
     }
 }

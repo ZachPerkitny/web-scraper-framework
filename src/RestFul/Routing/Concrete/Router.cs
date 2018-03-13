@@ -8,6 +8,7 @@ using RestFul.Exceptions;
 using RestFul.Extensions;
 using RestFul.Http;
 using RestFul.Loggers;
+using RestFul.Result;
 
 namespace RestFul.Routing.Concrete
 {
@@ -36,7 +37,7 @@ namespace RestFul.Routing.Concrete
             Routes = new HashSet<IRoute>();
         }
 
-        public void Route(IHttpContext httpContext)
+        public IResult Route(IHttpContext httpContext)
         {
             IRoute route = GetRouteForContext(httpContext);
             if (route == null)
@@ -44,7 +45,7 @@ namespace RestFul.Routing.Concrete
                 throw new APIException("Not Found", Enum.HttpStatusCode.NotFound);
             }
 
-            route.Invoke(httpContext);
+            return route.Invoke(httpContext);
         }
 
         public void ScanAssemblies()
@@ -67,16 +68,18 @@ namespace RestFul.Routing.Concrete
         {
             foreach (MethodInfo method in type.GetMethods().Where(m => m.IsRestRoute()))
             {
-                Register(method);
+                RestControllerAttribute attr = type.GetControllerAttribute();
+                Register(method, attr.BasePath);
             }
         }
 
-        public void Register(MethodInfo method)
+        public void Register(MethodInfo method, string basePath)
         {
             foreach (RestRouteAttribute routeAttr in method.GetRouteAttributes())
             {
-                _logger.Debug("Registering Route {0} {1}", routeAttr.HttpMethod, routeAttr.Path);
-                Route route = new Route(method, routeAttr.HttpMethod, routeAttr.Path, _container);
+                string path = CreatePath(basePath, routeAttr.Path);
+                _logger.Debug("Registering Route {0} {1}", routeAttr.HttpMethod, path);
+                Route route = new Route(method, routeAttr.HttpMethod, path, _container);
                 if (!Routes.Add(route))
                 {
                     throw new DuplicateRouteException("Duplicate Route {0}", route);
@@ -87,6 +90,21 @@ namespace RestFul.Routing.Concrete
         public IRoute GetRouteForContext(IHttpContext httpContext)
         {
             return Routes.FirstOrDefault(route => route.Matches(httpContext));
+        }
+
+        private string CreatePath(string basePath, string path)
+        {
+            if (!string.IsNullOrEmpty(basePath) && !basePath.StartsWith("/"))
+            {
+                basePath = $"/{basePath}";
+            }
+
+            if (!string.IsNullOrEmpty(path) && !path.StartsWith("/"))
+            {
+                path = $"{path}";
+            }
+
+            return $"{basePath}{path}";
         }
     }
 }

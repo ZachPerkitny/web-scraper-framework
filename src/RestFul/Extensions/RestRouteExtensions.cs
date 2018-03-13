@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using RestFul.Attributes;
 using RestFul.Exceptions;
 using RestFul.Http;
+using RestFul.Result;
 
 namespace RestFul.Extensions
 {
@@ -45,11 +45,11 @@ namespace RestFul.Extensions
         /// <returns></returns>
         public static bool IsValidRoute(this MethodInfo methodInfo, bool throwIfInvalid = false)
         {
-            if (methodInfo.ReturnType != typeof(Task) && methodInfo.ReturnType != typeof(Task<>))
+            if (methodInfo.ReturnType != typeof(IResult))
             {
                 if (throwIfInvalid)
                 {
-                    throw new InvalidRouteMethod("Expected Route Method {0} to return a Task.", methodInfo.Name);
+                    throw new InvalidRouteMethod("Expected Route Method {0} to return a IResult.", methodInfo.Name);
                 }
 
                 return false;

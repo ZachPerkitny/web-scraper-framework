@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ScraperFramework.Data.Entities;
 
 namespace ScraperFramework.Data

@@ -5,7 +5,7 @@ namespace RestFul.Attributes
     /// <summary>
     /// Class attribute for defining a Rest Controller
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class RestControllerAttribute : Attribute
     {
         /// <summary>

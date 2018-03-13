@@ -24,7 +24,7 @@ namespace Driver
                 config.DBreezeDataFolderName = @"C:\Users\Mr Zach\Documents\dbreeze";
             });
 
-            IController controller = scraperBuilder.Build();
+            ICoordinator controller = scraperBuilder.Build();
             controller.Start();
 
             Console.ReadLine();

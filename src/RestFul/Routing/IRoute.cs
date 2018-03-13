@@ -1,5 +1,6 @@
 ﻿using RestFul.Enum;
 using RestFul.Http;
+using RestFul.Result;
 
 namespace RestFul.Routing
 {
@@ -18,7 +19,7 @@ namespace RestFul.Routing
         /// <summary>
         /// 
         /// </summary>
-        void Invoke(IHttpContext httpContext);
+        IResult Invoke(IHttpContext httpContext);
 
         /// <summary>
         /// 
