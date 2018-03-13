@@ -20,11 +20,17 @@ namespace ScraperFramework.Controllers
         }
 
         [RestRoute(HttpMethod = HttpMethod.GET)]
-        public IResult GetKeywords(IHttpContext context)
+        public IResult GetKeywords(HttpContext context)
         {
             IEnumerable<Keyword> keywords = _keywordRepo.SelectAll();
 
-            return new Result(HttpStatusCode.OK, keywords);
+            return new SerializedResult(keywords);
+        }
+
+        [RestRoute(HttpMethod = HttpMethod.POST)]
+        public IResult PostKeyword(HttpContext context)
+        {
+            return new RedirectResult("http://localhost:8000/keywords-5");
         }
     }
 }

@@ -3,6 +3,11 @@
     public enum HttpStatusCode
     {
         /// <summary>
+        /// For internal usage.
+        /// </summary>
+        Undefined = 0,
+
+        /// <summary>
         /// The initial part of a request has een received and has not yet
         /// been rejected by the server.
         /// </summary>

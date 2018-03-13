@@ -1,14 +1,13 @@
 ﻿using RestFul.Http;
-using RestFul.Serializer;
 
 namespace RestFul.Result
 {
     public interface IResult
     {
         /// <summary>
-        /// 
+        /// Handles the result based on the given context.
         /// </summary>
         /// <returns></returns>
-        void Execute(IHttpContext context, ISerializer serializer);
+        void Execute(HttpContext context);
     }
 }

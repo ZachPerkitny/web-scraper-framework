@@ -18,7 +18,7 @@ namespace RestFul.Routing
         /// context
         /// </summary>
         /// <param name="httpContext"></param>
-        IResult Route(IHttpContext httpContext);
+        IResult Route(HttpContext httpContext);
 
         /// <summary>
         /// 
@@ -47,6 +47,6 @@ namespace RestFul.Routing
         /// </summary>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-        IRoute GetRouteForContext(IHttpContext httpContext);
+        IRoute GetRouteForContext(HttpContext httpContext);
     }
 }

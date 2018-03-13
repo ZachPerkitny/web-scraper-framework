@@ -37,7 +37,7 @@ namespace RestFul.Routing.Concrete
             Routes = new HashSet<IRoute>();
         }
 
-        public IResult Route(IHttpContext httpContext)
+        public IResult Route(HttpContext httpContext)
         {
             IRoute route = GetRouteForContext(httpContext);
             if (route == null)
@@ -87,7 +87,7 @@ namespace RestFul.Routing.Concrete
             }
         }
 
-        public IRoute GetRouteForContext(IHttpContext httpContext)
+        public IRoute GetRouteForContext(HttpContext httpContext)
         {
             return Routes.FirstOrDefault(route => route.Matches(httpContext));
         }

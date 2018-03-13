@@ -66,11 +66,11 @@ namespace RestFul
                 {
                     while (IsListening)
                     {
-                        IHttpContext context = await _httpListener.GetContextAsync();
+                        HttpContext context = await _httpListener.GetContextAsync();
                         try
                         {
                             IResult result = _router.Route(context);
-                            result.Execute(context, _serializer);
+                            result.Execute(context);
                         }
                         catch (APIException ex)
                         {

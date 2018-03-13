@@ -37,17 +37,17 @@ namespace RestFul.Http
         /// 
         /// </summary>
         /// <param name="asyncResult"></param>
-        IHttpContext EndGetContext(IAsyncResult asyncResult);
+        HttpContext EndGetContext(IAsyncResult asyncResult);
 
         /// <summary>
         /// 
         /// </summary>
-        IHttpContext GetContext();
+        HttpContext GetContext();
 
         /// <summary>
         /// 
         /// </summary>
-        Task<IHttpContext> GetContextAsync();
+        Task<HttpContext> GetContextAsync();
 
         /// <summary>
         /// 

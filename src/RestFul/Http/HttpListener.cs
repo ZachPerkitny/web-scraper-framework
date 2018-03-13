@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using RestFul.Serializer;
 
-namespace RestFul.Http.Concrete
+namespace RestFul.Http
 {
     class HttpListener : IHttpListener
     {
         private readonly System.Net.HttpListener _listener;
+        private readonly ISerializer _serializer;
 
-        public HttpListener()
+        public HttpListener(ISerializer serializer)
         {
+            // TODO (zvp): Authentication ?
             _listener = new System.Net.HttpListener();
+            _serializer = serializer;
         }
 
         public bool IsListening
@@ -38,25 +42,25 @@ namespace RestFul.Http.Concrete
             _listener.Close();
         }
 
-        public IHttpContext EndGetContext(IAsyncResult asyncResult)
+        public HttpContext EndGetContext(IAsyncResult asyncResult)
         {
             HttpListenerContext listenerContext = _listener.EndGetContext(asyncResult);
 
-            return new HttpContext(listenerContext);
+            return new HttpContext(listenerContext, _serializer);
         }
 
-        public IHttpContext GetContext()
+        public HttpContext GetContext()
         {
             HttpListenerContext listenerContext = _listener.GetContext();
 
-            return new HttpContext(listenerContext);
+            return new HttpContext(listenerContext, _serializer);
         }
 
-        public async Task<IHttpContext> GetContextAsync()
+        public async Task<HttpContext> GetContextAsync()
         {
             HttpListenerContext listenerContext = await _listener.GetContextAsync();
 
-            return new HttpContext(listenerContext);
+            return new HttpContext(listenerContext, _serializer);
         }
 
         public void Start()

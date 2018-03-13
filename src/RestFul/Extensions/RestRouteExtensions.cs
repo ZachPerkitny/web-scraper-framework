@@ -65,12 +65,12 @@ namespace RestFul.Extensions
                 return false;
             }
 
-            if (methodInfo.GetParameters()[0].ParameterType != typeof(IHttpContext))
+            if (methodInfo.GetParameters()[0].ParameterType != typeof(HttpContext))
             {
                 if (throwIfInvalid)
                 {
                     throw new InvalidRouteMethod("Expected Route Method {0}'s argument to be of type {1}",
-                        methodInfo.Name, typeof(IHttpContext).Name);
+                        methodInfo.Name, typeof(HttpContext).Name);
                 }
 
                 return false;

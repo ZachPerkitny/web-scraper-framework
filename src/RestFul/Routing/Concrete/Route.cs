@@ -14,7 +14,7 @@ namespace RestFul.Routing.Concrete
 
         public string Path { get; private set; }
 
-        public Func<IHttpContext, IResult> Method { get; private set; }
+        public Func<HttpContext, IResult> Method { get; private set; }
 
         private readonly IContainer _container;
 
@@ -26,12 +26,12 @@ namespace RestFul.Routing.Concrete
             _container = container;
         }
 
-        public IResult Invoke(IHttpContext httpContext)
+        public IResult Invoke(HttpContext httpContext)
         {
             return Method.Invoke(httpContext);
         }
 
-        public bool Matches(IHttpContext httpContext)
+        public bool Matches(HttpContext httpContext)
         {
             if (httpContext.Request.HttpMethod == HttpMethod && httpContext.Request.Path == Path)
             {
@@ -65,7 +65,7 @@ namespace RestFul.Routing.Concrete
             return ToString().GetHashCode();
         }
 
-        private Func<IHttpContext, IResult> CreateRouteFunc(MethodInfo method)
+        private Func<HttpContext, IResult> CreateRouteFunc(MethodInfo method)
         {
             method.IsValidRoute(true);
             
