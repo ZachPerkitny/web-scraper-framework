@@ -39,9 +39,9 @@ namespace ScraperFramework
                 // the file, the data is lost.
 
                 // TODO(zvp): Random Capacity 4kb, fix this
-                using (var mmf = MemoryMappedFile.CreateNew(ScraperID.ToString(), 4096))
+                using (var mmf = MemoryMappedFile.CreateNew("testmap", 4096))
                 {
-                    string mutexName = $"{ScraperID.ToString()}-Mutex";
+                    string mutexName = "testmapmutex";
                     Mutex mutex = new Mutex(true, mutexName);
 
                     Process process = new Process
@@ -50,8 +50,10 @@ namespace ScraperFramework
                         {
                             Arguments = $"WebScraper.dll --mapName={ScraperID} --mutex={mutexName}", // for mutex, and mmf
                             FileName = "dotnet",
-                            CreateNoWindow = false,
-                            UseShellExecute = false
+                            CreateNoWindow = true,
+                            UseShellExecute = true,
+                            // TODO (zvp): Don't Hardcode this
+                            WorkingDirectory = @"C:\Users\zaperkitny\Projects\web-scraper-framework\src\WebScraper\bin\Release\WebScraper\"
                         }
                     };
 
@@ -70,9 +72,10 @@ namespace ScraperFramework
                     mutex.WaitOne();
 
                     using (MemoryMappedViewStream stream = mmf.CreateViewStream())
+                    using (MemoryStream memoryStream = new MemoryStream())
                     {
-                        BinaryReader binaryReader = new BinaryReader(stream);
-                        byte[] crawlResult = binaryReader.ReadBytes(int.MaxValue);
+                        stream.CopyTo(memoryStream);
+                        byte[] crawlResult = memoryStream.ToArray();
                     }
 
                     //wait for scraper to shut down
