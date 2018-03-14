@@ -27,6 +27,19 @@ namespace ScraperFramework.Data
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="searchTargetId"></param>
+        /// <returns></returns>
+        IEnumerable<CrawlLog> SelectMany(int searchTargetId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<CrawlLog> SelectAll();
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         ulong Count();
     }

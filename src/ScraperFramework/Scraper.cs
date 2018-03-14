@@ -1,16 +1,25 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.IO.MemoryMappedFiles;
+using System.Reflection;
+using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 using ScraperFramework.Pocos;
 
 namespace ScraperFramework
 {
     class Scraper : IScraper
     {
+        public Guid ScraperID { get; private set; }
+
+        private readonly IScraperQueue _queue;
         private readonly CancellationToken _cancellationToken;
 
         public Scraper(CancellationToken cancellationToken)
         {
+            ScraperID = Guid.NewGuid();
             _cancellationToken = cancellationToken;
         }
 
@@ -18,10 +27,58 @@ namespace ScraperFramework
         {
             while (!_cancellationToken.IsCancellationRequested)
             {
-                //Task<CrawlDescription> getCrawlTask = _mediator.Send(
-                //    new CrawlDescriptionRequest());
+                //CrawlDescription crawlDescription = _queue.Dequeue();
+                //byte[] serializedCrawlDescription = Encoding.UTF8.GetBytes(
+                //    JsonConvert.SerializeObject(crawlDescription));
 
-                //getCrawlTask.Wait();
+                byte[] serializedCrawlDescription = new byte[] { 1, 2, 3 };
+
+                // Non-persisted files are memory-mapped files 
+                // that are not associated with a file on a disk.
+                // When the last process has finished working with
+                // the file, the data is lost.
+
+                // TODO(zvp): Random Capacity 4kb, fix this
+                using (var mmf = MemoryMappedFile.CreateNew(ScraperID.ToString(), 4096))
+                {
+                    string mutexName = $"{ScraperID.ToString()}-Mutex";
+                    Mutex mutex = new Mutex(true, mutexName);
+
+                    Process process = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            Arguments = $"WebScraper.dll --mapName={ScraperID} --mutex={mutexName}", // for mutex, and mmf
+                            FileName = "dotnet",
+                            CreateNoWindow = false,
+                            UseShellExecute = false
+                        }
+                    };
+
+                    process.Start();
+
+                    using (MemoryMappedViewStream stream = mmf.CreateViewStream())
+                    {
+                        BinaryWriter binaryWriter = new BinaryWriter(stream);
+                        binaryWriter.Write(serializedCrawlDescription);
+                    }
+
+                    mutex.ReleaseMutex();
+
+                    // Wait for scraper to finish
+                    // TODO(zvp): Add Timeout ?
+                    mutex.WaitOne();
+
+                    using (MemoryMappedViewStream stream = mmf.CreateViewStream())
+                    {
+                        BinaryReader binaryReader = new BinaryReader(stream);
+                        byte[] crawlResult = binaryReader.ReadBytes(int.MaxValue);
+                    }
+
+                    //wait for scraper to shut down
+                    // TODO(zvp): Add Timeout ?
+                    process.WaitForExit();
+                }
             }
         }
 

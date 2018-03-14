@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using RestFul;
 using Serilog;
@@ -8,6 +9,7 @@ namespace ScraperFramework
 {
     class Coordinator : ICoordinator
     {
+        private readonly List<IScraper> _scrapers;
         private readonly IScraperQueue _scraperQueue;
         private readonly IRestFulServer _restFulServer;
         private readonly ScraperConfig _config;
@@ -27,6 +29,9 @@ namespace ScraperFramework
         {
             Log.Information("Starting Rest API");
             _restFulServer.Start();
+
+            var x = new Scraper(_cancellationTokenSource.Token);
+            x.Start();
         }
 
         protected virtual void Dispose(bool disposing)

@@ -44,6 +44,7 @@ namespace ScraperFramework.Configuration
                     c.Register((_) => new SearchTargetController(Container.Resolve<ISearchTargetRepo>()));
                     c.Register((_) => new KeywordSearchTargetController(Container.Resolve<IKeywordSearchTargetRepo>()));
                     c.Register((_) => new EndpointController(Container.Resolve<IEndpointRepo>()));
+                    c.Register((_) => new StatsController(Container.Resolve<IStatsService>()));
                 }))
                 .RegisterType<ICrawlLogRepo, CrawlLogRepo>()
                 .RegisterType<IEndpointRepo, EndpointRepo>()
@@ -51,6 +52,7 @@ namespace ScraperFramework.Configuration
                 .RegisterType<IKeywordSearchTargetRepo, KeywordSearchTargetRepo>()
                 .RegisterType<ISearchTargetRepo, SearchTargetRepo>()
                 .RegisterType<ICrawlService, CrawlService>()
+                .RegisterType<IStatsService, StatsService>()
                 .RegisterType<IScraperQueue, ScraperQueue>()
                 .RegisterType<ICoordinator, Coordinator>();
 

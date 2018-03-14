@@ -44,6 +44,10 @@ namespace ScraperFramework.Data.Concrete
                         new DBreezeIndex(2, log.SearchTargetID, log.KeywordID)
                         {
                             AddPrimaryToTheEnd = true // select forward from (st, k, min_signed(32)) -> (st, k, max_signed(32))
+                        },
+                        new DBreezeIndex(3, log.SearchTargetID)
+                        {
+                            AddPrimaryToTheEnd = true
                         }
                     }
                 });
@@ -77,6 +81,50 @@ namespace ScraperFramework.Data.Concrete
                 IEnumerable<Row<byte[], byte[]>> rows = transaction.SelectForwardFromTo<byte[], byte[]>(
                         _table, 2.ToIndex(searchTargetId, keywordId, int.MinValue), true,
                         2.ToIndex(searchTargetId, keywordId, int.MaxValue), true);
+
+                foreach (var row in rows)
+                {
+                    DBreezeObject<CrawlLog> obj = row.ObjectGet<CrawlLog>();
+                    if (obj != null)
+                    {
+                        CrawlLog entity = obj.Entity;
+                        entities.Add(entity);
+                    }
+                }
+
+                return entities;
+            }
+        }
+
+        public IEnumerable<CrawlLog> SelectMany(int searchTargetId)
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                var entities = new List<CrawlLog>();
+                IEnumerable<Row<byte[], byte[]>> rows = transaction.SelectBackwardFromTo<byte[], byte[]>(
+                    _table, 3.ToIndex(searchTargetId, int.MinValue), true,
+                    3.ToIndex(searchTargetId, int.MaxValue), true);
+
+                foreach (var row in rows)
+                {
+                    DBreezeObject<CrawlLog> obj = row.ObjectGet<CrawlLog>();
+                    if (obj != null)
+                    {
+                        CrawlLog entity = obj.Entity;
+                        entities.Add(entity);
+                    }
+                }
+
+                return entities;
+            }
+        }
+
+        public IEnumerable<CrawlLog> SelectAll()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                var entities = new List<CrawlLog>();
+                IEnumerable<Row<byte[], byte[]>> rows = transaction.SelectForward<byte[], byte[]>(_table);
 
                 foreach (var row in rows)
                 {
