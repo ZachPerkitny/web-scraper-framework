@@ -7,7 +7,7 @@ namespace RestFul.Extensions
     static class RestControllerExtensions
     {
         /// <summary>
-        /// Indicates whether or not a class is a RestController
+        /// Indicates whether or not a class is a valid RestController
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>

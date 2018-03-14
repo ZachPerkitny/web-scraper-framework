@@ -17,12 +17,7 @@ namespace RestFul.Extensions
         /// <returns></returns>
         public static bool IsRestRoute(this MethodInfo methodInfo)
         {
-            if (methodInfo.GetCustomAttributes().Any(attr => attr is RestRouteAttribute))
-            {
-                return true;
-            }
-
-            return false;
+            return methodInfo.GetCustomAttributes().Any(attr => attr is RestRouteAttribute);
         }
 
         /// <summary>
