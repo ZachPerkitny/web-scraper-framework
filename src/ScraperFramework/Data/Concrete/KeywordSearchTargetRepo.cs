@@ -24,32 +24,22 @@ namespace ScraperFramework.Data.Concrete
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                bool newEntity = keywordSearchTarget.ID == 0;
-                if (newEntity)
+                Insert(transaction, keywordSearchTarget);
+
+                transaction.Commit();
+            }
+        }
+
+        public void InsertMany(IEnumerable<KeywordSearchTarget> keywordSearchTargets)
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                foreach (KeywordSearchTarget keywordSearchTarget in keywordSearchTargets)
                 {
-                    keywordSearchTarget.ID = transaction.ObjectGetNewIdentity<int>(_table);
+                    Insert(transaction, keywordSearchTarget);
                 }
 
-                transaction.ObjectInsert(_table, new DBreezeObject<KeywordSearchTarget>
-                {
-                    NewEntity = newEntity,
-                    Entity = keywordSearchTarget,
-                    Indexes = new List<DBreezeIndex>
-                    {
-                        new DBreezeIndex(1, keywordSearchTarget.ID)
-                        {
-                            PrimaryIndex = true
-                        },
-                        new DBreezeIndex(2, keywordSearchTarget.SearchTargetID, keywordSearchTarget.KeywordID)
-                        {
-                            AddPrimaryToTheEnd = false
-                        },
-                        new DBreezeIndex(3, keywordSearchTarget.SearchTargetID)
-                        {
-                            AddPrimaryToTheEnd = true
-                        }
-                    }
-                });
+                transaction.Commit();
             }
         }
 
@@ -108,6 +98,50 @@ namespace ScraperFramework.Data.Concrete
 
                 return entities;
             }
+        }
+
+        public ulong Count()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                return transaction.Count(_table);
+            }
+        }
+
+        /// <summary>
+        /// Does an object insert and creates the necessary indexes for
+        /// a keyword search target
+        /// </summary>
+        /// <param name="transaction"></param>
+        /// <param name="keywordSearchTarget"></param>
+        private void Insert(Transaction transaction, KeywordSearchTarget keywordSearchTarget)
+        {
+            bool newEntity = keywordSearchTarget.ID == 0;
+            if (newEntity)
+            {
+                keywordSearchTarget.ID = transaction.ObjectGetNewIdentity<int>(_table);
+            }
+            
+            transaction.ObjectInsert(_table, new DBreezeObject<KeywordSearchTarget>
+            {
+                NewEntity = newEntity,
+                Entity = keywordSearchTarget,
+                Indexes = new List<DBreezeIndex>
+                {
+                    new DBreezeIndex(1, keywordSearchTarget.ID)
+                    {
+                        PrimaryIndex = true
+                    },
+                    new DBreezeIndex(2, keywordSearchTarget.SearchTargetID, keywordSearchTarget.KeywordID)
+                    {
+                        AddPrimaryToTheEnd = false
+                    },
+                    new DBreezeIndex(3, keywordSearchTarget.SearchTargetID)
+                    {
+                        AddPrimaryToTheEnd = true
+                    }
+                }
+            });
         }
     }
 }

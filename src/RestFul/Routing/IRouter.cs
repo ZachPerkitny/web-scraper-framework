@@ -23,7 +23,7 @@ namespace RestFul.Routing
         /// <summary>
         /// 
         /// </summary>
-        void ScanAssemblies();
+        void Initialize();
 
         /// <summary>
         /// 

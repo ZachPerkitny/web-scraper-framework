@@ -12,6 +12,12 @@ namespace ScraperFramework.Data
         void Insert(KeywordSearchTarget keywordSearchTarget);
 
         /// <summary>
+        /// Inserts multiple keyword search target entities.
+        /// </summary>
+        /// <param name="keywordSearchTargets">List of keyword search targets to insert</param>
+        void InsertMany(IEnumerable<KeywordSearchTarget> keywordSearchTargets);
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
@@ -30,5 +36,11 @@ namespace ScraperFramework.Data
         /// <param name="searchTargetId"></param>
         /// <returns></returns>
         IEnumerable<KeywordSearchTarget> SelectMany(int searchTargetId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        ulong Count();
     }
 }

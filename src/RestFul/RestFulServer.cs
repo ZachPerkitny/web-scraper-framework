@@ -12,11 +12,6 @@ namespace RestFul
 {
     public class RestFulServer : IRestFulServer
     {
-        public bool IsListening
-        {
-            get { return _httpListener.IsListening; }
-        }
-
         private readonly UriBuilder _uriBuilder;
 
         private readonly IRestFulLogger _logger;
@@ -24,6 +19,8 @@ namespace RestFul
         private readonly IHttpListener _httpListener;
         private readonly IRouter _router;
         private bool _starting;
+        private bool _hasRun;
+        private bool _stopping;
         private Task _httpListenerTask;
 
         public RestFulServer(IRestFulSettings settings, IRestFulLogger logger, ISerializer serializer,
@@ -42,6 +39,12 @@ namespace RestFul
             _router = router ?? throw new ArgumentNullException(nameof(router));
         }
 
+        public bool IsListening
+        {
+            get { return _httpListener.IsListening; }
+        }
+
+
         public void Start()
         {
             if (IsListening || _starting)
@@ -53,13 +56,12 @@ namespace RestFul
 
             try
             {
-                if (_router.Routes.Count == 0)
+                if (!_hasRun)
                 {
-                    _router.ScanAssemblies();
+                    _router.Initialize();
+                    _httpListener.Prefixes.Add(_uriBuilder.Uri.ToString());
                 }
-                
-                _httpListener.Prefixes.Clear();
-                _httpListener.Prefixes.Add(_uriBuilder.Uri.ToString());
+
                 _httpListener.Start();
                 _httpListenerTask = Task.Factory.StartNew(async () =>
                 {
@@ -73,10 +75,11 @@ namespace RestFul
                             IResult result = _router.Route(context);
                             result.Execute(context);
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
                             context.Response.StatusCode = HttpStatusCode.InternalServerError;
                             context.Response.Send();
+                            _logger.Error("Internal Server Error ({0}): {1}", ex.GetType(), ex.Message);
                         }
                     }
                 }, TaskCreationOptions.LongRunning);
@@ -88,6 +91,7 @@ namespace RestFul
             finally
             {
                 _starting = false;
+                _hasRun = true;
             }
         }
 

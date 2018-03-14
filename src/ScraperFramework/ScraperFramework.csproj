@@ -16,8 +16,4 @@
     <ProjectReference Include="..\RestFul\RestFul.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\ViewModels\" />
-  </ItemGroup>
-
 </Project>

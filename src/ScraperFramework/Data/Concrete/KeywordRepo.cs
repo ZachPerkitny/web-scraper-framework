@@ -24,26 +24,7 @@ namespace ScraperFramework.Data.Concrete
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                Keyword entity = new Keyword
-                {
-                    // Automatically get monotonically grown entity ID
-                    ID = transaction.ObjectGetNewIdentity<int>(_table),
-                    Value = keyword
-                };
-
-                // Insert New Keyword Entity
-                transaction.ObjectInsert(_table, new DBreezeObject<Keyword>
-                {
-                    NewEntity = true,
-                    Entity = entity,
-                    Indexes = new List<DBreezeIndex>
-                    {
-                        new DBreezeIndex(1, entity.ID)
-                        {
-                            PrimaryIndex = true
-                        }
-                    }
-                });
+                Insert(transaction, keyword);
 
                 transaction.Commit();
             }
@@ -55,25 +36,7 @@ namespace ScraperFramework.Data.Concrete
             {
                 foreach (string keyword in keywords)
                 {
-                    Keyword entity = new Keyword
-                    {
-                        ID = transaction.ObjectGetNewIdentity<int>(_table),
-                        Value = keyword
-                    };
-
-                    // TODO(zvp): this is not dry
-                    transaction.ObjectInsert(_table, new DBreezeObject<Keyword>
-                    {
-                        NewEntity = true,
-                        Entity = entity,
-                        Indexes = new List<DBreezeIndex>
-                        {
-                            new DBreezeIndex(1, entity.ID)
-                            {
-                                PrimaryIndex = true
-                            }
-                        }
-                    });
+                    Insert(transaction, keyword);
                 }
 
                 transaction.Commit();
@@ -139,6 +102,42 @@ namespace ScraperFramework.Data.Concrete
 
                 transaction.Commit();
             }
+        }
+
+        public ulong Count()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                return transaction.Count(_table);
+            }
+        }
+
+        /// <summary>
+        /// Does an object insert and creates the necessary indexes for
+        /// a keyword
+        /// </summary>
+        /// <param name="transaction"></param>
+        /// <param name="keyword"></param>
+        private void Insert(Transaction transaction, string keyword)
+        {
+            Keyword entity = new Keyword
+            {
+                ID = transaction.ObjectGetNewIdentity<int>(_table),
+                Value = keyword
+            };
+
+            transaction.ObjectInsert(_table, new DBreezeObject<Keyword>
+            {
+                NewEntity = true,
+                Entity = entity,
+                Indexes = new List<DBreezeIndex>
+                {
+                    new DBreezeIndex(1, entity.ID)
+                    {
+                        PrimaryIndex = true
+                    }
+                }
+            });
         }
     }
 }

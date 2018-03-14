@@ -39,10 +39,14 @@ namespace ScraperFramework.Configuration
                 .RegisterInstance(RestfulServerFactory.Create(c => 
                 {
                     c.Register<IRestFulLogger>((_) => new SerilogLogger(Log.Logger));
+                    // TODO(zvp): add unity adaptor
                     c.Register((_) => new KeywordController(Container.Resolve<IKeywordRepo>()));
+                    c.Register((_) => new SearchTargetController(Container.Resolve<ISearchTargetRepo>()));
+                    c.Register((_) => new KeywordSearchTargetController(Container.Resolve<IKeywordSearchTargetRepo>()));
                 }))
                 .RegisterType<ICrawlLogRepo, CrawlLogRepo>()
                 .RegisterType<IKeywordRepo, KeywordRepo>()
+                .RegisterType<IKeywordSearchTargetRepo, KeywordSearchTargetRepo>()
                 .RegisterType<ISearchTargetRepo, SearchTargetRepo>()
                 .RegisterType<ICrawlService, CrawlService>()
                 .RegisterType<IScraperQueue, ScraperQueue>()

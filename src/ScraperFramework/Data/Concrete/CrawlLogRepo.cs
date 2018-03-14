@@ -91,5 +91,13 @@ namespace ScraperFramework.Data.Concrete
                 return entities;
             }
         }
+
+        public ulong Count()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                return transaction.Count(_table);
+            }
+        }
     }
 }

@@ -21,6 +21,7 @@ namespace RestFul.Routing
 
         private readonly IRestFulLogger _logger;
         private readonly IContainer _container;
+        private bool _initialized;
 
         static Router()
         {
@@ -49,11 +50,16 @@ namespace RestFul.Routing
             return route.Invoke(httpContext);
         }
 
-        public void ScanAssemblies()
+        public void Initialize()
         {
-            foreach (Assembly assembly in Assemblies)
+            if (!_initialized)
             {
-                Register(assembly);
+                foreach (Assembly assembly in Assemblies)
+                {
+                    Register(assembly);
+                }
+
+                _initialized = true;
             }
         }
 
