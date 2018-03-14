@@ -1,47 +1,49 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using ScraperFramework.Data.Entities;
 
 namespace ScraperFramework.Data
 {
-    public interface IKeywordSearchTargetRepo
+    public interface IEndpointSearchTargetRepo
     {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="keywordSearchTarget"></param>
-        void Insert(KeywordSearchTarget keywordSearchTarget);
+        /// <param name="endpointSearchTarget"></param>
+        void Insert(EndpointSearchTarget endpointSearchTarget);
 
         /// <summary>
-        /// Inserts multiple keyword search target entities.
+        /// 
         /// </summary>
-        /// <param name="keywordSearchTargets">List of keyword search targets to insert</param>
-        void InsertMany(IEnumerable<KeywordSearchTarget> keywordSearchTargets);
+        /// <param name="endpointSearchTargets"></param>
+        void InsertMany(IEnumerable<EndpointSearchTarget> endpointSearchTargets);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
-        KeywordSearchTarget Select(int id);
+        EndpointSearchTarget Select(int id);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="searchTargetId"></param>
-        /// <param name="keywordId"></param>
-        KeywordSearchTarget Select(int searchTargetId, int keywordId);
+        /// <param name="endpointId"></param>
+        EndpointSearchTarget Select(int searchTargetId, int endpointId);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="searchTargetId"></param>
         /// <returns></returns>
-        IEnumerable<KeywordSearchTarget> SelectMany(int searchTargetId);
+        IEnumerable<EndpointSearchTarget> SelectMany(int searchTargetId);
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        IEnumerable<KeywordSearchTarget> SelectAll();
+        IEnumerable<EndpointSearchTarget> SelectAll();
 
         /// <summary>
         /// 

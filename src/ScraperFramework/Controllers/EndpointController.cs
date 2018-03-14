@@ -9,14 +9,14 @@ using ScraperFramework.Data.Entities;
 
 namespace ScraperFramework.Controllers
 {
-    [RestController(BasePath = "/search-targets")]
-    public class SearchTargetController
+    [RestController(BasePath = "/endpoints")]
+    public class EndpointController
     {
-        private readonly ISearchTargetRepo _searchTargetRepo;
+        private readonly IEndpointRepo _endpointRepo;
 
-        public SearchTargetController(ISearchTargetRepo searchTargetRepo)
+        public EndpointController(IEndpointRepo endpointRepo)
         {
-            _searchTargetRepo = searchTargetRepo ?? throw new ArgumentNullException(nameof(searchTargetRepo));
+            _endpointRepo = endpointRepo ?? throw new ArgumentNullException(nameof(endpointRepo));
         }
 
         /// <summary>
@@ -25,11 +25,11 @@ namespace ScraperFramework.Controllers
         /// <param name="context"></param>
         /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.GET)]
-        public IResult GetSearchTargets(HttpContext context)
+        public IResult GetEndpoints(HttpContext context)
         {
-            IEnumerable<SearchTarget> searchTargets = _searchTargetRepo.SelectAll();
+            IEnumerable<Endpoint> endpoints = _endpointRepo.SelectAll();
 
-            return new SerializedResult(searchTargets);
+            return new SerializedResult(endpoints);
         }
 
         /// <summary>
@@ -38,12 +38,12 @@ namespace ScraperFramework.Controllers
         /// <param name="context"></param>
         /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.GET, Path = @"\d+")]
-        public IResult GetSearchTarget(HttpContext context)
+        public IResult GetEndpoint(HttpContext context)
         {
-            int id = int.Parse(context.Request.StrParams[1]);
-            SearchTarget searchTarget = _searchTargetRepo.Select(id);
+            int endpointID = int.Parse(context.Request.StrParams[1]);
+            Endpoint endpoint = _endpointRepo.Select(endpointID);
 
-            return new SerializedResult(searchTarget);
+            return new SerializedResult(endpoint);
         }
 
         /// <summary>
@@ -52,18 +52,17 @@ namespace ScraperFramework.Controllers
         /// <param name="context"></param>
         /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.POST)]
-        public IResult PostSearchTarget(HttpContext context)
+        public IResult PostEndpoint(HttpContext context)
         {
             if (!context.Request.HasEntityBody)
             {
                 return new EmptyResult(HttpStatusCode.BadRequest);
             }
 
-            SearchTarget searchTarget = null;
+            IEnumerable<Endpoint> endpoints = null;
             try
             {
-                // TODO(zvp): Add View Models ? I guess
-                searchTarget = context.Serializer.Deserialize<SearchTarget>(
+                endpoints = context.Serializer.Deserialize<IEnumerable<Endpoint>>(
                     context.Request.DataBody);
             }
             catch (Exception)
@@ -71,9 +70,9 @@ namespace ScraperFramework.Controllers
                 return new EmptyResult(HttpStatusCode.BadRequest);
             }
 
-            _searchTargetRepo.Insert(searchTarget);
+            _endpointRepo.InsertMany(endpoints);
 
-            return new SerializedResult(searchTarget);
+            return new EmptyResult(HttpStatusCode.NoContent);
         }
 
         /// <summary>
@@ -82,11 +81,11 @@ namespace ScraperFramework.Controllers
         /// <param name="context"></param>
         /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.GET, Path = "/count")]
-        public IResult GetSearchTargetCount(HttpContext context)
+        public IResult GetEndpointCount(HttpContext context)
         {
             return new SerializedResult(new
             {
-                SearchTargetCount = _searchTargetRepo.Count()
+                EndpointCount = _endpointRepo.Count()
             });
         }
     }

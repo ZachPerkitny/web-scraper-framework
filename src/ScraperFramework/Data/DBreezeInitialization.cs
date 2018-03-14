@@ -19,6 +19,7 @@ namespace ScraperFramework.Data
             if (!_initialized)
             {
                 // Setup Serializers using Newtonsoft
+                // TODO (zvp): Maybe use something more compact ?
                 DBreeze.Utils.CustomSerializator.ByteArraySerializator = (object obj) =>
                 {
                     return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj));

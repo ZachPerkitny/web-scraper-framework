@@ -9,47 +9,47 @@ using ScraperFramework.Data.Entities;
 
 namespace ScraperFramework.Data.Concrete
 {
-    class KeywordSearchTargetRepo : IKeywordSearchTargetRepo
+    public class EndpointSearchTargetRepo : IEndpointSearchTargetRepo
     {
-        private const string _table = "KeywordSearchTarget";
+        private const string _table = "EndpointSearchTarget";
         private readonly DBreezeEngine _engine;
 
-        public KeywordSearchTargetRepo(DBreezeEngine engine)
+        public EndpointSearchTargetRepo(DBreezeEngine engine)
         {
             _engine = engine ?? throw new ArgumentNullException(nameof(engine));
             DBreezeInitialization.SetupUtils();
         }
 
-        public void Insert(KeywordSearchTarget keywordSearchTarget)
+        public void Insert(EndpointSearchTarget endpointSearchTarget)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                Insert(transaction, keywordSearchTarget);
+                Insert(transaction, endpointSearchTarget);
 
                 transaction.Commit();
             }
         }
 
-        public void InsertMany(IEnumerable<KeywordSearchTarget> keywordSearchTargets)
+        public void InsertMany(IEnumerable<EndpointSearchTarget> endpointSearchTargets)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                foreach (KeywordSearchTarget keywordSearchTarget in keywordSearchTargets)
+                foreach (var endpointSearchTarget in endpointSearchTargets)
                 {
-                    Insert(transaction, keywordSearchTarget);
+                    Insert(transaction, endpointSearchTarget);
                 }
 
                 transaction.Commit();
             }
         }
 
-        public KeywordSearchTarget Select(int id)
+        public EndpointSearchTarget Select(int id)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                DBreezeObject<KeywordSearchTarget> obj = transaction
+                DBreezeObject<EndpointSearchTarget> obj = transaction
                     .Select<byte[], byte[]>(_table, 1.ToIndex(id))
-                    .ObjectGet<KeywordSearchTarget>();
+                    .ObjectGet<EndpointSearchTarget>();
 
                 if (obj != null)
                 {
@@ -60,13 +60,13 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public KeywordSearchTarget Select(int searchTargetId, int keywordId)
+        public EndpointSearchTarget Select(int searchTargetId, int endpointId)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                DBreezeObject<KeywordSearchTarget> obj = transaction
-                    .Select<byte[], byte[]>(_table, 2.ToIndex(searchTargetId, keywordId))
-                    .ObjectGet<KeywordSearchTarget>();
+                DBreezeObject<EndpointSearchTarget> obj = transaction
+                    .Select<byte[], byte[]>(_table, 2.ToIndex(searchTargetId, endpointId))
+                    .ObjectGet<EndpointSearchTarget>();
 
                 if (obj != null)
                 {
@@ -77,21 +77,21 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public IEnumerable<KeywordSearchTarget> SelectMany(int searchTargetId)
+        public IEnumerable<EndpointSearchTarget> SelectMany(int searchTargetId)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                var entities = new List<KeywordSearchTarget>();
+                var entities = new List<EndpointSearchTarget>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction.SelectForwardFromTo<byte[], byte[]>(
-                    _table, 3.ToIndex(searchTargetId, int.MinValue), true,
+                    _table, 3.ToIndex(searchTargetId, int.MinValue, true), true,
                     3.ToIndex(searchTargetId, int.MaxValue), true);
 
                 foreach (var row in rows)
                 {
-                    DBreezeObject<KeywordSearchTarget> obj = row.ObjectGet<KeywordSearchTarget>();
+                    DBreezeObject<EndpointSearchTarget> obj = row.ObjectGet<EndpointSearchTarget>();
                     if (obj != null)
                     {
-                        KeywordSearchTarget entity = obj.Entity;
+                        EndpointSearchTarget entity = obj.Entity;
                         entities.Add(entity);
                     }
                 }
@@ -100,20 +100,19 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public IEnumerable<KeywordSearchTarget> SelectAll()
+        public IEnumerable<EndpointSearchTarget> SelectAll()
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                var entities = new List<KeywordSearchTarget>();
+                var entities = new List<EndpointSearchTarget>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction.SelectForward<byte[], byte[]>(_table);
 
                 foreach (var row in rows)
                 {
-                    DBreezeObject<KeywordSearchTarget> obj = row.ObjectGet<KeywordSearchTarget>();
-
+                    DBreezeObject<EndpointSearchTarget> obj = row.ObjectGet<EndpointSearchTarget>();
                     if (obj != null)
                     {
-                        KeywordSearchTarget entity = obj.Entity;
+                        EndpointSearchTarget entity = obj.Entity;
                         entities.Add(entity);
                     }
                 }
@@ -132,33 +131,33 @@ namespace ScraperFramework.Data.Concrete
 
         /// <summary>
         /// Does an object insert and creates the necessary indexes for
-        /// a keyword search target
+        /// a endpoint search target
         /// </summary>
         /// <param name="transaction"></param>
-        /// <param name="keywordSearchTarget"></param>
-        private void Insert(Transaction transaction, KeywordSearchTarget keywordSearchTarget)
+        /// <param name="endpointSearchTarget"></param>
+        private void Insert(Transaction transaction, EndpointSearchTarget endpointSearchTarget)
         {
-            bool newEntity = keywordSearchTarget.ID == 0;
+            bool newEntity = endpointSearchTarget.ID == 0;
             if (newEntity)
             {
-                keywordSearchTarget.ID = transaction.ObjectGetNewIdentity<int>(_table);
+                endpointSearchTarget.ID = transaction.ObjectGetNewIdentity<int>(_table);
             }
-            
-            transaction.ObjectInsert(_table, new DBreezeObject<KeywordSearchTarget>
+
+            transaction.ObjectInsert(_table, new DBreezeObject<EndpointSearchTarget>
             {
                 NewEntity = newEntity,
-                Entity = keywordSearchTarget,
+                Entity = endpointSearchTarget,
                 Indexes = new List<DBreezeIndex>
                 {
-                    new DBreezeIndex(1, keywordSearchTarget.ID)
+                    new DBreezeIndex(1, endpointSearchTarget.ID)
                     {
                         PrimaryIndex = true
                     },
-                    new DBreezeIndex(2, keywordSearchTarget.SearchTargetID, keywordSearchTarget.KeywordID)
+                    new DBreezeIndex(2, endpointSearchTarget.SearchTargetID, endpointSearchTarget.EndpointID)
                     {
                         AddPrimaryToTheEnd = false
                     },
-                    new DBreezeIndex(3, keywordSearchTarget.SearchTargetID)
+                    new DBreezeIndex(3, endpointSearchTarget.SearchTargetID)
                     {
                         AddPrimaryToTheEnd = true
                     }

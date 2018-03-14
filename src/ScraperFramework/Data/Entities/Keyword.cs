@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ScraperFramework.Data.Entities
+﻿namespace ScraperFramework.Data.Entities
 {
     public class Keyword
     {

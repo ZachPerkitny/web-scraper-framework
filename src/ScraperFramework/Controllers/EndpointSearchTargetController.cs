@@ -9,14 +9,14 @@ using ScraperFramework.Data.Entities;
 
 namespace ScraperFramework.Controllers
 {
-    [RestController(BasePath = "/keyword-search-targets")]
-    public class KeywordSearchTargetController
+    [RestController(BasePath = "/endpoint-search-targets")]
+    public class EndpointSearchTargetController
     {
-        private readonly IKeywordSearchTargetRepo _keywordSearchTargetRepo;
+        private readonly IEndpointSearchTargetRepo _endpointSearchTargetRepo;
 
-        public KeywordSearchTargetController(IKeywordSearchTargetRepo keywordSearchTargetRepo)
+        public EndpointSearchTargetController(IEndpointSearchTargetRepo endpointSearchTargetRepo)
         {
-            _keywordSearchTargetRepo = keywordSearchTargetRepo ?? throw new ArgumentNullException(nameof(keywordSearchTargetRepo));
+            _endpointSearchTargetRepo = endpointSearchTargetRepo ?? throw new ArgumentNullException(nameof(endpointSearchTargetRepo));
         }
 
         /// <summary>
@@ -25,16 +25,16 @@ namespace ScraperFramework.Controllers
         /// <param name="context"></param>
         /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.GET)]
-        public IResult GetKeywordSearchTargets(HttpContext context)
+        public IResult GetEndpointSearchTargets(HttpContext context)
         {
-            IEnumerable<KeywordSearchTarget> keywordSearchTargets = null;
+            IEnumerable<EndpointSearchTarget> endpointSearchTargets = null;
 
             if (context.Request.QueryString["search-target"] != null)
             {
                 try
                 {
                     int searchTargetId = int.Parse(context.Request.QueryString["search-target"]);
-                    keywordSearchTargets = _keywordSearchTargetRepo.SelectMany(searchTargetId);
+                    endpointSearchTargets = _endpointSearchTargetRepo.SelectMany(searchTargetId);
                 }
                 catch (Exception)
                 {
@@ -43,10 +43,10 @@ namespace ScraperFramework.Controllers
             }
             else
             {
-                keywordSearchTargets = _keywordSearchTargetRepo.SelectAll();
+                endpointSearchTargets = _endpointSearchTargetRepo.SelectAll();
             }
 
-            return new SerializedResult(keywordSearchTargets);
+            return new SerializedResult(endpointSearchTargets);
         }
 
         /// <summary>
@@ -55,12 +55,12 @@ namespace ScraperFramework.Controllers
         /// <param name="context"></param>
         /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.GET, Path = @"\d+")]
-        public IResult GetKeywordSearchTarget(HttpContext context)
+        public IResult GetEndpointSearchTarget(HttpContext context)
         {
-            int keywordSearchTargetId = int.Parse(context.Request.StrParams[1]);
-            KeywordSearchTarget keywordSearchTarget = _keywordSearchTargetRepo.Select(keywordSearchTargetId);
+            int endpointSearchTargetId = int.Parse(context.Request.StrParams[1]);
+            EndpointSearchTarget endpointSearchTarget = _endpointSearchTargetRepo.Select(endpointSearchTargetId);
 
-            return new SerializedResult(keywordSearchTarget);
+            return new SerializedResult(endpointSearchTarget);
         }
 
         /// <summary>
@@ -69,25 +69,25 @@ namespace ScraperFramework.Controllers
         /// <param name="context"></param>
         /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.POST)]
-        public IResult PostKeywordSearchTarget(HttpContext context)
+        public IResult PostEndpointSearchTarget(HttpContext context)
         {
             if (!context.Request.HasEntityBody)
             {
                 return new EmptyResult(HttpStatusCode.BadRequest);
             }
 
-            IEnumerable<KeywordSearchTarget> keywordSearchTargets = null;
+            IEnumerable<EndpointSearchTarget> endpointSearchTargets = null;
             try
             {
-                keywordSearchTargets = context.Serializer
-                    .Deserialize<IEnumerable<KeywordSearchTarget>>(context.Request.DataBody);
+                endpointSearchTargets = context.Serializer
+                    .Deserialize<IEnumerable<EndpointSearchTarget>>(context.Request.DataBody);
             }
             catch (Exception)
             {
                 return new EmptyResult(HttpStatusCode.BadRequest);
             }
 
-            _keywordSearchTargetRepo.InsertMany(keywordSearchTargets);
+            _endpointSearchTargetRepo.InsertMany(endpointSearchTargets);
 
             return new EmptyResult(HttpStatusCode.NoContent);
         }
@@ -98,11 +98,11 @@ namespace ScraperFramework.Controllers
         /// <param name="context"></param>
         /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.GET, Path = "/count")]
-        public IResult GetKeywordSearchTargetCount(HttpContext context)
+        public IResult GetEndpointSearchTargetCount(HttpContext context)
         {
             return new SerializedResult(new
             {
-                KeywordSearchTargetCount = _keywordSearchTargetRepo.Count()
+                EndpointSearchTargetCount = _endpointSearchTargetRepo.Count()
             });
         }
     }
