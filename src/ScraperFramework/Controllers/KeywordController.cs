@@ -9,7 +9,7 @@ using ScraperFramework.Data.Entities;
 
 namespace ScraperFramework.Controllers
 {
-    [RestController(BasePath = "/keywords")]
+    [RestController(BasePath = "keywords/")]
     public class KeywordController
     {
         private readonly IKeywordRepo _keywordRepo;
@@ -17,6 +17,15 @@ namespace ScraperFramework.Controllers
         public KeywordController(IKeywordRepo keywordRepo)
         {
             _keywordRepo = keywordRepo ?? throw new ArgumentNullException(nameof(keywordRepo));
+        }
+
+        [RestRoute(HttpMethod = HttpMethod.GET, Path = @"\d+")]
+        public IResult GetKeyword(HttpContext context)
+        {
+            int keywordId = int.Parse(context.Request.StrParams[1]);
+            Keyword keyword = _keywordRepo.Select(keywordId);
+
+            return new SerializedResult(keyword);
         }
 
         [RestRoute(HttpMethod = HttpMethod.GET)]

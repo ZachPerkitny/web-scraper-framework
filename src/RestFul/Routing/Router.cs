@@ -93,19 +93,51 @@ namespace RestFul.Routing
             return Routes.FirstOrDefault(route => route.Matches(httpContext));
         }
 
+        /// <summary>
+        /// Creates a the Route Path by appending the basePath and 
+        /// the path. If the path begins with a caret, it is moved to
+        /// the front of the path. If the basePath does not begin with
+        /// a forward slash, it is prepended, so it can be properly matched.
+        /// If the path does not start with a forward slash, and the basePath
+        /// does not end with a forward slash, a forward slash is prepended
+        /// to the path so it can be properly matched.
+        /// </summary>
+        /// <param name="basePath"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
         private string CreatePath(string basePath, string path)
         {
-            if (!string.IsNullOrEmpty(basePath) && !basePath.StartsWith("/"))
+            // if both are null, just set to index route
+            if (basePath == null && path == null)
+            {
+                return "/";
+            }
+
+            string caret = string.Empty;
+
+            // Handle Caret in front of Route Attr Path, Move it to front
+            // of final constructed path
+            if (path != null && path.StartsWith("^"))
+            {
+                path.TrimStart(new char[] { '^' });
+                caret = "^";
+            }
+
+            // Prepend slash to base path if the first character is not a slash
+            if (basePath != null && !basePath.StartsWith("/"))
             {
                 basePath = $"/{basePath}";
             }
 
-            if (!string.IsNullOrEmpty(path) && !path.StartsWith("/"))
+            // Prepend slash to path if the first character is not a slash
+            // and the basePath is null or does not end with a slash
+            if ((path != null && !path.StartsWith("/")) && 
+                (basePath == null || !basePath.EndsWith("/")))
             {
-                path = $"{path}";
+                path = $"/{path}";
             }
 
-            return $"{basePath}{path}";
+            return $"{caret}{basePath}{path}";
         }
     }
 }

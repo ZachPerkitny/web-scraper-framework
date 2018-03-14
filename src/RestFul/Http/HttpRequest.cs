@@ -1,5 +1,7 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Specialized;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using RestFul.Enum;
@@ -18,6 +20,7 @@ namespace RestFul.Http
         private string _data;
         private bool _convertedHttpMethod;
         private HttpMethod _httpMethod;
+        private string[] _strParams;
 
         public HttpRequest(HttpListenerRequest httpListenerRequest)
         {
@@ -135,6 +138,175 @@ namespace RestFul.Http
         public Stream InputStream
         {
             get { return _httpListenerRequest.InputStream; }
+        }
+
+        /// <summary>
+        /// Gets a boolean value that indicates whether
+        /// the client making the request is authenticated
+        /// or not.
+        /// </summary>
+        public bool IsAuthenticated
+        {
+            get { return _httpListenerRequest.IsAuthenticated; }
+        }
+
+        /// <summary>
+        /// Gets a boolean value that indicates whether
+        /// the request was sent from a local computer
+        /// or not.
+        /// </summary>
+        public bool IsLocal
+        {
+            get { return _httpListenerRequest.IsLocal; }
+        }
+
+        /// <summary>
+        /// Gets a boolean value that indicates whether
+        /// the request is using SSL.
+        /// </summary>
+        public bool IsSecureConnection
+        {
+            get { return _httpListenerRequest.IsSecureConnection; }
+        }
+
+        /// <summary>
+        /// Gets a boolean value that indicates that the
+        /// connection should be persistent.
+        /// </summary>
+        public bool KeepAlive
+        {
+            get { return _httpListenerRequest.KeepAlive; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IPEndPoint LocalEndPoint
+        {
+            get { return _httpListenerRequest.LocalEndPoint; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Version ProtocolVersion
+        {
+            get { return _httpListenerRequest.ProtocolVersion; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public NameValueCollection QueryString
+        {
+            get { return _httpListenerRequest.QueryString; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string RawUrl
+        {
+            get { return _httpListenerRequest.RawUrl; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IPEndPoint RemoteEndPoint
+        {
+            get { return _httpListenerRequest.RemoteEndPoint; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Guid RequestTraceIdentifier
+        {
+            get { return _httpListenerRequest.RequestTraceIdentifier; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ServiceName
+        {
+            get { return _httpListenerRequest.ServiceName; }
+        }
+
+        /// <summary>
+        /// Gets an array of the request parameters.
+        /// </summary>
+        public string[] StrParams
+        {
+            get
+            {
+                if (_strParams != null)
+                {
+                    return _strParams;
+                }
+
+                _strParams = _httpListenerRequest.Url.Segments.Skip(1)
+                    .Select(p => p.Replace("/", "")).ToArray();
+
+                return _strParams;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public TransportContext TransportContext
+        {
+            get { return _httpListenerRequest.TransportContext; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Uri Url
+        {
+            get { return _httpListenerRequest.Url; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Uri UriReferrer
+        {
+            get { return _httpListenerRequest.UrlReferrer; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string UserAgent
+        {
+            get { return _httpListenerRequest.UserAgent; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string UserHostAddress
+        {
+            get { return _httpListenerRequest.UserHostAddress; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string UserHostName
+        {
+            get { return _httpListenerRequest.UserHostName; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string[] UserLanguages
+        {
+            get { return _httpListenerRequest.UserLanguages; }
         }
     }
 }
