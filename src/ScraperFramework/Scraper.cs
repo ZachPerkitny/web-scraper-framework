@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Serilog;
 using WebScraper.Pocos;
+using ScraperFramework.Data;
+using ScraperFramework.Data.Entities;
+using ScraperFramework.Enum;
 
 namespace ScraperFramework
 {
@@ -24,7 +27,7 @@ namespace ScraperFramework
             _scraperQueue = scraperQueue ?? throw new ArgumentNullException(nameof(scraperQueue));
             ScraperID = Guid.NewGuid();
             _cancellationToken = cancellationToken;
-            _mutex = new Mutex(false, "testmapmutex");
+            _mutex = new Mutex(false, $"{ScraperID}mutex");
         }
 
         public async Task Start()
@@ -39,7 +42,7 @@ namespace ScraperFramework
                 // that are not associated with a file on a disk.
                 // When the last process has finished working with
                 // the file, the data is lost.
-                using (MemoryMappedFile mmf = MemoryMappedFile.CreateNew("testmap", 1024))
+                using (MemoryMappedFile mmf = MemoryMappedFile.CreateNew(ScraperID.ToString(), 1024))
                 {
                     _mutex.WaitOne();
 
@@ -47,7 +50,7 @@ namespace ScraperFramework
                     {
                         StartInfo = new ProcessStartInfo
                         {
-                            //Arguments = $"--mapName={ScraperID} --mutex={mutexName}", // for mutex, and mmf
+                            Arguments = $"--mapName={ScraperID} --mutexName={ScraperID}mutex", // for mutex, and mmf
                             FileName = "WebScraper.exe",
                             CreateNoWindow = true,
                             UseShellExecute = false,
@@ -63,7 +66,7 @@ namespace ScraperFramework
                         BinaryWriter binaryWriter = new BinaryWriter(stream);
                         binaryWriter.Write(serializedCrawlDescription);
                     }
-
+                    
                     _mutex.ReleaseMutex();
 
                     Thread.Sleep(100); // temp race condition fix

@@ -1,5 +1,5 @@
 ﻿using System;
-using ScraperFramework.Enums;
+using ScraperFramework.Enum;
 
 namespace ScraperFramework.Data.Entities
 {
@@ -15,6 +15,6 @@ namespace ScraperFramework.Data.Entities
 
         public DateTime CrawlTime { get; } = DateTime.UtcNow;
 
-        public CrawlResult CrawlResultID { get; set; }
+        public CrawlResultID CrawlResultID { get; set; }
     }
 }

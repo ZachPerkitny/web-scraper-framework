@@ -3,6 +3,7 @@ using System.IO.MemoryMappedFiles;
 using System.Text;
 using System.Threading;
 using WebScraper.Pocos;
+using NDesk.Options;
 using Newtonsoft.Json;
 
 namespace WebScraper
@@ -12,9 +13,34 @@ namespace WebScraper
         // temp, just testing
         static void Main(string[] args)
         {
-            using (MemoryMappedFile mmf = MemoryMappedFile.OpenExisting("testmap"))
+            string mapName = null;
+            string mutexName = null;
+
+            OptionSet optionSet = new OptionSet
             {
-                Mutex mutex = Mutex.OpenExisting("testmapmutex");
+                {"mapName=", "Memory Map Name",  (v) => mapName = v },
+                {"mutexName=", "Mutex Name", (v) =>  mutexName = v }
+            };
+
+            try
+            {
+                optionSet.Parse(args);
+            }
+            catch (OptionException)
+            {
+                System.Console.WriteLine("no");
+                System.Console.ReadLine();
+                return;
+            }
+            System.Console.WriteLine("{0} {1}", mapName, mutexName);
+            if (mapName == null || mutexName == null)
+            {
+                return;
+            }
+
+            using (MemoryMappedFile mmf = MemoryMappedFile.OpenExisting(mapName))
+            {
+                Mutex mutex = Mutex.OpenExisting(mutexName);
                 mutex.WaitOne();
 
                 CrawlDescription crawlDescription = null;

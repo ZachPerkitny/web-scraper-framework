@@ -40,6 +40,7 @@ namespace ScraperFramework.Configuration
                 {
                     c.Register<IRestFulLogger>((_) => new SerilogLogger(Log.Logger));
                     // TODO(zvp): add unity adaptor
+                    c.Register((_) => new CrawlLogController(Container.Resolve<ICrawlLogRepo>()));
                     c.Register((_) => new EndpointController(Container.Resolve<IEndpointRepo>()));
                     c.Register((_) => new EndpointSearchTargetController(Container.Resolve<IEndpointSearchTargetRepo>()));
                     c.Register((_) => new KeywordController(Container.Resolve<IKeywordRepo>()));

@@ -49,16 +49,5 @@ namespace ScraperFramework.Services.Concrete
             
             return toBeCrawled;
         }
-
-        public IEnumerable<SearchTarget> GetSearchTargets()
-        {
-            IEnumerable<SearchTarget> searchTargets = _searchTargetRepo.SelectAll();
-            return searchTargets;
-        }
-
-        public void LogCrawl(CrawlLog crawlLog)
-        {
-            _crawlLogRepo.Insert(crawlLog);
-        }
     }
 }

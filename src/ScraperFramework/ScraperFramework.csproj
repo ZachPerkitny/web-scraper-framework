@@ -95,6 +95,7 @@
     <Compile Include="Configuration\ScraperBuilder.cs" />
     <Compile Include="Configuration\ScraperConfig.cs" />
     <Compile Include="Controllers\CoordinatorController.cs" />
+    <Compile Include="Controllers\CrawlLogController.cs" />
     <Compile Include="Controllers\EndpointController.cs" />
     <Compile Include="Controllers\EndpointSearchTargetController.cs" />
     <Compile Include="Controllers\KeywordController.cs" />
@@ -115,7 +116,7 @@
     <Compile Include="Data\Entities\Keyword.cs" />
     <Compile Include="Data\Entities\KeywordSearchTarget.cs" />
     <Compile Include="Data\Entities\SearchTarget.cs" />
-    <Compile Include="Enums\CrawlResult.cs" />
+    <Compile Include="Enum\CrawlResultID.cs" />
     <Compile Include="ICoordinator.cs" />
     <Compile Include="Data\ICrawlLogRepo.cs" />
     <Compile Include="Data\IEndpointRepo.cs" />

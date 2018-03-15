@@ -36,7 +36,7 @@ namespace ScraperFramework
             _restFulServer.Start();
 
             Log.Information("Starting Scrapers");
-            for (int i = 0; i < /*_config.Scrapers*/ 1; i++)
+            for (int i = 0; i < _config.Scrapers; i++)
             {
                 _scrapers.Add(new Scraper(_scraperQueue, _cancellationTokenSource.Token));
             }
@@ -44,7 +44,7 @@ namespace ScraperFramework
             _scraperTasks = _scrapers.Select(scraper => Task.Factory.StartNew(async () =>
             {
                 await scraper.Start();
-            })).ToList();
+            }, TaskCreationOptions.LongRunning)).ToList();
         }
 
         protected virtual void Dispose(bool disposing)
