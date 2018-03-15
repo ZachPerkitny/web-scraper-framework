@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ScraperFramework.Pocos
+﻿namespace ScraperFramework.Pocos
 {
     public class CrawlDescription
     {

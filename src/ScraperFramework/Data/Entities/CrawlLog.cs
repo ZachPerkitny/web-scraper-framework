@@ -11,6 +11,8 @@ namespace ScraperFramework.Data.Entities
 
         public int SearchTargetID { get; set; }
 
+        public int EndpointID { get; set; }
+
         public DateTime CrawlTime { get; } = DateTime.UtcNow;
 
         public CrawlResult CrawlResultID { get; set; }

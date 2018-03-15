@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using ScraperFramework.Pocos;
 
 namespace ScraperFramework
@@ -9,6 +9,6 @@ namespace ScraperFramework
         /// 
         /// </summary>
         /// <returns></returns>
-        CrawlDescription Dequeue();
+        Task<CrawlDescription> Dequeue();
     }
 }

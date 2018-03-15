@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 
 namespace ScraperFramework
 {
@@ -7,7 +7,7 @@ namespace ScraperFramework
         /// <summary>
         /// 
         /// </summary>
-        void Start();
+        Task Start();
         /// <summary>
         /// 
         /// </summary>
