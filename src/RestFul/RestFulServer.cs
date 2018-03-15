@@ -20,7 +20,7 @@ namespace RestFul
         private readonly IRouter _router;
         private bool _starting;
         private bool _hasRun;
-        private bool _stopping;
+        //private bool _stopping;
         private Task _httpListenerTask;
 
         public RestFulServer(IRestFulSettings settings, IRestFulLogger logger, ISerializer serializer,

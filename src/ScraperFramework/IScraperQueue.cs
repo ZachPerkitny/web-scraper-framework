@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using ScraperFramework.Pocos;
+using WebScraper.Pocos;
 
 namespace ScraperFramework
 {

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using Microsoft.Extensions.Configuration;
 using Serilog;
 using ScraperFramework;
 using ScraperFramework.Configuration;
@@ -11,12 +9,6 @@ namespace Driver
     {
         static void Main(string[] args)
         {
-            var configBuilder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", true)
-                .AddEnvironmentVariables()
-                .Build();
-
             Log.Logger = SetupLogger();
 
             var scraperBuilder = new ScraperBuilder(config =>
@@ -44,3 +36,4 @@ namespace Driver
         }
     }
 }
+

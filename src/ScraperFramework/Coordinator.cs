@@ -11,12 +11,14 @@ namespace ScraperFramework
 {
     class Coordinator : ICoordinator
     {
-        private readonly List<IScraper> _scrapers;
-        private List<Task<Task>> _scraperTasks;
         private readonly IScraperQueue _scraperQueue;
         private readonly IRestFulServer _restFulServer;
         private readonly ScraperConfig _config;
         private readonly CancellationTokenSource _cancellationTokenSource;
+
+        private readonly List<IScraper> _scrapers = new List<IScraper>();
+        private List<Task<Task>> _scraperTasks;
+
         private bool _disposed = false;
 
         public Coordinator(IScraperQueue scraperQueue, IRestFulServer restFulServer, ScraperConfig config, 
@@ -34,9 +36,9 @@ namespace ScraperFramework
             _restFulServer.Start();
 
             Log.Information("Starting Scrapers");
-            for (int i = 0; i < _config.Scrapers; i++)
+            for (int i = 0; i < /*_config.Scrapers*/ 1; i++)
             {
-                _scrapers.Add(new Scraper(_cancellationTokenSource.Token));
+                _scrapers.Add(new Scraper(_scraperQueue, _cancellationTokenSource.Token));
             }
 
             _scraperTasks = _scrapers.Select(scraper => Task.Factory.StartNew(async () =>

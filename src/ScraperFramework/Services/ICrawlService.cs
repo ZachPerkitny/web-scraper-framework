@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ScraperFramework.Data.Entities;
-using ScraperFramework.Pocos;
+using WebScraper.Pocos;
 
 namespace ScraperFramework.Services
 {

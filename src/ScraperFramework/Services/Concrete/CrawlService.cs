@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ScraperFramework.Data;
 using ScraperFramework.Data.Entities;
-using ScraperFramework.Pocos;
+using WebScraper.Pocos;
 
 namespace ScraperFramework.Services.Concrete
 {
@@ -25,16 +25,6 @@ namespace ScraperFramework.Services.Concrete
         private readonly IKeywordSearchTargetRepo _keywordSearchTargetRepo;
         private readonly ISearchTargetRepo _searchTargetRepo;
         private readonly ICrawlLogRepo _crawlLogRepo;
-        
-        private readonly Dictionary<int, Keyword> _keywords = new Dictionary<int, Keyword>();
-        private readonly Dictionary<int, Dictionary<int, int>> _keywordCrawlCounts =
-            new Dictionary<int, Dictionary<int, int>>();
-
-        private readonly Dictionary<int, Endpoint> _endpoints = new Dictionary<int, Endpoint>();
-        // Tuple (WebsiteID, CountryID)
-        private readonly Dictionary<Tuple<int, int>, DateTime> _endpointCooldowns = new Dictionary<Tuple<int, int>, DateTime>();
-        
-        private bool _filledCache;
 
         public CrawlService(IEndpointRepo endpointRepo, IEndpointSearchTargetRepo endpointSearchTargetRepo, IKeywordRepo keywordRepo, 
             IKeywordSearchTargetRepo keywordSearchTargetRepo, ISearchTargetRepo searchTargetRepo, ICrawlLogRepo crawlLogRepo)
@@ -49,13 +39,13 @@ namespace ScraperFramework.Services.Concrete
 
         public IEnumerable<CrawlDescription> GetKeywordsToCrawl(int count)
         {
-            if (!_filledCache)
-            {
-                FillCache();
-            }
-
-            var toBeCrawled = new List<CrawlDescription>();
-
+            IEnumerable<CrawlDescription> toBeCrawled = _keywordRepo.SelectAll()
+                .Select(k => new CrawlDescription
+                {
+                    Keyword = k.Value,
+                    KeywordID = k.ID,
+                    EndpointAddress = "54.226.252.167:8888"
+                });
             
             return toBeCrawled;
         }
@@ -68,24 +58,7 @@ namespace ScraperFramework.Services.Concrete
 
         public void LogCrawl(CrawlLog crawlLog)
         {
-            if (!_filledCache)
-            {
-                FillCache();
-            }
-
             _crawlLogRepo.Insert(crawlLog);
-            _keywordCrawlCounts[crawlLog.SearchTargetID][crawlLog.KeywordID] += 1;
-        }
-
-        /// <summary>
-        /// On initial load, the service fills up a dictionary with 
-        /// crawl counts to avoid uneccesary file reads.
-        /// </summary>
-        private void FillCache()
-        {
-            
-
-            _filledCache = true;
         }
     }
 }

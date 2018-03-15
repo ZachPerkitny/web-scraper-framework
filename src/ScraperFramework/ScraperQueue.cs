@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ScraperFramework.Pocos;
 using ScraperFramework.Services;
+using WebScraper.Pocos;
 
 namespace ScraperFramework
 {
@@ -17,7 +17,7 @@ namespace ScraperFramework
 
         public ScraperQueue(ICrawlService crawlService)
         {
-            _crawlService = crawlService;
+            _crawlService = crawlService ?? throw new ArgumentNullException(nameof(crawlService));
         }
 
         public async Task<CrawlDescription> Dequeue()

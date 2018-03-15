@@ -1,4 +1,4 @@
-﻿namespace ScraperFramework.Pocos
+﻿namespace WebScraper.Pocos
 {
     public class CrawlDescription
     {
@@ -8,7 +8,7 @@
 
         public int SearchTargetID { get; set; }
 
-        public int EndpointAddress { get; set; }
+        public string EndpointAddress { get; set; }
 
         public int EndpointID { get; set; }
     }

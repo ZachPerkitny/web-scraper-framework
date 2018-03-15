@@ -1,20 +1,156 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7B10DF9F-AD52-4BFA-B1A4-05B71A16A0E9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ScraperFramework</RootNamespace>
+    <AssemblyName>ScraperFramework</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DBreeze" Version="1.90.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
-    <PackageReference Include="Serilog" Version="2.6.0" />
-    <PackageReference Include="Unity" Version="5.7.3" />
+    <Reference Include="CommonServiceLocator, Version=2.0.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.5.7.3\lib\net46\CommonServiceLocator.dll</HintPath>
+    </Reference>
+    <Reference Include="DBreeze, Version=1.90.2018.220, Culture=neutral, PublicKeyToken=174b57f1c155f3c6, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DBreeze.1.90.0\lib\net462\DBreeze.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Serilog.2.6.0\lib\net46\Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Unity.Abstractions, Version=3.3.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.5.7.3\lib\net46\Unity.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Configuration, Version=5.2.1.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.5.7.3\lib\net46\Unity.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Container, Version=5.7.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.5.7.3\lib\net46\Unity.Container.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Interception, Version=5.5.1.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.5.7.3\lib\net46\Unity.Interception.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Interception.Configuration, Version=5.1.4.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.5.7.3\lib\net46\Unity.Interception.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RegistrationByConvention, Version=2.1.5.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.5.7.3\lib\net46\Unity.RegistrationByConvention.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ServiceLocation, Version=2.1.2.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Unity.5.7.3\lib\net46\Unity.ServiceLocation.dll</HintPath>
+    </Reference>
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\Restful.Serilog\Restful.Serilog.csproj" />
-    <ProjectReference Include="..\RestFul\RestFul.csproj" />
-    <ProjectReference Include="..\WebScraper\WebScraper.csproj" />
+    <Compile Include="Configuration\IScraperBuilder.cs" />
+    <Compile Include="Configuration\ScraperBuilder.cs" />
+    <Compile Include="Configuration\ScraperConfig.cs" />
+    <Compile Include="Controllers\CoordinatorController.cs" />
+    <Compile Include="Controllers\EndpointController.cs" />
+    <Compile Include="Controllers\EndpointSearchTargetController.cs" />
+    <Compile Include="Controllers\KeywordController.cs" />
+    <Compile Include="Controllers\KeywordSearchTargetController.cs" />
+    <Compile Include="Controllers\SearchTargetController.cs" />
+    <Compile Include="Controllers\StatsController.cs" />
+    <Compile Include="Coordinator.cs" />
+    <Compile Include="Data\Concrete\CrawlLogRepo.cs" />
+    <Compile Include="Data\Concrete\EndpointRepo.cs" />
+    <Compile Include="Data\Concrete\EndpointSearchTargetRepo.cs" />
+    <Compile Include="Data\Concrete\KeywordRepo.cs" />
+    <Compile Include="Data\Concrete\KeywordSearchTargetRepo.cs" />
+    <Compile Include="Data\Concrete\SearchTargetRepo.cs" />
+    <Compile Include="Data\DBreezeInitialization.cs" />
+    <Compile Include="Data\Entities\CrawlLog.cs" />
+    <Compile Include="Data\Entities\Endpoint.cs" />
+    <Compile Include="Data\Entities\EndpointSearchTarget.cs" />
+    <Compile Include="Data\Entities\Keyword.cs" />
+    <Compile Include="Data\Entities\KeywordSearchTarget.cs" />
+    <Compile Include="Data\Entities\SearchTarget.cs" />
+    <Compile Include="Enums\CrawlResult.cs" />
+    <Compile Include="ICoordinator.cs" />
+    <Compile Include="Data\ICrawlLogRepo.cs" />
+    <Compile Include="Data\IEndpointRepo.cs" />
+    <Compile Include="Data\IEndpointSearchTargetRepo.cs" />
+    <Compile Include="Data\IKeywordRepo.cs" />
+    <Compile Include="Data\IKeywordSearchTargetRepo.cs" />
+    <Compile Include="IScraper.cs" />
+    <Compile Include="IScraperQueue.cs" />
+    <Compile Include="Data\ISearchTargetRepo.cs" />
+    <Compile Include="Pocos\CrawlStats.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scraper.cs" />
+    <Compile Include="ScraperQueue.cs" />
+    <Compile Include="Services\Concrete\CrawlService.cs" />
+    <Compile Include="Services\Concrete\StatsService.cs" />
+    <Compile Include="Services\ICrawlService.cs" />
+    <Compile Include="Services\IRedistributionService.cs" />
+    <Compile Include="Services\IStatsService.cs" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Restful.Serilog\Restful.Serilog.csproj">
+      <Project>{49476814-c554-44e9-a941-0fa4baaa5cb3}</Project>
+      <Name>Restful.Serilog</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RestFul\RestFul.csproj">
+      <Project>{1c22bce9-8ab8-478a-877d-f0e208ecd265}</Project>
+      <Name>RestFul</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WebScraper\WebScraper.csproj">
+      <Project>{9b544c9e-67f0-4d6b-854d-c711effb40dc}</Project>
+      <Name>WebScraper</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
