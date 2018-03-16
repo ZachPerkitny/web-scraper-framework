@@ -11,5 +11,7 @@
         public string EndpointAddress { get; set; }
 
         public int EndpointID { get; set; }
+
+        public string SearchTargetUrl { get; set; }
     }
 }

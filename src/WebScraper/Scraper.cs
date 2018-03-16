@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using CefSharp;
 using CefSharp.OffScreen;
+using Serilog;
+using WebScraper.Enum;
 using WebScraper.Extractors;
 using WebScraper.Pocos;
 
@@ -11,7 +13,6 @@ namespace WebScraper
     {
         public CrawlDescription CrawlDescription { get; private set; }
         
-        private const string BING_URL = "https://www.bing.com/search?q={0}";
         private bool _disposed = false;
 
         public Scraper(CrawlDescription crawlDescription)
@@ -58,12 +59,26 @@ namespace WebScraper
                 SearchTargetID = CrawlDescription.SearchTargetID
             };
 
-            using (ChromiumWebBrowser browser = new ChromiumWebBrowser())
+            BrowserSettings browserSettings = new BrowserSettings
             {
-                await WaitForBrowserInit(browser);
-                await LoadAsync(browser, string.Format(BING_URL, CrawlDescription.Keyword));
+                WindowlessFrameRate = 1
+            };
 
-                crawlResult.Ads = await BingExtractor.ExtractTextAds(browser);
+            using (ChromiumWebBrowser browser = new ChromiumWebBrowser(browserSettings: browserSettings))
+            {
+                try
+                {
+                    await WaitForBrowserInit(browser);
+                    await LoadAsync(browser, string.Format(CrawlDescription.SearchTargetUrl, CrawlDescription.Keyword));
+
+                    crawlResult.Ads = await BingExtractor.ExtractTextAds(browser);
+                    crawlResult.CrawlResultID = CrawlResultID.Success;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Scraper Exception({0}): {1}", ex.GetType(), ex.Message);
+                    crawlResult.CrawlResultID = CrawlResultID.Failure;
+                }
             }
 
             return crawlResult;

@@ -48,6 +48,10 @@ namespace ScraperFramework.Data.Concrete
                         new DBreezeIndex(3, log.SearchTargetID)
                         {
                             AddPrimaryToTheEnd = true
+                        },
+                        new DBreezeIndex(4, log.CrawlResultID)
+                        {
+                            AddPrimaryToTheEnd = true
                         }
                     }
                 });

@@ -19,12 +19,31 @@ namespace ScraperFramework.Controllers
             _crawlLogRepo = crawlLogRepo ?? throw new ArgumentNullException(nameof(crawlLogRepo));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.GET)]
         public IResult GetCrawlLogs(HttpContext context)
         {
             IEnumerable<CrawlLog> crawlLogs = _crawlLogRepo.SelectAll();
 
             return new SerializedResult(crawlLogs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        [RestRoute(HttpMethod = HttpMethod.GET, Path = "/total-count")]
+        public IResult GetKeywordCount(HttpContext context)
+        {
+            return new SerializedResult(new
+            {
+                CrawlLogCount = _crawlLogRepo.Count()
+            });
         }
     }
 }

@@ -44,7 +44,8 @@ namespace ScraperFramework.Services.Concrete
                 {
                     Keyword = k.Value,
                     KeywordID = k.ID,
-                    EndpointAddress = "54.226.252.167:8888"
+                    EndpointAddress = "34.228.166.129:8888",
+                    SearchTargetUrl = "http://www.bing.com/search?q={0}"
                 });
             
             return toBeCrawled;

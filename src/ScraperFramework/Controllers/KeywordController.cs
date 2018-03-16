@@ -19,6 +19,11 @@ namespace ScraperFramework.Controllers
             _keywordRepo = keywordRepo ?? throw new ArgumentNullException(nameof(keywordRepo));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.GET)]
         public IResult GetKeywords(HttpContext context)
         {
@@ -27,6 +32,11 @@ namespace ScraperFramework.Controllers
             return new SerializedResult(keywords);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.GET, Path = @"\d+")]
         public IResult GetKeyword(HttpContext context)
         {
@@ -36,6 +46,11 @@ namespace ScraperFramework.Controllers
             return new SerializedResult(keyword);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.POST)]
         public IResult PostKeyword(HttpContext context)
         {
@@ -57,9 +72,14 @@ namespace ScraperFramework.Controllers
 
             _keywordRepo.InsertMany(keywords);
 
-            return new EmptyResult(HttpStatusCode.NoContent);
+            return new SerializedResult(keywords);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         [RestRoute(HttpMethod = HttpMethod.GET, Path = "/count")]
         public IResult GetKeywordCount(HttpContext context)
         {

@@ -55,8 +55,10 @@ namespace ScraperFramework.Configuration
                 .RegisterType<IKeywordSearchTargetRepo, KeywordSearchTargetRepo>()
                 .RegisterType<ISearchTargetRepo, SearchTargetRepo>()
                 .RegisterType<ICrawlService, CrawlService>()
+                .RegisterType<ILoggerService, LoggerService>()
                 .RegisterType<IStatsService, StatsService>()
                 .RegisterType<IScraperQueue, ScraperQueue>()
+                .RegisterType<IScraperFactory, ScraperFactory>()
                 .RegisterType<ICoordinator, Coordinator>();
 
             return Container.Resolve<ICoordinator>();

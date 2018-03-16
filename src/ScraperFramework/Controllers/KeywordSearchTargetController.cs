@@ -89,7 +89,7 @@ namespace ScraperFramework.Controllers
 
             _keywordSearchTargetRepo.InsertMany(keywordSearchTargets);
 
-            return new EmptyResult(HttpStatusCode.NoContent);
+            return new SerializedResult(keywordSearchTargets);
         }
 
         /// <summary>

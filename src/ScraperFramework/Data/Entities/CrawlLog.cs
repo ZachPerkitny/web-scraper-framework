@@ -1,5 +1,5 @@
 ﻿using System;
-using ScraperFramework.Enum;
+using WebScraper.Enum;
 
 namespace ScraperFramework.Data.Entities
 {

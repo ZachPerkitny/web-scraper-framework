@@ -1,4 +1,4 @@
-﻿namespace ScraperFramework.Enum
+﻿namespace WebScraper.Enum
 {
     public enum CrawlResultID
     {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using WebScraper.Enum;
 
 namespace WebScraper.Pocos
 {
@@ -16,6 +17,8 @@ namespace WebScraper.Pocos
         public int SearchTargetID { get; set; }
 
         public int EndpointID { get; set; }
+
+        public CrawlResultID CrawlResultID { get; set; }
 
         public IEnumerable<AdResult> Ads { get; set; }
     }

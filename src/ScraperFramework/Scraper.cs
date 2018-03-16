@@ -1,33 +1,27 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.IO.MemoryMappedFiles;
-using System.Text;
+using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Serilog;
 using WebScraper.Pocos;
-using ScraperFramework.Data;
-using ScraperFramework.Data.Entities;
-using ScraperFramework.Enum;
+using ScraperFramework.Services;
 
 namespace ScraperFramework
 {
     class Scraper : IScraper
     {
-        public Guid ScraperID { get; private set; }
-
+        private readonly ILoggerService _loggerService;
         private readonly IScraperQueue _scraperQueue;
         private readonly CancellationToken _cancellationToken;
-        private readonly Mutex _mutex;
 
-        public Scraper(IScraperQueue scraperQueue, CancellationToken cancellationToken)
+        public Scraper(ILoggerService loggerService, IScraperQueue scraperQueue, CancellationToken cancellationToken)
         {
+            _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
             _scraperQueue = scraperQueue ?? throw new ArgumentNullException(nameof(scraperQueue));
-            ScraperID = Guid.NewGuid();
             _cancellationToken = cancellationToken;
-            _mutex = new Mutex(false, $"{ScraperID}mutex");
         }
 
         public async Task Start()
@@ -35,68 +29,85 @@ namespace ScraperFramework
             while (!_cancellationToken.IsCancellationRequested)
             {
                 CrawlDescription crawlDescription = await _scraperQueue.Dequeue();
-                byte[] serializedCrawlDescription = Encoding.UTF8.GetBytes(
-                    JsonConvert.SerializeObject(crawlDescription));
+                CrawlResult crawlResult = null;
 
-                // Non-persisted files are memory-mapped files 
-                // that are not associated with a file on a disk.
-                // When the last process has finished working with
-                // the file, the data is lost.
-                using (MemoryMappedFile mmf = MemoryMappedFile.CreateNew(ScraperID.ToString(), 1024))
+                Process pipeClient = new Process
                 {
-                    _mutex.WaitOne();
-
-                    Process process = new Process
+                    StartInfo = new ProcessStartInfo
                     {
-                        StartInfo = new ProcessStartInfo
-                        {
-                            Arguments = $"--mapName={ScraperID} --mutexName={ScraperID}mutex", // for mutex, and mmf
-                            FileName = "WebScraper.exe",
-                            CreateNoWindow = true,
-                            UseShellExecute = false,
-                            WindowStyle = ProcessWindowStyle.Hidden,
-                            WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory
-                        }
-                    };
-
-                    process.Start();
-
-                    using (MemoryMappedViewStream stream = mmf.CreateViewStream())
-                    {
-                        BinaryWriter binaryWriter = new BinaryWriter(stream);
-                        binaryWriter.Write(serializedCrawlDescription);
+                        FileName = "WebScraper.exe",
+                        CreateNoWindow = false,
+                        UseShellExecute = false,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory
                     }
-                    
-                    _mutex.ReleaseMutex();
+                };
 
-                    Thread.Sleep(100); // temp race condition fix
+                // For In-Out Inter-Process Communication
+                using (AnonymousPipeServerStream pipeServerWriter =
+                    new AnonymousPipeServerStream(PipeDirection.Out,
+                    HandleInheritability.Inheritable))
+                using (AnonymousPipeServerStream pipeServerReader =
+                    new AnonymousPipeServerStream(PipeDirection.In,
+                    HandleInheritability.Inheritable))
+                {
+                    // Start Pipe Client (WebScraper.exe)
+                    pipeClient.StartInfo.Arguments =
+                        $"{pipeServerWriter.GetClientHandleAsString()} {pipeServerReader.GetClientHandleAsString()}";
+                    pipeClient.Start();
 
-                    // Wait for scraper to finish
-                    // TODO(zvp): Add Timeout ?
-                    _mutex.WaitOne(30000);
+                    // release object handles
+                    pipeServerWriter.DisposeLocalCopyOfClientHandle();
+                    pipeServerReader.DisposeLocalCopyOfClientHandle();
 
-                    CrawlResult crawlResult = null;
-
-                    using (MemoryMappedViewStream stream = mmf.CreateViewStream())
+                    try
                     {
-                        BinaryReader binaryReader = new BinaryReader(stream);
-                        string value = Encoding.UTF8.GetString(binaryReader.ReadBytes((int) stream.Length));
-                        crawlResult = JsonConvert.DeserializeObject<CrawlResult>(value);
-                        if (crawlResult.Ads != null)
+                        using (StreamWriter sw = new StreamWriter(pipeServerWriter))
                         {
-                            Log.Information("Finished Crawling {0}", crawlDescription.Keyword);
-                            foreach (var ad in crawlResult.Ads)
+                            // flush after every write
+                            sw.AutoFlush = true;
+
+                            // write sync message
+                            await sw.WriteLineAsync("SYNC");
+                            pipeServerWriter.WaitForPipeDrain();
+
+                            // write crawl description
+                            string serializedCrawlDescription = JsonConvert.SerializeObject(crawlDescription);
+                            await sw.WriteLineAsync(serializedCrawlDescription);
+                        }
+
+                        using (StreamReader sr = new StreamReader(pipeServerReader))
+                        {
+                            string message;
+
+                            do
                             {
-                                Log.Information("{0} - {1}", ad.Title, ad.Url);
-                            }
+                                // TODO(zvp) : have to exit eventually.
+                                message = await sr.ReadLineAsync();
+                                Log.Debug("Pipe Received Message: {0}", message);
+                            } while (message == null || !message.StartsWith("SYNC"));
+
+                            message = await sr.ReadLineAsync();
+                            crawlResult = JsonConvert.DeserializeObject<CrawlResult>(message);
+                            Log.Debug("Pipe Received Crawl Result: {0}", message);
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        Log.Error("WebScraper Exception({0}): {1}", ex.GetType(), ex.Message);
+                    }
+                    finally
+                    {
+                        // wait for client to shutdown
+                        pipeClient.WaitForExit();
+                        // free resources
+                        pipeClient.Close();
+                    }
+                }
 
-                    _mutex.ReleaseMutex();
-
-                    //wait for scraper to shut down
-                    // TODO(zvp): Add Timeout ?
-                    process.WaitForExit(30000);
+                if (crawlResult != null)
+                {
+                    _loggerService.LogCrawlResult(crawlResult);
                 }
             }
         }
