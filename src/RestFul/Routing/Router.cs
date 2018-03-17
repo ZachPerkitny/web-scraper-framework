@@ -15,22 +15,11 @@ namespace RestFul.Routing
 {
     class Router : IRouter
     {
-        public static readonly List<Assembly> Assemblies;
-
         public HashSet<IRoute> Routes { get; private set; }
 
         private readonly IRestFulLogger _logger;
         private readonly IContainer _container;
         private bool _initialized;
-
-        static Router()
-        {
-            Assemblies = new List<Assembly>();
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                Assemblies.Add(assembly);
-            }
-        }
 
         public Router(IRestFulLogger logger, IContainer container)
         {
@@ -41,46 +30,46 @@ namespace RestFul.Routing
 
         public IResult Route(HttpContext httpContext)
         {
-            IRoute route = GetRouteForContext(httpContext);
+            IRoute route = Routes.FirstOrDefault(r => r.IsMatch(httpContext));
             if (route == null)
             {
                 return new EmptyResult(HttpStatusCode.NotFound);
             }
 
-            return route.Invoke(httpContext);
+            return route.Execute(httpContext);
         }
 
         public void Initialize()
         {
             if (!_initialized)
             {
-                foreach (Assembly assembly in Assemblies)
+                foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    Register(assembly);
+                    Add(assembly);
                 }
 
                 _initialized = true;
             }
         }
 
-        public void Register(Assembly assembly)
+        public void Add(Assembly assembly)
         {
             foreach (Type type in assembly.GetTypes().Where(t => t.IsRestController()))
             {
-                Register(type);
+                Add(type);
             }
         }
 
-        public void Register(Type type)
+        public void Add(Type type)
         {
             foreach (MethodInfo method in type.GetMethods().Where(m => m.IsRestRoute()))
             {
                 RestControllerAttribute attr = type.GetControllerAttribute();
-                Register(method, attr.BasePath);
+                Add(method, attr.BasePath);
             }
         }
 
-        public void Register(MethodInfo method, string basePath)
+        public void Add(MethodInfo method, string basePath)
         {
             foreach (RestRouteAttribute routeAttr in method.GetRouteAttributes())
             {
@@ -92,11 +81,6 @@ namespace RestFul.Routing
                     throw new DuplicateRouteException("Duplicate Route {0}", route);
                 }
             }
-        }
-
-        public IRoute GetRouteForContext(HttpContext httpContext)
-        {
-            return Routes.FirstOrDefault(route => route.Matches(httpContext));
         }
 
         /// <summary>

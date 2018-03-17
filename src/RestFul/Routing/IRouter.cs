@@ -28,25 +28,18 @@ namespace RestFul.Routing
         /// <summary>
         /// 
         /// </summary>
-        void Register(Assembly assembly);
+        void Add(Assembly assembly);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="type"></param>
-        void Register(Type type);
+        void Add(Type type);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="method"></param>
-        void Register(MethodInfo method, string basePath);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <returns></returns>
-        IRoute GetRouteForContext(HttpContext httpContext);
+        void Add(MethodInfo method, string basePath);
     }
 }

@@ -35,12 +35,12 @@ namespace RestFul.Routing
             _container = container ?? throw new ArgumentNullException(nameof(container));
         }
 
-        public IResult Invoke(HttpContext httpContext)
+        public IResult Execute(HttpContext httpContext)
         {
             return Method.Invoke(httpContext);
         }
 
-        public bool Matches(HttpContext httpContext)
+        public bool IsMatch(HttpContext httpContext)
         {
             if (httpContext.Request.HttpMethod == HttpMethod && PathPattern.IsMatch(httpContext.Request.Path))
             {

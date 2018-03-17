@@ -25,12 +25,12 @@ namespace RestFul.Routing
         /// <summary>
         /// 
         /// </summary>
-        IResult Invoke(HttpContext httpContext);
+        IResult Execute(HttpContext httpContext);
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        bool Matches(HttpContext httpContext);
+        bool IsMatch(HttpContext httpContext);
     }
 }
