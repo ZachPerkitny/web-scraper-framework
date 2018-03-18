@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Driver", "src\Driver\Driver
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScraperFramework", "src\ScraperFramework\ScraperFramework.csproj", "{7B10DF9F-AD52-4BFA-B1A4-05B71A16A0E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlatFileDB", "FlatFileDB\FlatFileDB.csproj", "{D92E01D1-FA3E-4C12-8B94-B934E21BD200}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlatFileDB", "src\FlatFileDB\FlatFileDB.csproj", "{D92E01D1-FA3E-4C12-8B94-B934E21BD200}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

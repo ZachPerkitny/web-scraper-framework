@@ -18,6 +18,7 @@ namespace RestFul.Configuration
             container
                 .Register((_) => container)
                 .Register<IRestFulLogger, NullLogger>()
+                .Register<IRouteFactory, RouteFactory>()
                 .Register<ISerializer, JsonSerializer>()
                 .Register<IHttpListener, HttpListener>()
                 .Register<IRouter, Router>()

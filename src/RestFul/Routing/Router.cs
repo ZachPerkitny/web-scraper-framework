@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using RestFul.Attributes;
-using RestFul.DI;
 using RestFul.Enum;
 using RestFul.Exceptions;
 using RestFul.Extensions;
@@ -18,13 +17,13 @@ namespace RestFul.Routing
         public HashSet<IRoute> Routes { get; private set; }
 
         private readonly IRestFulLogger _logger;
-        private readonly IContainer _container;
+        private readonly IRouteFactory _routeFactory;
         private bool _initialized;
 
-        public Router(IRestFulLogger logger, IContainer container)
+        public Router(IRestFulLogger logger, IRouteFactory routeFactory)
         {
-            _logger = logger;
-            _container = container;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _routeFactory = routeFactory ?? throw new ArgumentNullException(nameof(routeFactory));
             Routes = new HashSet<IRoute>();
         }
 
@@ -75,7 +74,7 @@ namespace RestFul.Routing
             {
                 string path = CreatePath(basePath, routeAttr.Path);
                 _logger.Debug("Registering Route {0} {1}", routeAttr.HttpMethod, path);
-                Route route = new Route(method, routeAttr.HttpMethod, path, _container);
+                IRoute route = _routeFactory.Create(method, routeAttr.HttpMethod, path);
                 if (!Routes.Add(route))
                 {
                     throw new DuplicateRouteException("Duplicate Route {0}", route);
