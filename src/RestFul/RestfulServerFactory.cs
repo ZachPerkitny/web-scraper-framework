@@ -6,11 +6,11 @@ namespace RestFul
 {
     public static class RestfulServerFactory
     {
-        private static IContainer _container = new RestFulContainer();
+        private static Func<IContainer> _createContainer = () => new RestFulContainer();
 
-        public static void UseDIContainer(IContainer container)
+        public static void UseDIContainer(Func<IContainer> createContainer)
         {
-            _container = container;
+            _createContainer = createContainer ?? throw new ArgumentNullException(nameof(createContainer));
         }
 
         public static IRestFulServer Create()
@@ -37,11 +37,13 @@ namespace RestFul
 
         public static IRestFulServer Create(IRestFulSettings settings, Action<IContainer> register)
         {
-            register?.Invoke(_container);
-            _container.Register((_) => settings);
-            RestFulRegistration.RegisterComponents(_container);
+            IContainer container = _createContainer();
 
-            return _container.Resolve<IRestFulServer>();
+            register?.Invoke(container);
+            container.Register((_) => settings);
+            RestFulRegistration.RegisterComponents(container);
+
+            return container.Resolve<IRestFulServer>();
         }
     }
 }
