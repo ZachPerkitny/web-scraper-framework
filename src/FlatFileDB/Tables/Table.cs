@@ -12,21 +12,25 @@ namespace FlatFileDB.Tables
         {
             Type tableType = typeof(T);
 
+            // ensure the poco has a table attribute defined
             if (tableType.IsTable())
             {
+                // whether or not to include the header 
+                // in the flat file
                 bool useHeader = tableType.UsesHeader();
 
+                // generate columns specific to the table
+                // type
                 if (tableType.IsDelimitedTable())
                 {
-                    List<IDelimitedColumn> columns = new List<IDelimitedColumn>();
+                    List<IColumn> columns = new List<IColumn>();
 
                     return new Table<T>(useHeader, columns);
                 }
-                else if (tableType.IsFixedTable())
+                // otherwise it's a fixed table
+                else
                 {
-                    List<IFixedColumn> columns = new List<IFixedColumn>();
-
-                    return new Table<T>(useHeader, columns);
+                    throw new NotImplementedException();
                 }
             }
             else
@@ -65,17 +69,17 @@ namespace FlatFileDB.Tables
             get { return typeof(T).IsFixedTable(); }
         }
 
-        public byte[] BuildHeader()
+        public string BuildHeader()
         {
             throw new NotImplementedException();
         }
 
-        public byte[] BuildRow(T entity)
+        public string BuildRow(T entity)
         {
             throw new NotImplementedException();
         }
 
-        public T ParseRow(byte[] row)
+        public T ParseRow(string row)
         {
             throw new NotImplementedException();
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using ScraperFramework.Services;
+using ScraperFramework.Utils;
 
 namespace ScraperFramework
 {
@@ -15,9 +16,9 @@ namespace ScraperFramework
             _scraperQueue = scraperQueue ?? throw new ArgumentNullException(nameof(scraperQueue));
         }
 
-        public IScraper Create(CancellationToken cancellationToken)
+        public IScraper Create(AsyncManualResetEvent manualResetEvent, CancellationToken cancellationToken)
         {
-            return new Scraper(_loggerService, _scraperQueue, cancellationToken);
+            return new Scraper(_loggerService, _scraperQueue, manualResetEvent, cancellationToken);
         }
     }
 }

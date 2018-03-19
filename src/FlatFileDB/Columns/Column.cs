@@ -1,41 +1,25 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using FlatFileDB.Attributes;
 using FlatFileDB.Serializer;
 
 namespace FlatFileDB.Columns
 {
-    internal class Column : IColumn
+    internal abstract class Column : IColumn
     {
-        public static IColumn Create(FieldInfo fieldInfo)
-        {
-            IColumn column = new Column(fieldInfo)
-            {
-                Name = fieldInfo.GetColumnName() ?? fieldInfo.Name
-            };
-
-            return column;
-        }
-
-        private Column(FieldInfo fieldInfo)
+        protected Column(FieldInfo fieldInfo)
         {
             Field = fieldInfo;
+            Name = fieldInfo.GetColumnName() ?? fieldInfo.Name;
         }
 
         public FieldInfo Field { get; private set; }
 
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
-        public ISerializer Serializer { get; set; }
+        public ISerializer Serializer { get; private set; }
 
-        public object Deserialize(byte[] col)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract object Deserialize(string col);
 
-        public byte[] Serialize(object obj)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract string Serialize(object obj);
     }
 }

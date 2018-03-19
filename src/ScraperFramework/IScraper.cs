@@ -8,13 +8,5 @@ namespace ScraperFramework
         /// 
         /// </summary>
         Task Start();
-        /// <summary>
-        /// 
-        /// </summary>
-        void Pause();
-        /// <summary>
-        /// 
-        /// </summary>
-        void Stop();
     }
 }

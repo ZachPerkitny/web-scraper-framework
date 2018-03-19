@@ -42,20 +42,20 @@ namespace FlatFileDB.Tables
         /// 
         /// </summary>
         /// <returns></returns>
-        byte[] BuildHeader();
+        string BuildHeader();
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        byte[] BuildRow(T entity);
+        string BuildRow(T entity);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="row"></param>
         /// <returns></returns>
-        T ParseRow(byte[] row);
+        T ParseRow(string row);
     }
 }

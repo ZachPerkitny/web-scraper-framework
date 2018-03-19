@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Serilog;
 using WebScraper.Pocos;
 using ScraperFramework.Services;
+using ScraperFramework.Utils;
 
 namespace ScraperFramework
 {
@@ -15,12 +16,15 @@ namespace ScraperFramework
     {
         private readonly ILoggerService _loggerService;
         private readonly IScraperQueue _scraperQueue;
+        private readonly AsyncManualResetEvent _manualResetEvent;
         private readonly CancellationToken _cancellationToken;
 
-        public Scraper(ILoggerService loggerService, IScraperQueue scraperQueue, CancellationToken cancellationToken)
+        public Scraper(ILoggerService loggerService, IScraperQueue scraperQueue, AsyncManualResetEvent manualResetEvent,
+            CancellationToken cancellationToken)
         {
             _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
             _scraperQueue = scraperQueue ?? throw new ArgumentNullException(nameof(scraperQueue));
+            _manualResetEvent = manualResetEvent ?? throw new ArgumentNullException(nameof(manualResetEvent));
             _cancellationToken = cancellationToken;
         }
 
@@ -28,8 +32,14 @@ namespace ScraperFramework
         {
             while (!_cancellationToken.IsCancellationRequested)
             {
+                // pause (let it finish current scrape)
+                await _manualResetEvent.WaitAsync();
+
                 CrawlDescription crawlDescription = await _scraperQueue.Dequeue();
                 CrawlResult crawlResult = null;
+
+                // pause (let it finish dequeue)
+                await _manualResetEvent.WaitAsync();
 
                 Process pipeClient = new Process
                 {
@@ -110,16 +120,6 @@ namespace ScraperFramework
                     _loggerService.LogCrawlResult(crawlResult);
                 }
             }
-        }
-
-        public void Pause()
-        {
-            throw new NotImplementedException();
-        } 
-
-        public void Stop()
-        {
-            throw new NotImplementedException();
         }
     }
 }
