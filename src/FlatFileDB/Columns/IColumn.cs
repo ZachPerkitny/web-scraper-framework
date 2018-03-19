@@ -13,12 +13,12 @@ namespace FlatFileDB.Columns
         /// <summary>
         /// 
         /// </summary>
-        string Name { get; }
+        string Name { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        ISerializer Serializer { get; }
+        ISerializer Serializer { get; set; }
 
         /// <summary>
         /// 
