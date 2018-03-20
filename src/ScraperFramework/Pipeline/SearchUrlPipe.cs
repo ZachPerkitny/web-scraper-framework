@@ -14,7 +14,7 @@ namespace ScraperFramework.Pipeline
             _searchStringRepo = searchStringRepo ?? throw new ArgumentNullException(nameof(searchStringRepo));
         }
 
-        public override IEnumerable<CrawlDescription> Drain(IEnumerable<CrawlDescription> entity)
+        public override IEnumerable<CrawlDescription> Flow(IEnumerable<CrawlDescription> entity)
         {
             throw new NotImplementedException();
         }

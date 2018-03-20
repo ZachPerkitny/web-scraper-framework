@@ -97,6 +97,8 @@
     <Compile Include="Controllers\CoordinatorController.cs" />
     <Compile Include="Coordinator.cs" />
     <Compile Include="Data\Concrete\CachedSearchStringRepo.cs" />
+    <Compile Include="Data\Concrete\InternationalUULERepo.cs" />
+    <Compile Include="Data\Concrete\LocalUULERepo.cs" />
     <Compile Include="Data\Concrete\ProxyMultiplierRepo.cs" />
     <Compile Include="Data\Concrete\ProxyRepo.cs" />
     <Compile Include="Data\Concrete\KeywordRepo.cs" />
@@ -106,22 +108,32 @@
     <Compile Include="Data\Entities\Proxy.cs" />
     <Compile Include="Data\Entities\Keyword.cs" />
     <Compile Include="Data\Entities\ProxyMultiplier.cs" />
+    <Compile Include="Data\Entities\SearchEngine.cs" />
     <Compile Include="Data\Entities\SearchString.cs" />
+    <Compile Include="Data\Entities\SpecialKeyword.cs" />
+    <Compile Include="Data\Entities\InternationalUULE.cs" />
+    <Compile Include="Data\Entities\LocalUULE.cs" />
+    <Compile Include="Data\IInternationalUULERepo.cs" />
     <Compile Include="Data\IProxyMultiplierRepo.cs" />
+    <Compile Include="Data\ISearchEngineRepo.cs" />
     <Compile Include="Data\ISearchStringRepo.cs" />
+    <Compile Include="Data\ILocalUULERepo.cs" />
     <Compile Include="ICoordinator.cs" />
     <Compile Include="Data\IProxyRepo.cs" />
     <Compile Include="Data\IKeywordRepo.cs" />
     <Compile Include="IScraper.cs" />
     <Compile Include="IScraperFactory.cs" />
     <Compile Include="IScraperQueue.cs" />
+    <Compile Include="Pipeline\ProxySink.cs" />
+    <Compile Include="Pipeline\Pipe.cs" />
+    <Compile Include="Pipeline\SearchUrlPipe.cs" />
+    <Compile Include="Pipeline\Sink.cs" />
+    <Compile Include="Pipeline\UULEPipe.cs" />
     <Compile Include="Pocos\CrawlStats.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scraper.cs" />
     <Compile Include="ScraperFactory.cs" />
     <Compile Include="ScraperQueue.cs" />
-    <Compile Include="Services\Concrete\CrawlService.cs" />
-    <Compile Include="Services\ICrawlService.cs" />
     <Compile Include="Utils\AsyncManualResetEvent.cs" />
   </ItemGroup>
   <ItemGroup>

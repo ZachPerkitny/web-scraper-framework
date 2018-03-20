@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Serilog;
 using WebScraper.Pocos;
-using ScraperFramework.Services;
 using ScraperFramework.Utils;
 
 namespace ScraperFramework

@@ -16,7 +16,7 @@ namespace ScraperFramework.Pipeline
             _localUULERepo = localUULERepo ?? throw new ArgumentNullException(nameof(localUULERepo));
         }
 
-        public override IEnumerable<CrawlDescription> Drain(IEnumerable<CrawlDescription> crawlDescriptions)
+        public override IEnumerable<CrawlDescription> Flow(IEnumerable<CrawlDescription> crawlDescriptions)
         {
             throw new NotImplementedException();
         }
