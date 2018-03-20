@@ -31,10 +31,10 @@ namespace WebScraper
                  *  See https://github.com/v8/v8/blob/master/src/flag-definitions.h
                  */
                 //JavascriptFlags = "",
-                UserAgent = CrawlDescription.EndpointAddress
+                UserAgent = CrawlDescription.UserAgent
             };
 
-            cefSettings.CefCommandLineArgs.Add("proxy-server", CrawlDescription.EndpointAddress);
+            cefSettings.CefCommandLineArgs.Add("proxy-server", CrawlDescription.IP);
 
             // Disable WebGL
             //cefSettings.DisableGpuAcceleration();
@@ -51,13 +51,7 @@ namespace WebScraper
 
         public async Task<CrawlResult> Scrape()
         {
-            // TODO(zvp): Add WebsiteID to Crawl Desc
-            // TODO(zvp): Add Search String to Crawl Desc
-            CrawlResult crawlResult = new CrawlResult
-            {
-                KeywordID = CrawlDescription.KeywordID,
-                SearchTargetID = CrawlDescription.SearchTargetID
-            };
+            CrawlResult crawlResult = new CrawlResult();
 
             BrowserSettings browserSettings = new BrowserSettings
             {
@@ -69,7 +63,7 @@ namespace WebScraper
                 try
                 {
                     await WaitForBrowserInit(browser);
-                    await LoadAsync(browser, string.Format(CrawlDescription.SearchTargetUrl, CrawlDescription.Keyword));
+                    await LoadAsync(browser, string.Format(CrawlDescription.SearchString, CrawlDescription.Keyword));
 
                     crawlResult.Ads = await BingExtractor.ExtractTextAds(browser);
                     crawlResult.CrawlResultID = CrawlResultID.Success;

@@ -2,7 +2,7 @@
 {
     internal abstract class Pipe<T>
     {
-        private Pipe<T> _connection;
+        protected Pipe<T> _connection;
 
         /// <summary>
         /// 

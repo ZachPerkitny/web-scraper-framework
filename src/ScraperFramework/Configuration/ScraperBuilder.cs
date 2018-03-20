@@ -9,6 +9,8 @@ using Unity;
 using Unity.Lifetime;
 using ScraperFramework.Data;
 using ScraperFramework.Data.Concrete;
+using ScraperFramework.Pipeline;
+using ScraperFramework.Pocos;
 
 namespace ScraperFramework.Configuration
 {
@@ -42,6 +44,7 @@ namespace ScraperFramework.Configuration
                 .RegisterType<IProxyRepo, ProxyRepo>()
                 .RegisterType<IProxyMultiplierRepo, ProxyMultiplierRepo>()
                 .RegisterType<ISearchStringRepo, SearchStringRepo>()
+                .RegisterType<PipeLine<PipedCrawlDescription>, CrawlDescriptionPipeline>()
                 .RegisterType<IScraperQueue, ScraperQueue>()
                 .RegisterType<IScraperFactory, ScraperFactory>()
                 .RegisterType<ICoordinator, Coordinator>();

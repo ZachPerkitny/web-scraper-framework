@@ -27,6 +27,13 @@ namespace ScraperFramework.Data
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="searchEngineGroup"></param>
+        /// <returns></returns>
+        IEnumerable<SearchEngine> SelectMany(int searchEngineGroup);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         IEnumerable<SearchEngine> SelectAll();
 

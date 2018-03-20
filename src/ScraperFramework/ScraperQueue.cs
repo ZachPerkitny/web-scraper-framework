@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ScraperFramework.Pipeline;
+using ScraperFramework.Pocos;
 using WebScraper.Pocos;
 
 namespace ScraperFramework
@@ -10,12 +12,14 @@ namespace ScraperFramework
     {
         private const int KEYWORD_COUNT = 5000;
 
+        private readonly PipeLine<PipelinedCrawlDescription> _pipeline;
+        private DateTime _nextAvailability;
         private readonly Queue<CrawlDescription> _queue = new Queue<CrawlDescription>();
         private readonly object _locker = new object();
 
-        public ScraperQueue()
+        public ScraperQueue(PipeLine<PipelinedCrawlDescription> pipeline)
         {
-            
+            _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
         }
 
         public async Task<CrawlDescription> Dequeue()
@@ -33,19 +37,17 @@ namespace ScraperFramework
 
         private async Task RequestMoreCrawlDescriptions()
         {
-            //IEnumerable<CrawlDescription> crawlDescriptions = _crawlService.GetKeywordsToCrawl(KEYWORD_COUNT);
-            //if (!crawlDescriptions.Any())
-            //{
-            //    await Task.Delay((_crawlService.NextAvailability - DateTime.Now).Milliseconds);
-            //}
+            PipelinedCrawlDescription pipelinedCrawlDescription = _pipeline.Drain();
+            if (!pipelinedCrawlDescription.CrawlDescriptions.Any())
+            {
+                await Task.Delay((pipelinedCrawlDescription.NextAvailability - DateTime.Now).Milliseconds);
+                pipelinedCrawlDescription = _pipeline.Drain();
+            }
 
-            //lock (_locker)
-            //{
-            //    foreach (var crawl in crawlDescriptions)
-            //    {
-            //        _queue.Enqueue(crawl);
-            //    }
-            //}
+            foreach (CrawlDescription crawl in pipelinedCrawlDescription.CrawlDescriptions)
+            {
+                _queue.Enqueue(crawl);
+            }
         }
     }
 }

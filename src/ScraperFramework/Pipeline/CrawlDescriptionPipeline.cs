@@ -1,20 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using ScraperFramework.Data;
-using WebScraper.Pocos;
+using ScraperFramework.Pocos;
 
 namespace ScraperFramework.Pipeline
 {
-    internal class ProxySink : Sink<IEnumerable<CrawlDescription>>
+    internal class CrawlDescriptionPipeline : PipeLine<PipelinedCrawlDescription>
     {
         private readonly IProxyRepo _proxyRepo;
 
-        public ProxySink(IProxyRepo proxyRepo)
+        public CrawlDescriptionPipeline(IProxyRepo proxyRepo)
         {
             _proxyRepo = proxyRepo ?? throw new ArgumentNullException(nameof(proxyRepo));
         }
 
-        public override IEnumerable<CrawlDescription> Drain()
+        public override PipelinedCrawlDescription Drain()
         {
             throw new NotImplementedException();
         }

@@ -6,12 +6,22 @@
 
         public int KeywordID { get; set; }
 
-        public int SearchTargetID { get; set; }
+        public int SearchEngineID { get; set; }
 
-        public string EndpointAddress { get; set; }
+        public int RegionID { get; set; }
 
-        public int EndpointID { get; set; }
+        public int CityID { get; set; }
 
-        public string SearchTargetUrl { get; set; }
+        public int SearchEngineGroup { get; set; }
+
+        public int ProxyID { get; set; }
+
+        public string IP { get; set; }
+
+        public string UserAgent { get; set; }
+
+        public string SearchString { get; set; }
+
+        public bool IsNatural { get; set; }
     }
 }

@@ -1,8 +1,10 @@
-﻿namespace ScraperFramework.Pipeline
+﻿using System;
+
+namespace ScraperFramework.Pipeline
 {
-    internal abstract class Sink<T>
+    internal abstract class PipeLine<T>
     {
-        private Pipe<T> _connection;
+        private Pipe<T> _rootPipe;
 
         /// <summary>
         /// 
@@ -10,7 +12,7 @@
         /// <param name="pipe"></param>
         public void Connect(Pipe<T> pipe)
         {
-            _connection = pipe;
+            _rootPipe = pipe ?? throw new ArgumentNullException(nameof(pipe));
         }
 
         /// <summary>
