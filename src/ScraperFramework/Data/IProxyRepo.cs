@@ -3,32 +3,32 @@ using ScraperFramework.Data.Entities;
 
 namespace ScraperFramework.Data
 {
-    public interface IEndpointRepo
+    public interface IProxyRepo
     {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="endpoint"></param>
-        void Insert(Endpoint endpoint);
+        /// <param name="proxy"></param>
+        void Insert(Proxy proxy);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="endpoints"></param>
-        void InsertMany(IEnumerable<Endpoint> endpoints);
+        /// <param name="proxies"></param>
+        void InsertMany(IEnumerable<Proxy> proxies);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="endpointId"></param>
+        /// <param name="proxyId"></param>
         /// <returns></returns>
-        Endpoint Select(int endpointId);
+        Proxy Select(int proxyId);
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        IEnumerable<Endpoint> SelectAll();
+        IEnumerable<Proxy> SelectAll();
 
         /// <summary>
         /// 

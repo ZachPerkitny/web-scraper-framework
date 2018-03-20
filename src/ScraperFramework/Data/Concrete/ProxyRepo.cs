@@ -9,47 +9,47 @@ using ScraperFramework.Data.Entities;
 
 namespace ScraperFramework.Data.Concrete
 {
-    class EndpointRepo : IEndpointRepo
+    class ProxyRepo : IProxyRepo
     {
-        private const string _table = "Endpoint";
+        private const string _table = "Proxy_V2";
         private readonly DBreezeEngine _engine;
 
-        public EndpointRepo(DBreezeEngine engine)
+        public ProxyRepo(DBreezeEngine engine)
         {
             _engine = engine ?? throw new ArgumentNullException(nameof(engine));
             DBreezeInitialization.SetupUtils();
         }
 
-        public void Insert(Endpoint endpoint)
+        public void Insert(Proxy proxy)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                Insert(transaction, endpoint);
+                Insert(transaction, proxy);
 
                 transaction.Commit();
             }
         }
 
-        public void InsertMany(IEnumerable<Endpoint> endpoints)
+        public void InsertMany(IEnumerable<Proxy> proxies)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                foreach (Endpoint endpoint in endpoints)
+                foreach (Proxy proxy in proxies)
                 {
-                    Insert(transaction, endpoint);
+                    Insert(transaction, proxy);
                 }
 
                 transaction.Commit();
             }
         }
 
-        public Endpoint Select(int endpointId)
+        public Proxy Select(int proxyId)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                DBreezeObject<Endpoint> obj = transaction
-                    .Select<byte[], byte[]>(_table, 1.ToIndex(endpointId))
-                    .ObjectGet<Endpoint>();
+                DBreezeObject<Proxy> obj = transaction
+                    .Select<byte[], byte[]>(_table, 1.ToIndex(proxyId))
+                    .ObjectGet<Proxy>();
 
                 if (obj != null)
                 {
@@ -60,19 +60,19 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public IEnumerable<Endpoint> SelectAll()
+        public IEnumerable<Proxy> SelectAll()
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                var entities = new List<Endpoint>();
+                var entities = new List<Proxy>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction.SelectForward<byte[], byte[]>(_table);
 
                 foreach (var row in rows)
                 {
-                    DBreezeObject<Endpoint> obj = row.ObjectGet<Endpoint>();
+                    DBreezeObject<Proxy> obj = row.ObjectGet<Proxy>();
                     if (obj != null)
                     {
-                        Endpoint entity = obj.Entity;
+                        Proxy entity = obj.Entity;
                         entities.Add(entity);
                     }
                 }
@@ -91,25 +91,25 @@ namespace ScraperFramework.Data.Concrete
 
         /// <summary>
         /// Does an object insert and creates the necessary indexes for
-        /// an endpoint entity
+        /// an proxy entity
         /// </summary>
         /// <param name="transaction"></param>
-        /// <param name="endpoint"></param>
-        private void Insert(Transaction transaction, Endpoint endpoint)
+        /// <param name="proxy"></param>
+        private void Insert(Transaction transaction, Proxy proxy)
         {
-            bool newEntity = endpoint.ID == 0;
+            bool newEntity = proxy.ID == 0;
             if (newEntity)
             {
-                endpoint.ID = transaction.ObjectGetNewIdentity<int>(_table);
+                proxy.ID = transaction.ObjectGetNewIdentity<int>(_table);
             }
 
-            transaction.ObjectInsert(_table, new DBreezeObject<Endpoint>
+            transaction.ObjectInsert(_table, new DBreezeObject<Proxy>
             {
                 NewEntity = newEntity,
-                Entity = endpoint,
+                Entity = proxy,
                 Indexes = new List<DBreezeIndex>
                     {
-                        new DBreezeIndex(1, endpoint.ID)
+                        new DBreezeIndex(1, proxy.ID)
                         {
                             PrimaryIndex = true
                         }

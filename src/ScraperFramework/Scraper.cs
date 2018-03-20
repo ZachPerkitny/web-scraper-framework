@@ -14,15 +14,13 @@ namespace ScraperFramework
 {
     class Scraper : IScraper
     {
-        private readonly ILoggerService _loggerService;
         private readonly IScraperQueue _scraperQueue;
         private readonly AsyncManualResetEvent _manualResetEvent;
         private readonly CancellationToken _cancellationToken;
 
-        public Scraper(ILoggerService loggerService, IScraperQueue scraperQueue, AsyncManualResetEvent manualResetEvent,
+        public Scraper(IScraperQueue scraperQueue, AsyncManualResetEvent manualResetEvent,
             CancellationToken cancellationToken)
         {
-            _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
             _scraperQueue = scraperQueue ?? throw new ArgumentNullException(nameof(scraperQueue));
             _manualResetEvent = manualResetEvent ?? throw new ArgumentNullException(nameof(manualResetEvent));
             _cancellationToken = cancellationToken;
@@ -113,11 +111,6 @@ namespace ScraperFramework
                         // free resources
                         pipeClient.Close();
                     }
-                }
-
-                if (crawlResult != null)
-                {
-                    _loggerService.LogCrawlResult(crawlResult);
                 }
             }
         }

@@ -7,7 +7,6 @@ using Restful.Serilog;
 using Serilog;
 using Unity;
 using Unity.Lifetime;
-using ScraperFramework.Controllers;
 using ScraperFramework.Data;
 using ScraperFramework.Data.Concrete;
 using ScraperFramework.Services;
@@ -40,23 +39,12 @@ namespace ScraperFramework.Configuration
                 {
                     c.Register<IRestFulLogger>((_) => new SerilogLogger(Log.Logger));
                     // TODO(zvp): add unity adaptor
-                    c.Register((_) => new CrawlLogController(Container.Resolve<ICrawlLogRepo>()));
-                    c.Register((_) => new EndpointController(Container.Resolve<IEndpointRepo>()));
-                    c.Register((_) => new EndpointSearchTargetController(Container.Resolve<IEndpointSearchTargetRepo>()));
-                    c.Register((_) => new KeywordController(Container.Resolve<IKeywordRepo>()));
-                    c.Register((_) => new KeywordSearchTargetController(Container.Resolve<IKeywordSearchTargetRepo>()));
-                    c.Register((_) => new SearchTargetController(Container.Resolve<ISearchTargetRepo>()));   
-                    c.Register((_) => new StatsController(Container.Resolve<IStatsService>()));
                 }))
-                .RegisterType<ICrawlLogRepo, CrawlLogRepo>()
-                .RegisterType<IEndpointRepo, EndpointRepo>()
-                .RegisterType<IEndpointSearchTargetRepo, EndpointSearchTargetRepo>()
                 .RegisterType<IKeywordRepo, KeywordRepo>()
-                .RegisterType<IKeywordSearchTargetRepo, KeywordSearchTargetRepo>()
-                .RegisterType<ISearchTargetRepo, SearchTargetRepo>()
+                .RegisterType<IProxyRepo, ProxyRepo>()
+                .RegisterType<IProxyMultiplierRepo, ProxyMultiplierRepo>()
+                .RegisterType<ISearchStringRepo, SearchStringRepo>()
                 .RegisterType<ICrawlService, CrawlService>()
-                .RegisterType<ILoggerService, LoggerService>()
-                .RegisterType<IStatsService, StatsService>()
                 .RegisterType<IScraperQueue, ScraperQueue>()
                 .RegisterType<IScraperFactory, ScraperFactory>()
                 .RegisterType<ICoordinator, Coordinator>();

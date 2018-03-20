@@ -19,36 +19,12 @@ namespace ScraperFramework.Services.Concrete
         /// </summary>
         public DateTime NextAvailability { get; private set; }
 
-        private readonly IEndpointRepo _endpointRepo;
-        private readonly IEndpointSearchTargetRepo _endpointSearchTargetRepo;
-        private readonly IKeywordRepo _keywordRepo;
-        private readonly IKeywordSearchTargetRepo _keywordSearchTargetRepo;
-        private readonly ISearchTargetRepo _searchTargetRepo;
-        private readonly ICrawlLogRepo _crawlLogRepo;
-
-        public CrawlService(IEndpointRepo endpointRepo, IEndpointSearchTargetRepo endpointSearchTargetRepo, IKeywordRepo keywordRepo, 
-            IKeywordSearchTargetRepo keywordSearchTargetRepo, ISearchTargetRepo searchTargetRepo, ICrawlLogRepo crawlLogRepo)
-        {
-            _endpointRepo = endpointRepo ?? throw new ArgumentNullException(nameof(endpointRepo));
-            _endpointSearchTargetRepo = endpointSearchTargetRepo ?? throw new ArgumentNullException(nameof(endpointSearchTargetRepo));
-            _keywordRepo = keywordRepo ?? throw new ArgumentNullException(nameof(keywordRepo));
-            _keywordSearchTargetRepo = keywordSearchTargetRepo ?? throw new ArgumentNullException(nameof(keywordSearchTargetRepo));
-            _searchTargetRepo = searchTargetRepo ?? throw new ArgumentNullException(nameof(searchTargetRepo));
-            _crawlLogRepo = crawlLogRepo ?? throw new ArgumentNullException(nameof(crawlLogRepo));
-        }
+        public CrawlService()
+        { }
 
         public IEnumerable<CrawlDescription> GetKeywordsToCrawl(int count)
         {
-            IEnumerable<CrawlDescription> toBeCrawled = _keywordRepo.SelectAll()
-                .Select(k => new CrawlDescription
-                {
-                    Keyword = k.Value,
-                    KeywordID = k.ID,
-                    EndpointAddress = "34.228.166.129:8888",
-                    SearchTargetUrl = "http://www.bing.com/search?q={0}"
-                });
-            
-            return toBeCrawled;
+            throw new NotImplementedException();
         }
     }
 }
