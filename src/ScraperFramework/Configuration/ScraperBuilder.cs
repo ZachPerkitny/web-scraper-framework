@@ -6,6 +6,7 @@ using RestFul.Loggers;
 using Restful.Serilog;
 using Serilog;
 using Unity;
+using Unity.Injection;
 using Unity.Lifetime;
 using ScraperFramework.Data;
 using ScraperFramework.Data.Concrete;
@@ -40,11 +41,14 @@ namespace ScraperFramework.Configuration
                     c.Register<IRestFulLogger>((_) => new SerilogLogger(Log.Logger));
                     // TODO(zvp): add unity adaptor
                 }))
+                .RegisterType<IInternationalUULERepo, InternationalUULERepo>()
                 .RegisterType<IKeywordRepo, KeywordRepo>()
-                .RegisterType<IProxyRepo, ProxyRepo>()
+                .RegisterType<ILocalUULERepo, LocalUULERepo>()
                 .RegisterType<IProxyMultiplierRepo, ProxyMultiplierRepo>()
+                .RegisterType<IProxyRepo, ProxyRepo>()
+                .RegisterType<ISearchEngineRepo, SearchEngineRepo>()
                 .RegisterType<ISearchStringRepo, SearchStringRepo>()
-                .RegisterType<PipeLine<PipedCrawlDescription>, CrawlDescriptionPipeline>()
+                .RegisterType<PipeLine<PipelinedCrawlDescription>, CrawlDescriptionPipeline>()
                 .RegisterType<IScraperQueue, ScraperQueue>()
                 .RegisterType<IScraperFactory, ScraperFactory>()
                 .RegisterType<ICoordinator, Coordinator>();

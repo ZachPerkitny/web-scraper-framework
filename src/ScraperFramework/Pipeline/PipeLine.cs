@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ScraperFramework.Pipeline
+﻿namespace ScraperFramework.Pipeline
 {
     internal abstract class PipeLine<T>
     {
@@ -12,7 +10,14 @@ namespace ScraperFramework.Pipeline
         /// <param name="pipe"></param>
         public void Connect(Pipe<T> pipe)
         {
-            _rootPipe = pipe ?? throw new ArgumentNullException(nameof(pipe));
+            if (_rootPipe == null)
+            {
+                _rootPipe = pipe;
+            }
+            else
+            {
+                _rootPipe.Connect(pipe);
+            }
         }
 
         /// <summary>

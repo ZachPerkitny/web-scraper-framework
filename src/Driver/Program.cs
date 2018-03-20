@@ -13,7 +13,7 @@ namespace Driver
 
             var scraperBuilder = new ScraperBuilder(config =>
             {
-                config.DBreezeDataFolderName = @"C:\Users\Mr Zach\Documents\dbreeze";
+                config.DBreezeDataFolderName = @"C:\Users\zaperkitny\Documents\dbreeze";
                 config.Scrapers = 5;
             });
 

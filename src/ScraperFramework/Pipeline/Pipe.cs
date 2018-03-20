@@ -10,7 +10,14 @@
         /// <param name="pipe"></param>
         public void Connect(Pipe<T> pipe)
         {
-            _connection = pipe;
+            if (_connection == null)
+            {
+                _connection = pipe;
+            }
+            else
+            {
+                _connection.Connect(pipe);
+            }
         }
 
         /// <summary>

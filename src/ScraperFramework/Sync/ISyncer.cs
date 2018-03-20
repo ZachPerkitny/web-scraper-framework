@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ScraperFramework.Sync
 {
@@ -25,5 +26,11 @@ namespace ScraperFramework.Sync
         /// </summary>
         /// <param name="syncTask"></param>
         void RemoveSyncTask(ISyncTask syncTask);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task Execute();
     }
 }

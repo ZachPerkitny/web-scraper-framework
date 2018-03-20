@@ -1,4 +1,6 @@
-﻿namespace ScraperFramework.Sync
+﻿using System.Threading.Tasks;
+
+namespace ScraperFramework.Sync
 {
     public interface ISyncTask
     {
@@ -10,6 +12,6 @@
         /// <summary>
         /// 
         /// </summary>
-        void Execute();
+        Task Execute();
     }
 }
