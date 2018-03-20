@@ -57,12 +57,12 @@ namespace ScraperFramework
 
         public void Pause()
         {
-            _manualResetEvent.Set();
+            _manualResetEvent.Reset();
         }
 
         public void Resume()
         {
-            _manualResetEvent.Reset();
+            _manualResetEvent.Set();
         }
 
         public void Stop()

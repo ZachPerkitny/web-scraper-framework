@@ -13,6 +13,16 @@ namespace FlatFileDB.Columns
         /// <summary>
         /// 
         /// </summary>
+        int Index { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        bool IsLast { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         string Name { get; }
 
         /// <summary>

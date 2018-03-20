@@ -138,6 +138,7 @@
     <Compile Include="Services\ILoggerService.cs" />
     <Compile Include="Services\IRedistributionService.cs" />
     <Compile Include="Services\IStatsService.cs" />
+    <Compile Include="Utils\AsyncManualResetEvent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

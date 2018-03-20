@@ -106,7 +106,7 @@ namespace ScraperFramework.Data.Concrete
             {
                 var entities = new List<EndpointSearchTarget>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction.SelectForward<byte[], byte[]>(_table);
-
+                
                 foreach (var row in rows)
                 {
                     DBreezeObject<EndpointSearchTarget> obj = row.ObjectGet<EndpointSearchTarget>();

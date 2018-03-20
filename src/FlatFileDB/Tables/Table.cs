@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using FlatFileDB.Attributes;
 using FlatFileDB.Columns;
 
@@ -24,6 +26,13 @@ namespace FlatFileDB.Tables
                 if (tableType.IsDelimitedTable())
                 {
                     List<IColumn> columns = new List<IColumn>();
+
+                    FieldInfo[] fields = tableType.GetFields();
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        columns.Add(DelimitedColumn.Create(
+                            fields[i], i, i == (fields.Length - 1)));
+                    }
 
                     return new Table<T>(useHeader, columns);
                 }
@@ -76,7 +85,14 @@ namespace FlatFileDB.Tables
 
         public string BuildRow(T entity)
         {
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+
+            foreach (IColumn column in Columns)
+            {
+                sb.Append(column.Serialize(entity));
+            }
+
+            return sb.ToString();
         }
 
         public T ParseRow(string row)

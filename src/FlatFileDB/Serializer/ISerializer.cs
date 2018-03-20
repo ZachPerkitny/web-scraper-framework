@@ -7,13 +7,13 @@
         /// </summary>
         /// <param name="buffer"></param>
         /// <returns></returns>
-        object Deserialize(byte[] buffer);
+        object Deserialize(string buffer);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        byte[] Serialize(object obj);
+        string Serialize(object obj);
     }
 }
