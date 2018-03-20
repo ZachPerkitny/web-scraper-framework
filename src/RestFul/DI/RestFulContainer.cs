@@ -9,14 +9,16 @@ namespace RestFul.DI
     class RestFulContainer : IContainer
     {
         private readonly Dictionary<Type, Delegate> _creators;
-        private readonly Dictionary<Type, Type> _registrations;
+        private readonly HashSet<Type> _cRegistrations;
+        private readonly Dictionary<Type, Type> _iRegistrations;
         private readonly Dictionary<Type, object> _instances;
         private readonly object _locker = new object();
 
         public RestFulContainer()
         {
             _creators = new Dictionary<Type, Delegate>();
-            _registrations = new Dictionary<Type, Type>();
+            _cRegistrations = new HashSet<Type>();
+            _iRegistrations = new Dictionary<Type, Type>();
             _instances = new Dictionary<Type, object>();
         }
 
@@ -61,12 +63,50 @@ namespace RestFul.DI
                         concreteType.Name);
                 }
 
-                _registrations.Add(serviceType, concreteType);
+                _iRegistrations.Add(serviceType, concreteType);
 
                 return this;
             }
         }
-    
+
+        public IContainer Register<T>() where T : class
+        {
+            lock (_locker)
+            {
+                Type type = typeof(T);
+
+                if (IsRegistered(type))
+                {
+                    return this;
+                }
+
+                if (type.GetConstructors().Length > 1)
+                {
+                    throw new RestFulException("Expected {0} to have a single constructor",
+                        type.Name);
+                }
+
+                _cRegistrations.Add(type);
+
+                return this;
+            }
+        }
+
+        public IContainer Register<T>(T instance) where T : class
+        {
+            lock (_locker)
+            {
+                Type type = typeof(T);
+                if (_instances.ContainsKey(type))
+                {
+                    return this;
+                }
+
+                _instances.Add(type, instance);
+                return this;
+            }
+        }
+
         public object Resolve(Type serviceType)
         {
             lock (_locker)
@@ -75,18 +115,21 @@ namespace RestFul.DI
                 {
                     return _instances[serviceType];
                 }
-                else if (_registrations.ContainsKey(serviceType))
+                else if (_iRegistrations.ContainsKey(serviceType))
                 {
-                    ConstructorInfo constructor = _registrations[serviceType].GetConstructors()[0];
+                    ConstructorInfo constructor = _iRegistrations[serviceType].GetConstructors()[0];
 
-                    object[] args = constructor.GetParameters()
-                        .Select(p =>
-                        {
-                            return typeof(RestFulContainer)
-                                .GetMethod("Resolve", new Type[] { typeof(Type) })
-                                .Invoke(this, new object[] { p.ParameterType });
-                        })
-                        .ToArray();
+                    object[] args = ResolveParameters(constructor.GetParameters());
+
+                    object instance = constructor.Invoke(args);
+                    _instances.Add(serviceType, instance);
+                    return instance;
+                }
+                else if (_cRegistrations.Contains(serviceType))
+                {
+                    ConstructorInfo constructor = serviceType.GetConstructors()[0];
+
+                    object[] args = ResolveParameters(constructor.GetParameters());
 
                     object instance = constructor.Invoke(args);
                     _instances.Add(serviceType, instance);
@@ -110,9 +153,23 @@ namespace RestFul.DI
             return (TService)Resolve(typeof(TService));
         }
 
+        private object[] ResolveParameters(ParameterInfo[] parameters)
+        {
+            return parameters
+                .Select(p =>
+                {
+                    return typeof(RestFulContainer)
+                        .GetMethod("Resolve", new Type[] { typeof(Type) })
+                        .Invoke(this, new object[] { p.ParameterType });
+                })
+                .ToArray();
+        }
+
         private bool IsRegistered(Type serviceType)
         {
-            return _creators.ContainsKey(serviceType) || _registrations.ContainsKey(serviceType);
+            return _creators.ContainsKey(serviceType) ||
+                _iRegistrations.ContainsKey(serviceType) ||
+                _cRegistrations.Contains(serviceType);
         }
     }
 }

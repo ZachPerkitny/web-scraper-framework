@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ScraperFramework.Data.Entities;
 
 namespace ScraperFramework.Data.Concrete
 {
     public class CachedSearchStringRepo : SearchStringRepoDecorator
     {
-        private Dictionary<Tuple<int, int>, SearchString> _cache;
+        private readonly Dictionary<Tuple<int, int>, SearchString> _cache;
+        private bool _filledCache;
+        private object _locker = new object();
 
         public CachedSearchStringRepo(ISearchStringRepo searchStringRepo) 
             : base(searchStringRepo)
@@ -18,18 +21,79 @@ namespace ScraperFramework.Data.Concrete
         {
             Tuple<int, int> key = new Tuple<int, int>(searchEngineId, regionId);
             SearchString searchString = null;
-
-            if (_cache.ContainsKey(key))
+            
+            lock (_locker)
             {
-                searchString = _cache[key];
-            }
-            else
-            {
-                searchString = base.Select(searchEngineId, regionId);
-                _cache.Add(key, searchString);
+                if (_cache.ContainsKey(key))
+                {
+                    searchString = _cache[key];
+                }
+                // (searchEngineId, regionId) pair does not exist
+                // if the cache has already been filled, exit 
+                // early to avoid IO.
+                else if (!_filledCache)
+                {
+                    searchString = base.Select(searchEngineId, regionId);
+                    if (searchString != null)
+                    {
+                        _cache.Add(key, searchString);
+                    }
+                }
             }
 
             return searchString;
+        }
+
+        public override IEnumerable<SearchString> SelectAll()
+        {
+            lock (_locker)
+            {
+                if (_filledCache)
+                {
+                    return _cache.Values.ToList();
+                }
+                else
+                {
+                    IEnumerable<SearchString> searchStrings = base.SelectAll();
+                    
+                    foreach (SearchString searchString in searchStrings)
+                    {
+                        Tuple<int, int> key = new Tuple<int, int>(
+                            searchString.SearchEngineID, searchString.RegionID);
+
+                        _cache.Add(key, searchString);
+                    }
+
+                    _filledCache = true;
+
+                    return searchStrings;
+                }
+            }
+        }
+
+        public override void Insert(SearchString searchString)
+        {
+            base.Insert(searchString);
+
+            lock (_locker)
+            {
+                Tuple<int, int> key = new Tuple<int, int>(searchString.SearchEngineID, searchString.RegionID);
+                _cache.Add(key, searchString);
+            }
+        }
+
+        public override void InsertMany(IEnumerable<SearchString> searchStrings)
+        {
+            base.InsertMany(searchStrings);
+
+            lock (_locker)
+            {
+                foreach (SearchString searchString in searchStrings)
+                {
+                    Tuple<int, int> key = new Tuple<int, int>(searchString.SearchEngineID, searchString.RegionID);
+                    _cache.Add(key, searchString);
+                }
+            }
         }
     }
 }

@@ -25,6 +25,21 @@ namespace RestFul.DI
         /// <summary>
         /// 
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        IContainer Register<T>() where T : class;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="instance"></param>
+        /// <returns></returns>
+        IContainer Register<T>(T instance) where T : class;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="serviceType"></param>
         /// <returns></returns>
         object Resolve(Type serviceType);
