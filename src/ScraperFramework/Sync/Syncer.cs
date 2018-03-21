@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Timers;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace ScraperFramework.Sync
 {
     class Syncer : ISyncer
     {
         private readonly SortedSet<ISyncTask> _syncTasks = new SortedSet<ISyncTask>();
-        private readonly Timer _timer = new Timer();
+        private readonly System.Timers.Timer _timer = new System.Timers.Timer();
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         public Syncer() { }
 
@@ -54,12 +56,28 @@ namespace ScraperFramework.Sync
 
         public void AddSyncTask(ISyncTask syncTask)
         {
-            _syncTasks.Add(syncTask);
+            try
+            {
+                _semaphore.Wait();
+                _syncTasks.Add(syncTask);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
         public void RemoveSyncTask(ISyncTask syncTask)
         {
-            _syncTasks.Remove(syncTask);
+            try
+            {
+                _semaphore.Wait();
+                _syncTasks.Remove(syncTask);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
         public void StartSyncTimer()
@@ -91,16 +109,25 @@ namespace ScraperFramework.Sync
         /// <returns></returns>
         private async Task ExecuteSyncTasks()
         {
-            var batches = _syncTasks.GroupBy(st => st.Order);
-
-            foreach (var batch in batches)
+            try
             {
-                var tasks = batch.Select(async syncTask =>
-                {
-                    await syncTask.Execute();
-                });
+                await _semaphore.WaitAsync();
 
-                await Task.WhenAll(tasks);
+                var batches = _syncTasks.GroupBy(st => st.Order);
+
+                foreach (var batch in batches)
+                {
+                    var tasks = batch.Select(async syncTask =>
+                    {
+                        await syncTask.Execute();
+                    });
+
+                    await Task.WhenAll(tasks);
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
             }
         }
     }

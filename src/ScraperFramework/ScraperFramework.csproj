@@ -136,6 +136,7 @@
     <Compile Include="Scraper.cs" />
     <Compile Include="ScraperFactory.cs" />
     <Compile Include="ScraperQueue.cs" />
+    <Compile Include="Sync\Syncer.cs" />
     <Compile Include="Sync\ISyncer.cs" />
     <Compile Include="Sync\ISyncTask.cs" />
     <Compile Include="Utils\AsyncManualResetEvent.cs" />
