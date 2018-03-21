@@ -7,7 +7,7 @@ namespace ScraperFramework.Utils
     /// <summary>
     /// Utility class to log Program Performance
     /// </summary>
-    internal class PerformanceLogging
+    internal class PerformanceLogger
     {
         private readonly PerformanceCounter _cpuPerformanceCounter = new PerformanceCounter();
         private readonly PerformanceCounter _memoryPerformanceCounter = new PerformanceCounter();
@@ -22,7 +22,7 @@ namespace ScraperFramework.Utils
         /// </summary>
         /// <param name="interval"></param>
         /// <param name="autoStart"></param>
-        public PerformanceLogging(double interval = 60000, bool autoStart = false)
+        public PerformanceLogger(double interval = 60000, bool autoStart = false)
         {
             _cpuPerformanceCounter.CategoryName = "Processor";
             _cpuPerformanceCounter.CounterName = "% Processor Time";

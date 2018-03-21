@@ -155,7 +155,7 @@
     <Compile Include="Sync\ISyncer.cs" />
     <Compile Include="Sync\ISyncTask.cs" />
     <Compile Include="Utils\AsyncManualResetEvent.cs" />
-    <Compile Include="Utils\PerformanceLogging.cs" />
+    <Compile Include="Utils\PerformanceLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
