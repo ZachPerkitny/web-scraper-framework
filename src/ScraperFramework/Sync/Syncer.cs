@@ -1,14 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using Serilog;
 
 namespace ScraperFramework.Sync
 {
     class Syncer : ISyncer
     {
-        private readonly SortedSet<ISyncTask> _syncTasks = new SortedSet<ISyncTask>();
+        private readonly List<ISyncTask> _syncTasks = new List<ISyncTask>();
         private readonly System.Timers.Timer _timer = new System.Timers.Timer();
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
@@ -20,7 +22,7 @@ namespace ScraperFramework.Sync
         /// <param name="syncInterval"></param>
         /// <param name="syncAutoReset"></param>
         /// <param name="autoStart"></param>
-        public Syncer(int syncInterval, bool syncAutoReset = true, bool autoStart = false)
+        public Syncer(double syncInterval, bool syncAutoReset = true, bool autoStart = false)
         {
             _timer.Interval = syncInterval;
             _timer.AutoReset = syncAutoReset;
@@ -54,7 +56,7 @@ namespace ScraperFramework.Sync
             get { return _syncTasks; }
         }
 
-        public void AddSyncTask(ISyncTask syncTask)
+        public ISyncer AddSyncTask(ISyncTask syncTask)
         {
             try
             {
@@ -65,6 +67,8 @@ namespace ScraperFramework.Sync
             {
                 _semaphore.Release();
             }
+
+            return this;
         }
 
         public void RemoveSyncTask(ISyncTask syncTask)
@@ -80,8 +84,17 @@ namespace ScraperFramework.Sync
             }
         }
 
-        public void StartSyncTimer()
+        public void StartSyncTimer(bool immediate)
         {
+            if (immediate)
+            {
+                // immediate and blocking execution
+                // of sync tasks
+                ExecuteSyncTasks()
+                    .GetAwaiter()
+                    .GetResult();
+            }
+
             _timer.Start();
         }
 
@@ -113,7 +126,11 @@ namespace ScraperFramework.Sync
             {
                 await _semaphore.WaitAsync();
 
-                var batches = _syncTasks.GroupBy(st => st.Order);
+                Log.Information("Starting {0} Sync Task(s)", _syncTasks.Count);
+
+                var batches = _syncTasks
+                    .GroupBy(st => st.Order)
+                    .OrderBy(g => g.Key);
 
                 foreach (var batch in batches)
                 {
@@ -124,6 +141,12 @@ namespace ScraperFramework.Sync
 
                     await Task.WhenAll(tasks);
                 }
+
+                Log.Information("Completed All Sync Tasks Successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Sync Task Exception ({0}): {1}", ex.GetType(), ex.Message);
             }
             finally
             {

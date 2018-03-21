@@ -29,7 +29,7 @@ namespace ScraperFramework.Sync
         /// 
         /// </summary>
         /// <param name="syncTask"></param>
-        void AddSyncTask(ISyncTask syncTask);
+        ISyncer AddSyncTask(ISyncTask syncTask);
 
         /// <summary>
         /// 
@@ -40,7 +40,8 @@ namespace ScraperFramework.Sync
         /// <summary>
         /// 
         /// </summary>
-        void StartSyncTimer();
+        /// <param name="immediate"></param>
+        void StartSyncTimer(bool immediate = false);
 
         /// <summary>
         /// 

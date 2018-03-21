@@ -114,6 +114,40 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
+        public SearchEngine Max()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                DBreezeObject<SearchEngine> obj = transaction.Max<byte[], byte[]>(_table)
+                    .ObjectGet<SearchEngine>();
+
+                if (obj != null)
+                {
+                    SearchEngine entity = obj.Entity;
+                    return entity;
+                }
+
+                return null;
+            }
+        }
+
+        public SearchEngine Min()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                DBreezeObject<SearchEngine> obj = transaction.Min<byte[], byte[]>(_table)
+                    .ObjectGet<SearchEngine>();
+
+                if (obj != null)
+                {
+                    SearchEngine entity = obj.Entity;
+                    return entity;
+                }
+
+                return null;
+            }
+        }
+
         /// <summary>
         /// Does an object insert and creates the necessary indexes for
         /// an search engine entity
@@ -137,11 +171,11 @@ namespace ScraperFramework.Data.Concrete
                         new DBreezeIndex(1, searchEngine.ID)
                         {
                             PrimaryIndex = true
-                        },
-                        new DBreezeIndex(2, searchEngine.SearchEngineGroupID)
-                        {
-                            AddPrimaryToTheEnd = true
                         }
+                        //new DBreezeIndex(2, searchEngine.SearchEngineGroupID)
+                        //{
+                        //    AddPrimaryToTheEnd = true
+                        //}
                     }
             });
         }

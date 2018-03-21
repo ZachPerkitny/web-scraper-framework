@@ -4,6 +4,8 @@
     {
         public int ID { get; set; }
 
-        public int SearchEngineGroupID { get; set; }
+        public bool IsMobile { get; set; }
+
+        public byte[] RowRevision { get; set; }
     }
 }

@@ -51,6 +51,9 @@
     <Reference Include="CommonServiceLocator, Version=2.0.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Unity.5.7.3\lib\net46\CommonServiceLocator.dll</HintPath>
     </Reference>
+    <Reference Include="Dapper, Version=1.50.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Dapper.1.50.4\lib\net451\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="DBreeze, Version=1.90.2018.220, Culture=neutral, PublicKeyToken=174b57f1c155f3c6, processorArchitecture=MSIL">
       <HintPath>..\..\packages\DBreeze.1.90.0\lib\net462\DBreeze.dll</HintPath>
     </Reference>
@@ -97,6 +100,8 @@
     <Compile Include="Controllers\CoordinatorController.cs" />
     <Compile Include="Coordinator.cs" />
     <Compile Include="Data\Concrete\CachedSearchStringRepo.cs" />
+    <Compile Include="Data\Concrete\ConnectionFactory.cs" />
+    <Compile Include="Data\Concrete\DataStore.cs" />
     <Compile Include="Data\Concrete\InternationalUULERepo.cs" />
     <Compile Include="Data\Concrete\LocalUULERepo.cs" />
     <Compile Include="Data\Concrete\ProxyMultiplierRepo.cs" />
@@ -114,6 +119,7 @@
     <Compile Include="Data\Entities\SpecialKeyword.cs" />
     <Compile Include="Data\Entities\InternationalUULE.cs" />
     <Compile Include="Data\Entities\LocalUULE.cs" />
+    <Compile Include="Data\IDataStore.cs" />
     <Compile Include="Data\IInternationalUULERepo.cs" />
     <Compile Include="Data\IProxyMultiplierRepo.cs" />
     <Compile Include="Data\ISearchEngineRepo.cs" />
@@ -136,6 +142,7 @@
     <Compile Include="Scraper.cs" />
     <Compile Include="ScraperFactory.cs" />
     <Compile Include="ScraperQueue.cs" />
+    <Compile Include="Sync\SearchEngineSyncTask.cs" />
     <Compile Include="Sync\Syncer.cs" />
     <Compile Include="Sync\ISyncer.cs" />
     <Compile Include="Sync\ISyncTask.cs" />

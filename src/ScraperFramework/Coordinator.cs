@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using RestFul;
 using Serilog;
 using ScraperFramework.Configuration;
+using ScraperFramework.Sync;
 using ScraperFramework.Utils;
 
 namespace ScraperFramework
@@ -14,6 +15,7 @@ namespace ScraperFramework
     {
         private readonly IRestFulServer _restFulServer;
         private readonly IScraperFactory _scraperFactory;
+        private readonly ISyncer _syncer;
         private readonly ScraperConfig _config;
         private readonly AsyncManualResetEvent _manualResetEvent;
         private readonly CancellationTokenSource _cancellationTokenSource;
@@ -23,11 +25,12 @@ namespace ScraperFramework
 
         private bool _disposed = false;
 
-        public Coordinator(IRestFulServer restFulServer, IScraperFactory scraperFactory, ScraperConfig config, 
-            CancellationTokenSource cancellationTokenSource)
+        public Coordinator(IRestFulServer restFulServer, IScraperFactory scraperFactory, ISyncer syncer,
+            ScraperConfig config, CancellationTokenSource cancellationTokenSource)
         {
             _restFulServer = restFulServer ?? throw new ArgumentNullException(nameof(restFulServer));
             _scraperFactory = scraperFactory ?? throw new ArgumentNullException(nameof(scraperFactory));
+            _syncer = syncer ?? throw new ArgumentNullException(nameof(syncer));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _manualResetEvent = new AsyncManualResetEvent(true);
             _cancellationTokenSource = cancellationTokenSource ?? throw new ArgumentNullException(nameof(cancellationTokenSource));
@@ -49,10 +52,13 @@ namespace ScraperFramework
                 _scrapers.Add(_scraperFactory.Create(_manualResetEvent, _cancellationTokenSource.Token));
             }
 
-            _scraperTasks = _scrapers.Select(scraper => Task.Factory.StartNew(async () =>
-            {
-                await scraper.Start();
-            }, TaskCreationOptions.LongRunning)).ToList();
+            //_scraperTasks = _scrapers.Select(scraper => Task.Factory.StartNew(async () =>
+            //{
+            //    //await scraper.Start();
+            //}, TaskCreationOptions.LongRunning)).ToList();
+
+            Log.Information("Starting Syncer");
+            _syncer.StartSyncTimer(true);
         }
 
         public void Pause()

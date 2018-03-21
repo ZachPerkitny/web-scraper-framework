@@ -16,6 +16,8 @@ namespace Driver
             {
                 config.DBreezeDataFolderName = ConfigurationManager.AppSettings["DBreezeDataFolderName"];
                 config.Scrapers = int.Parse(ConfigurationManager.AppSettings["Scrapers"]);
+                config.SyncInterval = 60000;
+                config.ScraperConnectionString = ConfigurationManager.AppSettings["ScraperConnectionString"];
             });
 
             ICoordinator controller = scraperBuilder.Build();

@@ -16,7 +16,7 @@ namespace ScraperFramework.Controllers
             _coordinator = coordinator ?? throw new ArgumentNullException(nameof(coordinator));
         }
 
-        [RestRoute(HttpMethod = HttpMethod.POST, Path = "/pause")]
+        [RestRoute(HttpMethod = HttpMethod.POST, Path = "pause")]
         public IResult PauseCoordinator(HttpContext httpContext)
         {
             _coordinator.Pause();

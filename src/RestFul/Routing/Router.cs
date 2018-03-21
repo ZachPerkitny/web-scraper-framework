@@ -73,7 +73,7 @@ namespace RestFul.Routing
             foreach (RestRouteAttribute routeAttr in method.GetRouteAttributes())
             {
                 string path = CreatePath(basePath, routeAttr.Path);
-                _logger.Debug("Registering Route {0} {1}", routeAttr.HttpMethod, path);
+                _logger.Information("Registering Route {0} {1}", routeAttr.HttpMethod, path);
                 IRoute route = _routeFactory.Create(method, routeAttr.HttpMethod, path);
                 if (!Routes.Add(route))
                 {
