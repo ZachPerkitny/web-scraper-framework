@@ -9,13 +9,13 @@ namespace ScraperFramework.Data
         /// Inserts a single keyword entity.
         /// </summary>
         /// <param name="keyword">Keyword to insert</param>
-        void Insert(string keyword);
+        void Insert(Keyword keyword);
 
         /// <summary>
         /// Inserts multiple keyword entities.
         /// </summary>
         /// <param name="keywords">List of keywords to insert</param>
-        void InsertMany(IEnumerable<string> keywords);
+        void InsertMany(IEnumerable<Keyword> keywords);
 
         /// <summary>
         /// Returns the keyword with the specified id, or null, if the
@@ -47,5 +47,23 @@ namespace ScraperFramework.Data
         /// </summary>
         /// <returns></returns>
         ulong Count();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Keyword Max();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Keyword Min();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        byte[] GetLatestRevision();
     }
 }

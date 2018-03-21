@@ -90,7 +90,9 @@ namespace ScraperFramework.Data.Concrete
             {
                 List<SearchEngine> entities = new List<SearchEngine>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
-                    .SelectForward<byte[], byte[]>(_table);
+                    .SelectForwardFromTo<byte[], byte[]>(_table, 
+                    1.ToIndex(int.MinValue), true,
+                    1.ToIndex(int.MaxValue), true);
 
                 foreach (Row<byte[], byte[]> row in rows)
                 {
@@ -191,6 +193,7 @@ namespace ScraperFramework.Data.Concrete
                 searchEngine.ID = transaction.ObjectGetNewIdentity<int>(_table);
             }
 
+            DBreezeObjectInsertResult<SearchEngine> res = 
             transaction.ObjectInsert(_table, new DBreezeObject<SearchEngine>
             {
                 NewEntity = newEntity,

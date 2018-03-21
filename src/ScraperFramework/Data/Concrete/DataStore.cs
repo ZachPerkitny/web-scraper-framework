@@ -16,6 +16,45 @@ namespace ScraperFramework.Data.Concrete
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
+        public async Task<IEnumerable<Keyword>> SelectKeywords()
+        {
+            string sql = @"SELECT KeywordID as ID 
+                                ,Keyword AS Value
+                                ,RowRevision
+                           FROM [dbo].[keyword]";
+
+            using (IDbConnection connection = _connectionFactory.GetDbConnection())
+            {
+                IEnumerable<Keyword> keywords =
+                    await connection.QueryAsync<Keyword>(
+                        sql: sql);
+
+                return keywords;
+            }
+        }
+
+        public async Task<IEnumerable<Keyword>> SelectKeywords(byte[] rowVersion)
+        {
+            string sql = @"SELECT KeywordID as ID 
+                                ,Keyword AS Value
+                                ,RowRevision
+                           FROM [dbo].[keyword]
+                           WHERE @RowVersion < RowRevision";
+
+            using (IDbConnection connection = _connectionFactory.GetDbConnection())
+            {
+                IEnumerable<Keyword> keywords =
+                    await connection.QueryAsync<Keyword>(
+                        sql: sql,
+                        param: new
+                        {
+                            RowVersion = rowVersion
+                        });
+
+                return keywords;
+            }
+        }
+
         public async Task<IEnumerable<SearchEngine>> SelectSearchEngines()
         {
             string sql = @"SELECT SearchEngineID as ID

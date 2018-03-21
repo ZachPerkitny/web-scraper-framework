@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DBreeze;
 using DBreeze.DataTypes;
 using DBreeze.Objects;
@@ -20,7 +21,7 @@ namespace ScraperFramework.Data.Concrete
             DBreezeInitialization.SetupUtils();
         }
 
-        public void Insert(string keyword)
+        public void Insert(Keyword keyword)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
@@ -30,11 +31,11 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public void InsertMany(IEnumerable<string> keywords)
+        public void InsertMany(IEnumerable<Keyword> keywords)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                foreach (string keyword in keywords)
+                foreach (Keyword keyword in keywords)
                 {
                     Insert(transaction, keyword);
                 }
@@ -65,7 +66,10 @@ namespace ScraperFramework.Data.Concrete
             using (Transaction transaction = _engine.GetTransaction())
             {
                 var entities = new List<Keyword>();
-                IEnumerable<Row<byte[], byte[]>> rows = transaction.SelectForward<byte[], byte[]>(_table);
+                IEnumerable<Row<byte[], byte[]>> rows = transaction
+                    .SelectForwardFromTo<byte[], byte[]>(_table,
+                    1.ToIndex(int.MinValue), true,
+                    1.ToIndex(int.MaxValue), true);
 
                 foreach (var row in rows)
                 {
@@ -112,29 +116,95 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
+        public Keyword Max()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                DBreezeObject<Keyword> obj = transaction.Max<byte[], byte[]>(_table)
+                    .ObjectGet<Keyword>();
+
+                if (obj != null)
+                {
+                    Keyword entity = obj.Entity;
+                    return entity;
+                }
+
+                return null;
+            }
+        }
+
+        public Keyword Min()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                DBreezeObject<Keyword> obj = transaction.Min<byte[], byte[]>(_table)
+                    .ObjectGet<Keyword>();
+
+                if (obj != null)
+                {
+                    Keyword entity = obj.Entity;
+                    return entity;
+                }
+
+                return null;
+            }
+        }
+
+        public byte[] GetLatestRevision()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                // this should be done to take advantage of dbreeze's
+                // lazy loading, value is never actually loaded
+                // from disk. However, the key includes an extra byte,
+                // TODO(zvp): Figure out why
+                IEnumerable<Row<byte[], byte[]>> rows = transaction
+                    .SelectBackwardStartFrom<byte[], byte[]>(
+                    _table, BitConverter.GetBytes(ulong.MaxValue), true);
+
+                if (rows.Any())
+                {
+                    DBreezeObject<Keyword> obj = rows.First()
+                        .ObjectGet<Keyword>();
+
+                    if (obj != null)
+                    {
+                        byte[] latestRevision = obj.Entity.RowRevision;
+                        return latestRevision;
+                    }
+                }
+
+                return null;
+            }
+        }
+
         /// <summary>
         /// Does an object insert and creates the necessary indexes for
         /// a keyword
         /// </summary>
         /// <param name="transaction"></param>
         /// <param name="keyword"></param>
-        private void Insert(Transaction transaction, string keyword)
+        private void Insert(Transaction transaction, Keyword keyword)
         {
-            Keyword entity = new Keyword
+            bool newEntity = keyword.ID == 0;
+            if (newEntity)
             {
-                ID = transaction.ObjectGetNewIdentity<int>(_table),
-                Value = keyword
-            };
+                keyword.ID = transaction.ObjectGetNewIdentity<int>(_table);
+            }
 
             transaction.ObjectInsert(_table, new DBreezeObject<Keyword>
             {
-                NewEntity = true,
-                Entity = entity,
+                NewEntity = newEntity,
+                Entity = keyword,
                 Indexes = new List<DBreezeIndex>
                 {
-                    new DBreezeIndex(1, entity.ID)
+                    new DBreezeIndex(1, keyword.ID)
                     {
                         PrimaryIndex = true
+                    },
+                    new DBreezeIndex(2, keyword.RowRevision)
+                    {
+                        AddPrimaryToTheEnd = false
                     }
                 }
             });

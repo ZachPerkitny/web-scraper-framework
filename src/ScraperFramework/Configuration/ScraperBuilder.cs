@@ -58,9 +58,11 @@ namespace ScraperFramework.Configuration
                     new InjectionFactory(c => (new CrawlDescriptionPipeline(Container.Resolve<IProxyRepo>()))
                         .Connect(Container.Resolve<SearchUrlPipe>())
                         .Connect(Container.Resolve<UserAgentPipe>())))
+                .RegisterType<KeywordSyncTask>()
                 .RegisterType<SearchEngineSyncTask>()
                 .RegisterType<ISyncer>(
                     new InjectionFactory(c => (new Syncer(_config.SyncInterval))
+                        .AddSyncTask(Container.Resolve<KeywordSyncTask>())
                         .AddSyncTask(Container.Resolve<SearchEngineSyncTask>())))
                 // end weird
                 .RegisterType<IScraperQueue, ScraperQueue>()
