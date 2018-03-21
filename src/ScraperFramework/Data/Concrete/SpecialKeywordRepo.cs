@@ -10,101 +10,80 @@ using ScraperFramework.Data.Entities;
 
 namespace ScraperFramework.Data.Concrete
 {
-    class KeywordRepo : IKeywordRepo
+    class SpecialKeywordRepo : ISpecialKeywordRepo
     {
-        private const string _table = "Keyword";
+        private const string _table = "SpecialKeywords";
         private readonly DBreezeEngine _engine;
 
-        public KeywordRepo(DBreezeEngine engine)
+        public SpecialKeywordRepo(DBreezeEngine engine)
         {
             _engine = engine ?? throw new ArgumentNullException(nameof(engine));
-            DBreezeInitialization.SetupUtils();
         }
 
-        public void Insert(Keyword keyword)
+        public void Insert(SpecialKeyword specialKeyword)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                Insert(transaction, keyword);
+                Insert(transaction, specialKeyword);
 
                 transaction.Commit();
             }
         }
 
-        public void InsertMany(IEnumerable<Keyword> keywords)
+        public void InsertMany(IEnumerable<SpecialKeyword> specialKeywords)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                foreach (Keyword keyword in keywords)
+                foreach (SpecialKeyword specialKeyword in specialKeywords)
                 {
-                    Insert(transaction, keyword);
+                    Insert(transaction, specialKeyword);
                 }
 
                 transaction.Commit();
             }
         }
 
-        public Keyword Select(int keywordID)
+        public SpecialKeyword Select(int searchEngineId, int regionId, int keywordId)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                DBreezeObject<Keyword> obj = transaction
-                    .Select<byte[], byte[]>(_table, 1.ToIndex(keywordID))
-                    .ObjectGet<Keyword>();
+                DBreezeObject<SpecialKeyword> obj = transaction
+                    .Select<byte[], byte[]>(
+                        _table, 1.ToIndex(searchEngineId, regionId, keywordId))
+                    .ObjectGet<SpecialKeyword>();
 
                 if (obj != null)
                 {
-                    return obj.Entity;
+                    SpecialKeyword entity = obj.Entity;
+                    return entity;
                 }
 
                 return null;
             }
         }
 
-        public IEnumerable<Keyword> SelectAll()
+        public IEnumerable<SpecialKeyword> SelectAll()
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                List<Keyword> entities = new List<Keyword>();
+                List<SpecialKeyword> entities = new List<SpecialKeyword>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
                     .SelectForwardFromTo<byte[], byte[]>(
-                    _table, 1.ToIndex(int.MinValue), true,
-                    1.ToIndex(int.MaxValue), true);
+                    _table, 1.ToIndex(int.MinValue, int.MinValue, int.MinValue), true,
+                    1.ToIndex(int.MaxValue, int.MaxValue, int.MaxValue), true);
 
                 foreach (Row<byte[], byte[]> row in rows)
                 {
-                    DBreezeObject<Keyword> obj = row.ObjectGet<Keyword>();
+                    DBreezeObject<SpecialKeyword> obj = row.ObjectGet<SpecialKeyword>();
+
                     if (obj != null)
                     {
-                        Keyword entity = obj.Entity;
+                        SpecialKeyword entity = obj.Entity;
                         entities.Add(entity);
-                    } 
+                    }
                 }
 
                 return entities;
-            }
-        }
-
-        public void Delete(int keywordID)
-        {
-            using (Transaction transaction = _engine.GetTransaction())
-            {
-                transaction
-                    .RemoveKey(_table, 1.ToIndex(keywordID));
-
-                transaction.Commit();
-            }
-        }
-
-        public void DeleteAll()
-        {
-            using (Transaction transaction = _engine.GetTransaction())
-            {
-                // without file recreation
-                transaction
-                    .RemoveAllKeys(_table, false);
-
-                transaction.Commit();
             }
         }
 
@@ -116,16 +95,16 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public Keyword Max()
+        public SpecialKeyword Max()
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                DBreezeObject<Keyword> obj = transaction.Max<byte[], byte[]>(_table)
-                    .ObjectGet<Keyword>();
+                DBreezeObject<SpecialKeyword> obj = transaction.Max<byte[], byte[]>(_table)
+                    .ObjectGet<SpecialKeyword>();
 
                 if (obj != null)
                 {
-                    Keyword entity = obj.Entity;
+                    SpecialKeyword entity = obj.Entity;
                     return entity;
                 }
 
@@ -133,16 +112,16 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public Keyword Min()
+        public SpecialKeyword Min()
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                DBreezeObject<Keyword> obj = transaction.Min<byte[], byte[]>(_table)
-                    .ObjectGet<Keyword>();
+                DBreezeObject<SpecialKeyword> obj = transaction.Min<byte[], byte[]>(_table)
+                    .ObjectGet<SpecialKeyword>();
 
                 if (obj != null)
                 {
-                    Keyword entity = obj.Entity;
+                    SpecialKeyword entity = obj.Entity;
                     return entity;
                 }
 
@@ -163,7 +142,6 @@ namespace ScraperFramework.Data.Concrete
 
                 if (rows.Any())
                 {
-                    // skip first byte (dbreezeindex index)
                     return rows.First()
                         .Key.Skip(1).ToArray();
                 }
@@ -177,27 +155,19 @@ namespace ScraperFramework.Data.Concrete
         /// a keyword
         /// </summary>
         /// <param name="transaction"></param>
-        /// <param name="keyword"></param>
-        private void Insert(Transaction transaction, Keyword keyword)
+        /// <param name="specialKeyword"></param>
+        private void Insert(Transaction transaction, SpecialKeyword specialKeyword)
         {
-            bool newEntity = keyword.ID == 0;
-            if (newEntity)
+            transaction.ObjectInsert(_table, new DBreezeObject<SpecialKeyword>
             {
-                // gets monotonically grown identity
-                keyword.ID = transaction.ObjectGetNewIdentity<int>(_table);
-            }
-
-            transaction.ObjectInsert(_table, new DBreezeObject<Keyword>
-            {
-                NewEntity = newEntity,
-                Entity = keyword,
+                Entity = specialKeyword,
                 Indexes = new List<DBreezeIndex>
                 {
-                    new DBreezeIndex(1, keyword.ID)
+                    new DBreezeIndex(1, specialKeyword.SearchEngineID, specialKeyword.RegionID, specialKeyword.KeywordID)
                     {
                         PrimaryIndex = true
                     },
-                    new DBreezeIndex(2, keyword.RowRevision)
+                    new DBreezeIndex(2, specialKeyword.RowRevision)
                     {
                         AddPrimaryToTheEnd = false
                     }

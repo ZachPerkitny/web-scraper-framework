@@ -44,5 +44,18 @@ namespace ScraperFramework.Data
         /// <param name="rowVersion"></param>
         /// <returns></returns>
         Task<IEnumerable<SearchString>> SelectSearchStrings(byte[] rowVersion);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<SpecialKeyword>> SelectSpecialKeywords();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rowVersion"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SpecialKeyword>> SelectSpecialKeywords(byte[] rowVersion);
     }
 }

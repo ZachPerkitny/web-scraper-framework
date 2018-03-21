@@ -16,24 +16,17 @@ namespace ScraperFramework.Data.Concrete
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
-        public async Task<IEnumerable<Keyword>> SelectKeywords()
+        public Task<IEnumerable<Keyword>> SelectKeywords()
         {
             string sql = @"SELECT KeywordID AS ID 
                                 ,Keyword AS Value
                                 ,RowRevision
                            FROM [dbo].[keyword]";
 
-            using (IDbConnection connection = _connectionFactory.GetDbConnection())
-            {
-                IEnumerable<Keyword> keywords =
-                    await connection.QueryAsync<Keyword>(
-                        sql: sql);
-
-                return keywords;
-            }
+            return SelectMany<Keyword>(sql);
         }
 
-        public async Task<IEnumerable<Keyword>> SelectKeywords(byte[] rowVersion)
+        public Task<IEnumerable<Keyword>> SelectKeywords(byte[] rowVersion)
         {
             string sql = @"SELECT KeywordID AS ID 
                                 ,Keyword AS Value
@@ -41,38 +34,23 @@ namespace ScraperFramework.Data.Concrete
                            FROM [dbo].[keyword]
                            WHERE @RowVersion < RowRevision";
 
-            using (IDbConnection connection = _connectionFactory.GetDbConnection())
+            return SelectMany<Keyword>(sql, new
             {
-                IEnumerable<Keyword> keywords =
-                    await connection.QueryAsync<Keyword>(
-                        sql: sql,
-                        param: new
-                        {
-                            RowVersion = rowVersion
-                        });
-
-                return keywords;
-            }
+                RowVersion = rowVersion
+            });
         }
 
-        public async Task<IEnumerable<SearchEngine>> SelectSearchEngines()
+        public Task<IEnumerable<SearchEngine>> SelectSearchEngines()
         {
             string sql = @"SELECT SearchEngineID AS ID
                                 ,IsMobile
                                 ,RowRevision
                            FROM [dbo].[SearchEngine]";
 
-            using (IDbConnection connection = _connectionFactory.GetDbConnection())
-            {
-                IEnumerable<SearchEngine> searchEngines =
-                    await connection.QueryAsync<SearchEngine>(
-                        sql: sql);
-
-                return searchEngines;
-            }
+            return SelectMany<SearchEngine>(sql);
         }
 
-        public async Task<IEnumerable<SearchEngine>> SelectSearchEngines(byte[] rowVersion)
+        public Task<IEnumerable<SearchEngine>> SelectSearchEngines(byte[] rowVersion)
         {
             string sql = @"SELECT SearchEngineID AS ID
                                 ,IsMobile
@@ -80,21 +58,13 @@ namespace ScraperFramework.Data.Concrete
                            FROM [dbo].[SearchEngine]
                            WHERE @RowVersion < RowRevision";
 
-            using (IDbConnection connection = _connectionFactory.GetDbConnection())
+            return SelectMany<SearchEngine>(sql, new
             {
-                IEnumerable<SearchEngine> searchEngines = 
-                    await connection.QueryAsync<SearchEngine>(
-                        sql: sql,
-                        param: new
-                        {
-                            RowVersion = rowVersion
-                        });
-
-                return searchEngines;
-            }
+                RowVersion = rowVersion
+            });
         }
 
-        public async Task<IEnumerable<SearchString>> SelectSearchStrings()
+        public Task<IEnumerable<SearchString>> SelectSearchStrings()
         {
             string sql = @"SELECT SearchStringID AS ID
                                 ,SearchEngineId
@@ -106,17 +76,10 @@ namespace ScraperFramework.Data.Concrete
                                 ,RowRevision
                            FROM [dbo].[SearchStrings]";
 
-            using (IDbConnection connection = _connectionFactory.GetDbConnection())
-            {
-                IEnumerable<SearchString> searchStrings =
-                    await connection.QueryAsync<SearchString>(
-                        sql: sql);
-
-                return searchStrings;
-            }
+            return SelectMany<SearchString>(sql);
         }
 
-        public async Task<IEnumerable<SearchString>> SelectSearchStrings(byte[] rowVersion)
+        public Task<IEnumerable<SearchString>> SelectSearchStrings(byte[] rowVersion)
         {
             string sql = @"SELECT SearchStringID AS ID
                                 ,SearchEngineId
@@ -129,17 +92,49 @@ namespace ScraperFramework.Data.Concrete
                            FROM [dbo].[SearchStrings]
                            WHERE @RowVersion < RowRevision";
 
+            return SelectMany<SearchString>(sql, new
+            {
+                RowVersion = rowVersion
+            });
+        }
+
+        public Task<IEnumerable<SpecialKeyword>> SelectSpecialKeywords()
+        {
+            string sql = @"SELECT KeywordId
+                                ,SearchEngineId
+                                ,RegionId
+                                ,RowRevision
+                           FROM [dbo].[SpecialKeywords]";
+
+            return SelectMany<SpecialKeyword>(sql);
+        }
+
+        public Task<IEnumerable<SpecialKeyword>> SelectSpecialKeywords(byte[] rowVersion)
+        {
+            string sql = @"SELECT KeywordId
+                                ,SearchEngineId
+                                ,RegionId
+                                ,RowRevision
+                           FROM [dbo].[SpecialKeywords]
+                           WHERE @RowVersion < RowRevision";
+
+            return SelectMany<SpecialKeyword>(sql, new
+            {
+                RowVersion = rowVersion
+            });
+        }
+
+        private async Task<IEnumerable<T>> SelectMany<T>(string sql, object @params = null) 
+            where T : class
+        {
             using (IDbConnection connection = _connectionFactory.GetDbConnection())
             {
-                IEnumerable<SearchString> searchStrings =
-                    await connection.QueryAsync<SearchString>(
+                IEnumerable<T> entities =
+                    await connection.QueryAsync<T>(
                         sql: sql,
-                        param: new
-                        {
-                            RowVersion = rowVersion
-                        });
+                        param: @params);
 
-                return searchStrings;
+                return entities;
             }
         }
     }

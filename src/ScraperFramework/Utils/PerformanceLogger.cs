@@ -5,7 +5,7 @@ using Serilog;
 namespace ScraperFramework.Utils
 {
     /// <summary>
-    /// Utility class to log Program Performance
+    /// Utility class to log CPU Usage, Memory Usage and Disk Reads, Writes and Transfers
     /// </summary>
     internal class PerformanceLogger
     {

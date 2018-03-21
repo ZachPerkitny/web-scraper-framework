@@ -43,12 +43,12 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public InternationalUULE Select(int cityID)
+        public InternationalUULE Select(int regionId)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
                 DBreezeObject<InternationalUULE> obj = transaction
-                    .Select<byte[], byte[]>(_table, 2.ToIndex(cityID))
+                    .Select<byte[], byte[]>(_table, 2.ToIndex(regionId))
                     .ObjectGet<InternationalUULE>();
 
                 if (obj != null)
@@ -67,7 +67,9 @@ namespace ScraperFramework.Data.Concrete
             {
                 List<InternationalUULE> entities = new List<InternationalUULE>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
-                    .SelectForward<byte[], byte[]>(_table);
+                    .SelectForwardFromTo<byte[], byte[]>(
+                    _table, 1.ToIndex(int.MinValue), true,
+                    1.ToIndex(int.MaxValue), true);
 
                 foreach (Row<byte[], byte[]> row in rows)
                 {

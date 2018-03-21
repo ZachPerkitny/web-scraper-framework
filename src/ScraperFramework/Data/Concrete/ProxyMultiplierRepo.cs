@@ -85,7 +85,9 @@ namespace ScraperFramework.Data.Concrete
             {
                 List<ProxyMultiplier> entities = new List<ProxyMultiplier>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
-                    .SelectForward<byte[], byte[]>(_table);
+                    .SelectForwardFromTo<byte[], byte[]>(
+                    _table, 1.ToIndex(int.MinValue), true,
+                    1.ToIndex(int.MaxValue), true);
 
                 foreach (Row<byte[], byte[]> row in rows)
                 {

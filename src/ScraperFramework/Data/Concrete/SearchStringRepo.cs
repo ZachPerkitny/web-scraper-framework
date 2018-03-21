@@ -84,6 +84,7 @@ namespace ScraperFramework.Data.Concrete
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
+                // Documentation https://goo.gl/MbZAsB
                 List<SearchString> entities = new List<SearchString>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
                     .SelectForwardFromTo<byte[], byte[]>(_table,
@@ -153,11 +154,10 @@ namespace ScraperFramework.Data.Concrete
             {
                 // this is done to take advantage of dbreeze's
                 // lazy loading, value is never actually loaded
-                // from disk. However, the key includes an extra byte,
-                // TODO(zvp): Figure out why
+                // from disk.
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
                     .SelectBackwardStartFrom<byte[], byte[]>(
-                    _table, 3.ToIndex(BitConverter.GetBytes(ulong.MaxValue)), true);
+                    _table, 3.ToIndex(long.MaxValue), true);
 
                 if (rows.Any())
                 {

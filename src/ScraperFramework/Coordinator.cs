@@ -46,7 +46,7 @@ namespace ScraperFramework
             Log.Information("Starting Rest API");
             _restFulServer.Start();
 
-            Log.Information("Starting Syncer");
+            Log.Information("Starting Sync Timer");
             _syncer.StartSyncTimer(true);
 
             Log.Information("Starting Scrapers");

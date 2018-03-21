@@ -16,7 +16,7 @@ namespace Driver
             {
                 config.DBreezeDataFolderName = ConfigurationManager.AppSettings["DBreezeDataFolderName"];
                 config.Scrapers = int.Parse(ConfigurationManager.AppSettings["Scrapers"]);
-                config.SyncInterval = 60000;
+                config.SyncInterval = int.Parse(ConfigurationManager.AppSettings["SyncInterval"]);
                 config.ScraperConnectionString = ConfigurationManager.AppSettings["ScraperConnectionString"];
             });
 

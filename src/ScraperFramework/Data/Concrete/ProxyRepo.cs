@@ -65,7 +65,10 @@ namespace ScraperFramework.Data.Concrete
             using (Transaction transaction = _engine.GetTransaction())
             {
                 var entities = new List<Proxy>();
-                IEnumerable<Row<byte[], byte[]>> rows = transaction.SelectForward<byte[], byte[]>(_table);
+                IEnumerable<Row<byte[], byte[]>> rows = transaction
+                    .SelectForwardFromTo<byte[], byte[]>(
+                    _table, 1.ToIndex(int.MinValue), true,
+                    1.ToIndex(int.MaxValue), true);
 
                 foreach (var row in rows)
                 {

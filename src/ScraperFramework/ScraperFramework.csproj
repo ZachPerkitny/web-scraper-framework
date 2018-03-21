@@ -106,6 +106,7 @@
     <Compile Include="Controllers\CoordinatorController.cs" />
     <Compile Include="Coordinator.cs" />
     <Compile Include="Data\Concrete\CachedSearchStringRepo.cs" />
+    <Compile Include="Data\Concrete\SpecialKeywordRepo.cs" />
     <Compile Include="Data\ConnectionFactory.cs" />
     <Compile Include="Data\Concrete\DataStore.cs" />
     <Compile Include="Data\Concrete\InternationalUULERepo.cs" />
@@ -115,7 +116,8 @@
     <Compile Include="Data\Concrete\KeywordRepo.cs" />
     <Compile Include="Data\Concrete\SearchEngineRepo.cs" />
     <Compile Include="Data\Concrete\SearchStringRepo.cs" />
-    <Compile Include="Data\Concrete\SearchStringRepoDecorator.cs" />
+    <Compile Include="Data\ISpecialKeywordRepo.cs" />
+    <Compile Include="Data\SearchStringRepoDecorator.cs" />
     <Compile Include="Data\DBreezeInitialization.cs" />
     <Compile Include="Data\Entities\Proxy.cs" />
     <Compile Include="Data\Entities\Keyword.cs" />
@@ -151,6 +153,7 @@
     <Compile Include="Sync\KeywordSyncTask.cs" />
     <Compile Include="Sync\SearchEngineSyncTask.cs" />
     <Compile Include="Sync\SearchStringSyncTask.cs" />
+    <Compile Include="Sync\SpecialKeywordSyncTask.cs" />
     <Compile Include="Sync\Syncer.cs" />
     <Compile Include="Sync\ISyncer.cs" />
     <Compile Include="Sync\ISyncTask.cs" />

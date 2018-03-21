@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
-using Newtonsoft.Json;
 using ProtoBuf;
 
 namespace ScraperFramework.Data

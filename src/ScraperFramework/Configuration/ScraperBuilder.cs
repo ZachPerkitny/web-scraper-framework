@@ -51,6 +51,7 @@ namespace ScraperFramework.Configuration
                 .RegisterType<IProxyRepo, ProxyRepo>()
                 .RegisterType<ISearchEngineRepo, SearchEngineRepo>()
                 .RegisterType<ISearchStringRepo, SearchStringRepo>()
+                .RegisterType<ISpecialKeywordRepo, SpecialKeywordRepo>()
                 // start weird
                 .RegisterType<UserAgentPipe>()
                 .RegisterType<SearchUrlPipe>()
@@ -61,11 +62,13 @@ namespace ScraperFramework.Configuration
                 .RegisterType<KeywordSyncTask>()
                 .RegisterType<SearchEngineSyncTask>()
                 .RegisterType<SearchStringSyncTask>()
+                .RegisterType<SpecialKeywordSyncTask>()
                 .RegisterType<ISyncer>(
                     new InjectionFactory(c => (new Syncer(_config.SyncInterval))
                         .AddSyncTask(Container.Resolve<KeywordSyncTask>())
                         .AddSyncTask(Container.Resolve<SearchEngineSyncTask>())
-                        .AddSyncTask(Container.Resolve<SearchStringSyncTask>())))
+                        .AddSyncTask(Container.Resolve<SearchStringSyncTask>())
+                        .AddSyncTask(Container.Resolve<SpecialKeywordSyncTask>())))
                 // end weird
                 .RegisterType<IScraperQueue, ScraperQueue>()
                 .RegisterType<IScraperFactory, ScraperFactory>()
