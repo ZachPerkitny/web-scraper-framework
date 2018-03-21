@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using Newtonsoft.Json;
+using ProtoBuf;
 
 namespace ScraperFramework.Data
 {
@@ -18,17 +20,30 @@ namespace ScraperFramework.Data
         {
             if (!_initialized)
             {
-                // Setup Serializers using Newtonsoft
-                // TODO (zvp): Maybe use something more compact ?
+                // Setup Serializers using Protobuf-net
                 DBreeze.Utils.CustomSerializator.ByteArraySerializator = (object obj) =>
                 {
-                    return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj));
+                    byte[] serialized = null;
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        Serializer.NonGeneric.Serialize(ms, obj);
+                        serialized = ms.ToArray();
+                    }
+
+                    return serialized;
                 };
 
-                DBreeze.Utils.CustomSerializator.ByteArrayDeSerializator = (byte[] buffer, Type type) =>
+                DBreeze.Utils.CustomSerializator.ByteArrayDeSerializator = (byte[] data, Type type) =>
                 {
-                    string value = Encoding.UTF8.GetString(buffer);
-                    return JsonConvert.DeserializeObject(value, type);
+                    object ret = null;
+
+                    using (MemoryStream ms = new MemoryStream(data))
+                    {
+                        ret = Serializer.NonGeneric.Deserialize(type, ms);
+                    }
+
+                    return ret;
                 };
 
                 _initialized = true;

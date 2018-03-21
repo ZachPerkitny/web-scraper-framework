@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DBreeze;
 using DBreeze.DataTypes;
 using DBreeze.Objects;
@@ -148,6 +149,34 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
+        public byte[] GetLatestRevision()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                // this should be done to take advantage of dbreeze's
+                // lazy loading, value is never actually loaded
+                // from disk. However, the key includes an extra byte,
+                // TODO(zvp): Figure out why
+                IEnumerable<Row<byte[], byte[]>> rows = transaction
+                    .SelectBackwardStartFrom<byte[], byte[]>(
+                    _table, BitConverter.GetBytes(ulong.MaxValue), true);
+
+                if (rows.Any())
+                {
+                    DBreezeObject<SearchEngine> obj = rows.First()
+                        .ObjectGet<SearchEngine>();
+
+                    if (obj != null)
+                    {
+                        byte[] latestRevision = obj.Entity.RowRevision;
+                        return latestRevision;
+                    }
+                }
+
+                return null;
+            }
+        }
+
         /// <summary>
         /// Does an object insert and creates the necessary indexes for
         /// an search engine entity
@@ -171,8 +200,12 @@ namespace ScraperFramework.Data.Concrete
                         new DBreezeIndex(1, searchEngine.ID)
                         {
                             PrimaryIndex = true
+                        },
+                        new DBreezeIndex(2, searchEngine.RowRevision)
+                        {
+                            AddPrimaryToTheEnd = false
                         }
-                        //new DBreezeIndex(2, searchEngine.SearchEngineGroupID)
+                        //new DBreezeIndex(3, searchEngine.SearchEngineGroupID)
                         //{
                         //    AddPrimaryToTheEnd = true
                         //}

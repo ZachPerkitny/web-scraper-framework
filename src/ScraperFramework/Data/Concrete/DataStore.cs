@@ -39,9 +39,7 @@ namespace ScraperFramework.Data.Concrete
                                 ,IsMobile
                                 ,RowRevision
                            FROM [dbo].[SearchEngine]
-                           WHERE @RowVersion > 
-                                (SELECT MAX(RowRevision) 
-                                FROM [dbo].[SearchEngine])";
+                           WHERE @RowVersion < RowRevision";
 
             using (IDbConnection connection = _connectionFactory.GetDbConnection())
             {

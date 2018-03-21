@@ -54,5 +54,11 @@ namespace ScraperFramework.Data
         /// </summary>
         /// <returns></returns>
         SearchEngine Min();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        byte[] GetLatestRevision();
     }
 }

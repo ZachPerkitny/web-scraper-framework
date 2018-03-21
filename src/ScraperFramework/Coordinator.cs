@@ -46,6 +46,9 @@ namespace ScraperFramework
             Log.Information("Starting Rest API");
             _restFulServer.Start();
 
+            Log.Information("Starting Syncer");
+            _syncer.StartSyncTimer(true);
+
             Log.Information("Starting Scrapers");
             for (int i = 0; i < _config.Scrapers; i++)
             {
@@ -56,9 +59,6 @@ namespace ScraperFramework
             //{
             //    //await scraper.Start();
             //}, TaskCreationOptions.LongRunning)).ToList();
-
-            Log.Information("Starting Syncer");
-            _syncer.StartSyncTimer(true);
         }
 
         public void Pause()

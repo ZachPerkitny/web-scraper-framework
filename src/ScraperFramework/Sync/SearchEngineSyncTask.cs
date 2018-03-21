@@ -22,10 +22,10 @@ namespace ScraperFramework.Sync
 
         public async Task Execute()
         {
-            SearchEngine max = _searchEngineRepo.Max();
-            IEnumerable<SearchEngine> searchEngines = (max == null) ? 
+            byte[] latestRevision = _searchEngineRepo.GetLatestRevision();
+            IEnumerable<SearchEngine> searchEngines = (latestRevision == null) ? 
                 await _dataStore.SelectSearchEngines() : 
-                await _dataStore.SelectSearchEngines(max.RowRevision);
+                await _dataStore.SelectSearchEngines(latestRevision);
 
             if (searchEngines.Any())
             {
