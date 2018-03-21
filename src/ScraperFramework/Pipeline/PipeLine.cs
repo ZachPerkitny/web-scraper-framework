@@ -8,7 +8,7 @@
         /// 
         /// </summary>
         /// <param name="pipe"></param>
-        public void Connect(Pipe<T> pipe)
+        public PipeLine<T> Connect(Pipe<T> pipe)
         {
             if (_rootPipe == null)
             {
@@ -18,6 +18,8 @@
             {
                 _rootPipe.Connect(pipe);
             }
+
+            return this;
         }
 
         /// <summary>

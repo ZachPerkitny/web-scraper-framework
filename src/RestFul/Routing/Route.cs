@@ -92,6 +92,7 @@ namespace RestFul.Routing
 
             return (context) =>
             {
+                // anti-pattern, i know...
                 object instance = _container.Resolve(method.ReflectedType);
                 return (IResult)method.Invoke(instance, new object[] { context });
             };

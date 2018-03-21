@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ScraperFramework.Pipeline;
 using ScraperFramework.Pocos;
@@ -13,9 +14,8 @@ namespace ScraperFramework
         private const int KEYWORD_COUNT = 5000;
 
         private readonly PipeLine<PipelinedCrawlDescription> _pipeline;
-        private DateTime _nextAvailability;
         private readonly Queue<CrawlDescription> _queue = new Queue<CrawlDescription>();
-        private readonly object _locker = new object();
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         public ScraperQueue(PipeLine<PipelinedCrawlDescription> pipeline)
         {
@@ -24,15 +24,25 @@ namespace ScraperFramework
 
         public async Task<CrawlDescription> Dequeue()
         {
-            if (_queue.Count == 0)
+            CrawlDescription crawlDescription;
+
+            try
             {
-                await RequestMoreCrawlDescriptions();
+                await _semaphore.WaitAsync();
+
+                if (_queue.Count == 0)
+                {
+                    await RequestMoreCrawlDescriptions();
+                }
+
+                crawlDescription = _queue.Dequeue();
+            }
+            finally
+            {
+                _semaphore.Release();
             }
 
-            lock (_locker)
-            {
-                return _queue.Dequeue();
-            } 
+            return crawlDescription;
         }
 
         private async Task RequestMoreCrawlDescriptions()

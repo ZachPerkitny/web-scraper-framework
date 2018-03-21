@@ -36,7 +36,7 @@ namespace ScraperFramework.Configuration
                 .RegisterInstance(_config)
                 .RegisterInstance(new CancellationTokenSource())
                 .RegisterInstance(new DBreezeEngine(_config.DBreezeDataFolderName), new ContainerControlledLifetimeManager())
-                .RegisterInstance(RestfulServerFactory.Create(c => 
+                .RegisterInstance(RestfulServerFactory.Create(c =>
                 {
                     c.Register<IRestFulLogger>((_) => new SerilogLogger(Log.Logger));
                     // TODO(zvp): add unity adaptor
@@ -48,7 +48,12 @@ namespace ScraperFramework.Configuration
                 .RegisterType<IProxyRepo, ProxyRepo>()
                 .RegisterType<ISearchEngineRepo, SearchEngineRepo>()
                 .RegisterType<ISearchStringRepo, SearchStringRepo>()
-                .RegisterType<PipeLine<PipelinedCrawlDescription>, CrawlDescriptionPipeline>()
+                .RegisterType<Pipe<PipelinedCrawlDescription>, UserAgentPipe>()
+                .RegisterType<Pipe<PipelinedCrawlDescription>, SearchUrlPipe>()
+                .RegisterType<PipeLine<PipelinedCrawlDescription>>(
+                    new InjectionFactory(c => (new CrawlDescriptionPipeline(Container.Resolve<IProxyRepo>()))
+                        .Connect(Container.Resolve<SearchUrlPipe>())
+                        .Connect(Container.Resolve<UserAgentPipe>())))
                 .RegisterType<IScraperQueue, ScraperQueue>()
                 .RegisterType<IScraperFactory, ScraperFactory>()
                 .RegisterType<ICoordinator, Coordinator>();

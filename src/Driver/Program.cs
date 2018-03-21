@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using Serilog;
 using ScraperFramework;
 using ScraperFramework.Configuration;
@@ -13,8 +14,8 @@ namespace Driver
 
             var scraperBuilder = new ScraperBuilder(config =>
             {
-                config.DBreezeDataFolderName = @"C:\Users\zaperkitny\Documents\dbreeze";
-                config.Scrapers = 5;
+                config.DBreezeDataFolderName = ConfigurationManager.AppSettings["DBreezeDataFolderName"];
+                config.Scrapers = int.Parse(ConfigurationManager.AppSettings["Scrapers"]);
             });
 
             ICoordinator controller = scraperBuilder.Build();

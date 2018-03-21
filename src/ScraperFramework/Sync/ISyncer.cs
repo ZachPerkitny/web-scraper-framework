@@ -8,12 +8,22 @@ namespace ScraperFramework.Sync
         /// <summary>
         /// 
         /// </summary>
-        IEnumerable<ISyncTask> SyncTasks { get; }
+        bool SyncTimerAutoReset { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        int SyncInterval { get; }
+        bool SyncTimerEnabled { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        double SyncInterval { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        IEnumerable<ISyncTask> SyncTasks { get; }
 
         /// <summary>
         /// 
@@ -26,6 +36,16 @@ namespace ScraperFramework.Sync
         /// </summary>
         /// <param name="syncTask"></param>
         void RemoveSyncTask(ISyncTask syncTask);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void StartSyncTimer();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void StopSyncTimer();
 
         /// <summary>
         /// 

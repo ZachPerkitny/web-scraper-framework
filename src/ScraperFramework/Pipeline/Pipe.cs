@@ -3,7 +3,7 @@
     internal abstract class Pipe<T>
     {
         protected Pipe<T> _connection;
-
+        
         /// <summary>
         /// 
         /// </summary>
