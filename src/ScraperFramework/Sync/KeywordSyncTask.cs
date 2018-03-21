@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 using ScraperFramework.Data;
 using ScraperFramework.Data.Entities;
 
@@ -27,6 +28,7 @@ namespace ScraperFramework.Sync
                 await _dataStore.SelectKeywords() :
                 await _dataStore.SelectKeywords(latestRevision);
 
+            Log.Information("{0} Keyword(s) Updated or Added since last sync.", keywords.Count());
             if (keywords.Any())
             {
                 _keywordRepo.InsertMany(keywords);

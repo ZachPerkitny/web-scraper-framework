@@ -161,18 +161,13 @@ namespace ScraperFramework.Data.Concrete
                 // TODO(zvp): Figure out why
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
                     .SelectBackwardStartFrom<byte[], byte[]>(
-                    _table, BitConverter.GetBytes(ulong.MaxValue), true);
+                    _table, 2.ToIndex(BitConverter.GetBytes(ulong.MaxValue)), true);
 
                 if (rows.Any())
                 {
-                    DBreezeObject<SearchEngine> obj = rows.First()
-                        .ObjectGet<SearchEngine>();
-
-                    if (obj != null)
-                    {
-                        byte[] latestRevision = obj.Entity.RowRevision;
-                        return latestRevision;
-                    }
+                    // skip first byte (dbreezeindex index)
+                    return rows.First()
+                        .Key.Skip(1).ToArray();
                 }
 
                 return null;

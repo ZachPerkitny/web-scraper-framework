@@ -43,5 +43,23 @@ namespace ScraperFramework.Data
         /// </summary>
         /// <returns></returns>
         ulong Count();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        SearchString Max();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        SearchString Min();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        byte[] GetLatestRevision();
     }
 }

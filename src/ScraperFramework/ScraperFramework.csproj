@@ -106,7 +106,7 @@
     <Compile Include="Controllers\CoordinatorController.cs" />
     <Compile Include="Coordinator.cs" />
     <Compile Include="Data\Concrete\CachedSearchStringRepo.cs" />
-    <Compile Include="Data\Concrete\ConnectionFactory.cs" />
+    <Compile Include="Data\ConnectionFactory.cs" />
     <Compile Include="Data\Concrete\DataStore.cs" />
     <Compile Include="Data\Concrete\InternationalUULERepo.cs" />
     <Compile Include="Data\Concrete\LocalUULERepo.cs" />
@@ -150,6 +150,7 @@
     <Compile Include="ScraperQueue.cs" />
     <Compile Include="Sync\KeywordSyncTask.cs" />
     <Compile Include="Sync\SearchEngineSyncTask.cs" />
+    <Compile Include="Sync\SearchStringSyncTask.cs" />
     <Compile Include="Sync\Syncer.cs" />
     <Compile Include="Sync\ISyncer.cs" />
     <Compile Include="Sync\ISyncTask.cs" />

@@ -42,5 +42,20 @@ namespace ScraperFramework.Data.Concrete
         {
             return _searchStringRepo.Count();
         }
+
+        public SearchString Max()
+        {
+            return _searchStringRepo.Max();
+        }
+
+        public SearchString Min()
+        {
+            return _searchStringRepo.Min();
+        }
+
+        public byte[] GetLatestRevision()
+        {
+            return _searchStringRepo.GetLatestRevision();
+        }
     }
 }

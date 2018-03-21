@@ -25,5 +25,8 @@ namespace ScraperFramework.Data.Entities
 
         [ProtoMember(7)]
         public int DelayMultiplier { get; set; }
+
+        [ProtoMember(8)]
+        public byte[] RowRevision { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 
-namespace ScraperFramework.Data.Concrete
+namespace ScraperFramework.Data
 {
     internal class ConnectionFactory
     {

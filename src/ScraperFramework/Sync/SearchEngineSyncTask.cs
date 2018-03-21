@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 using ScraperFramework.Data;
 using ScraperFramework.Data.Entities;
 
@@ -27,6 +28,7 @@ namespace ScraperFramework.Sync
                 await _dataStore.SelectSearchEngines() : 
                 await _dataStore.SelectSearchEngines(latestRevision);
 
+            Log.Information("{0} Search Engine(s) Updated or Added since last sync.", searchEngines.Count());
             if (searchEngines.Any())
             {
                 _searchEngineRepo.InsertMany(searchEngines);

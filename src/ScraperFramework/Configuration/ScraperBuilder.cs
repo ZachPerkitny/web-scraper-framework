@@ -60,10 +60,12 @@ namespace ScraperFramework.Configuration
                         .Connect(Container.Resolve<UserAgentPipe>())))
                 .RegisterType<KeywordSyncTask>()
                 .RegisterType<SearchEngineSyncTask>()
+                .RegisterType<SearchStringSyncTask>()
                 .RegisterType<ISyncer>(
                     new InjectionFactory(c => (new Syncer(_config.SyncInterval))
                         .AddSyncTask(Container.Resolve<KeywordSyncTask>())
-                        .AddSyncTask(Container.Resolve<SearchEngineSyncTask>())))
+                        .AddSyncTask(Container.Resolve<SearchEngineSyncTask>())
+                        .AddSyncTask(Container.Resolve<SearchStringSyncTask>())))
                 // end weird
                 .RegisterType<IScraperQueue, ScraperQueue>()
                 .RegisterType<IScraperFactory, ScraperFactory>()

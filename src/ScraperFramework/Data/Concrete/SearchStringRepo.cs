@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DBreeze;
 using DBreeze.DataTypes;
 using DBreeze.Objects;
@@ -85,7 +86,9 @@ namespace ScraperFramework.Data.Concrete
             {
                 List<SearchString> entities = new List<SearchString>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
-                    .SelectForward<byte[], byte[]>(_table);
+                    .SelectForwardFromTo<byte[], byte[]>(_table,
+                    1.ToIndex(int.MinValue), true,
+                    1.ToIndex(int.MaxValue), true);
 
                 foreach (Row<byte[], byte[]> row in rows)
                 {
@@ -107,6 +110,63 @@ namespace ScraperFramework.Data.Concrete
             using (Transaction transaction = _engine.GetTransaction())
             {
                 return transaction.Count(_table);
+            }
+        }
+
+        public SearchString Max()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                DBreezeObject<SearchString> obj = transaction.Max<byte[], byte[]>(_table)
+                    .ObjectGet<SearchString>();
+
+                if (obj != null)
+                {
+                    SearchString entity = obj.Entity;
+                    return entity;
+                }
+
+                return null;
+            }
+        }
+
+        public SearchString Min()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                DBreezeObject<SearchString> obj = transaction.Min<byte[], byte[]>(_table)
+                    .ObjectGet<SearchString>();
+
+                if (obj != null)
+                {
+                    SearchString entity = obj.Entity;
+                    return entity;
+                }
+
+                return null;
+            }
+        }
+
+        public byte[] GetLatestRevision()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                // this is done to take advantage of dbreeze's
+                // lazy loading, value is never actually loaded
+                // from disk. However, the key includes an extra byte,
+                // TODO(zvp): Figure out why
+                IEnumerable<Row<byte[], byte[]>> rows = transaction
+                    .SelectBackwardStartFrom<byte[], byte[]>(
+                    _table, 3.ToIndex(BitConverter.GetBytes(ulong.MaxValue)), true);
+
+                if (rows.Any())
+                {
+                    // skip first byte (dbreezeindex index)
+                    return rows.First()
+                        .Key.Skip(1).ToArray();
+                }
+
+                return null;
             }
         }
 
@@ -135,6 +195,10 @@ namespace ScraperFramework.Data.Concrete
                             PrimaryIndex = true
                         },
                         new DBreezeIndex(2, searchString.SearchEngineID, searchString.RegionID)
+                        {
+                            AddPrimaryToTheEnd = false
+                        },
+                        new DBreezeIndex(3, searchString.RowRevision)
                         {
                             AddPrimaryToTheEnd = false
                         }
