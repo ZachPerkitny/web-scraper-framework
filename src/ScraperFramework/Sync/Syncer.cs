@@ -8,7 +8,7 @@ using Serilog;
 
 namespace ScraperFramework.Sync
 {
-    class Syncer : ISyncer
+    internal class Syncer : ISyncer
     {
         private readonly List<ISyncTask> _syncTasks = new List<ISyncTask>();
         private readonly System.Timers.Timer _timer = new System.Timers.Timer();

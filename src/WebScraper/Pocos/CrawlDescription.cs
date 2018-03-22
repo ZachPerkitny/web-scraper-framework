@@ -18,6 +18,8 @@
 
         public string IP { get; set; }
 
+        public int Port { get; set; }
+
         public string UserAgent { get; set; }
 
         public string SearchString { get; set; }

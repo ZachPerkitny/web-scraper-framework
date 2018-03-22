@@ -19,5 +19,8 @@ namespace ScraperFramework.Data.Entities
 
         [ProtoMember(5)]
         public int Multiplier { get; set; }
+
+        [ProtoMember(6)]
+        public byte[] RowRevision { get; set; }
     }
 }

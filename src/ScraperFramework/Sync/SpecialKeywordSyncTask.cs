@@ -8,7 +8,7 @@ using ScraperFramework.Data.Entities;
 
 namespace ScraperFramework.Sync
 {
-    class SpecialKeywordSyncTask : ISyncTask
+    internal class SpecialKeywordSyncTask : ISyncTask
     {
         private readonly IDataStore _dataStore;
         private readonly ISpecialKeywordRepo _specialKeywordRepo;

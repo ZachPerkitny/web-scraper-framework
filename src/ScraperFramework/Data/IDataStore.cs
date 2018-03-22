@@ -23,6 +23,19 @@ namespace ScraperFramework.Data
         /// 
         /// </summary>
         /// <returns></returns>
+        Task<IEnumerable<Proxy>> SelectProxies();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rowVersion"></param>
+        /// <returns></returns>
+        Task<IEnumerable<Proxy>> SelectProxies(byte[] rowVersion);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         Task<IEnumerable<SearchEngine>> SelectSearchEngines();
 
         /// <summary>

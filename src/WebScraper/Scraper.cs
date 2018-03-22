@@ -34,7 +34,7 @@ namespace WebScraper
                 UserAgent = CrawlDescription.UserAgent
             };
 
-            cefSettings.CefCommandLineArgs.Add("proxy-server", CrawlDescription.IP);
+            cefSettings.CefCommandLineArgs.Add("proxy-server", $"{CrawlDescription.IP}:{CrawlDescription.Port}");
 
             // Disable WebGL
             //cefSettings.DisableGpuAcceleration();

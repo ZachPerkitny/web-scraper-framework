@@ -12,18 +12,18 @@ namespace ScraperFramework.Data.Entities
         public string IP { get; set; }
 
         [ProtoMember(3)]
-        public string Port { get; set; }
+        public int Port { get; set; }
 
         [ProtoMember(4)]
         public int RegionID { get; set; }
 
         [ProtoMember(5)]
-        public int SearchEngineGroup { get; set; }
-
-        [ProtoMember(6)]
         public int Status { get; set; }
 
-        [ProtoMember(7)]
+        [ProtoMember(6)]
         public int ProxyBlockID { get; set; }
+
+        [ProtoMember(7)]
+        public byte[] RowRevision { get; set; }
     }
 }

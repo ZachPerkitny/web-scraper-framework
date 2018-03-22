@@ -40,6 +40,38 @@ namespace ScraperFramework.Data.Concrete
             });
         }
 
+        public Task<IEnumerable<Proxy>> SelectProxies()
+        {
+            string sql = @"SELECT ProxyID AS ID
+                                ,IP
+                                ,Port
+                                ,RegionId
+                                ,Status
+                                ,ProxyBlockID
+                                ,RowRevision
+                           FROM [dbo].[Proxy_v2]";
+
+            return SelectMany<Proxy>(sql);
+        }
+
+        public Task<IEnumerable<Proxy>> SelectProxies(byte[] rowVersion)
+        {
+            string sql = @"SELECT ProxyID AS ID
+                                ,IP
+                                ,Port
+                                ,RegionId
+                                ,Status
+                                ,ProxyBlockID
+                                ,RowRevision
+                           FROM [dbo].[Proxy_v2]
+                           WHERE @RowVersion < RowRevision";
+
+            return SelectMany<Proxy>(sql, new
+            {
+                RowVersion = rowVersion
+            });
+        }
+
         public Task<IEnumerable<SearchEngine>> SelectSearchEngines()
         {
             string sql = @"SELECT SearchEngineID AS ID

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DBreeze;
 using DBreeze.DataTypes;
 using DBreeze.Objects;
@@ -112,6 +113,62 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
+        public ProxyMultiplier Max()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                DBreezeObject<ProxyMultiplier> obj = transaction.Max<byte[], byte[]>(_table)
+                    .ObjectGet<ProxyMultiplier>();
+
+                if (obj != null)
+                {
+                    ProxyMultiplier entity = obj.Entity;
+                    return entity;
+                }
+
+                return null;
+            }
+        }
+
+        public ProxyMultiplier Min()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                DBreezeObject<ProxyMultiplier> obj = transaction.Min<byte[], byte[]>(_table)
+                    .ObjectGet<ProxyMultiplier>();
+
+                if (obj != null)
+                {
+                    ProxyMultiplier entity = obj.Entity;
+                    return entity;
+                }
+
+                return null;
+            }
+        }
+
+        public byte[] GetLatestRevision()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                // this is done to take advantage of dbreeze's
+                // lazy loading, value is never actually loaded
+                // from disk.
+                IEnumerable<Row<byte[], byte[]>> rows = transaction
+                    .SelectBackwardStartFrom<byte[], byte[]>(
+                    _table, 3.ToIndex(long.MaxValue), true);
+
+                if (rows.Any())
+                {
+                    // skip first byte (dbreezeindex index)
+                    return rows.First()
+                        .Key.Skip(1).ToArray();
+                }
+
+                return null;
+            }
+        }
+
         /// <summary>
         /// Does an object insert and creates the necessary indexes for
         /// an proxy multiplier entity
@@ -138,6 +195,10 @@ namespace ScraperFramework.Data.Concrete
                         },
                         new DBreezeIndex(2, proxyMultiplier.SearchEngineID, proxyMultiplier.RegionID, 
                         proxyMultiplier.ProxyID)
+                        {
+                            AddPrimaryToTheEnd = false
+                        },
+                        new DBreezeIndex(3, proxyMultiplier.RowRevision)
                         {
                             AddPrimaryToTheEnd = false
                         }
