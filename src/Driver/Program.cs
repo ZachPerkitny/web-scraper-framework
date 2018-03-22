@@ -3,6 +3,7 @@ using System.Configuration;
 using Serilog;
 using ScraperFramework;
 using ScraperFramework.Configuration;
+using ScraperFramework.Utils;
 
 namespace Driver
 {
@@ -12,20 +13,30 @@ namespace Driver
         {
             Log.Logger = SetupLogger();
 
-            var scraperBuilder = new ScraperBuilder(config =>
+            var x = new DoubleOrderedMap<int, int>
             {
-                config.DBreezeDataFolderName = ConfigurationManager.AppSettings["DBreezeDataFolderName"];
-                config.Scrapers = int.Parse(ConfigurationManager.AppSettings["Scrapers"]);
-                config.SyncInterval = int.Parse(ConfigurationManager.AppSettings["SyncInterval"]);
-                config.ScraperConnectionString = ConfigurationManager.AppSettings["ScraperConnectionString"];
-            });
+                { 1, 5 },
+                { 2, 6 },
+                { 4, 7 },
+                { 8, 12 }
+            };
 
-            ICoordinator controller = scraperBuilder.Build();
-            controller.Start();
+            Log.Information(x.Count.ToString());
 
-            Console.ReadLine();
-            controller.Dispose();
-            Console.ReadLine();
+            //var scraperBuilder = new ScraperBuilder(config =>
+            //{
+            //    config.DBreezeDataFolderName = ConfigurationManager.AppSettings["DBreezeDataFolderName"];
+            //    config.Scrapers = int.Parse(ConfigurationManager.AppSettings["Scrapers"]);
+            //    config.SyncInterval = int.Parse(ConfigurationManager.AppSettings["SyncInterval"]);
+            //    config.ScraperConnectionString = ConfigurationManager.AppSettings["ScraperConnectionString"];
+            //});
+
+            //ICoordinator controller = scraperBuilder.Build();
+            //controller.Start();
+
+            //Console.ReadLine();
+            //controller.Dispose();
+            //Console.ReadLine();
         }
 
         private static ILogger SetupLogger()

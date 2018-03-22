@@ -10,7 +10,7 @@ namespace ScraperFramework.Utils
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    internal class DoubleOrderedMap<TKey, TValue> : IDictionary<TKey, TValue>
+    public class DoubleOrderedMap<TKey, TValue> : IDictionary<TKey, TValue>
         where TKey: IComparable
         where TValue: IComparable
     {
@@ -64,7 +64,7 @@ namespace ScraperFramework.Utils
         /// <param name="value"></param>
         public void Add(TKey key, TValue value)
         {
-            throw new NotImplementedException();
+            Insert(key, value);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace ScraperFramework.Utils
         /// <param name="item"></param>
         public void Add(KeyValuePair<TKey, TValue> item)
         {
-            throw new NotImplementedException();
+            Insert(item.Key, item.Value);
         }
 
         /// <summary>
@@ -179,7 +179,6 @@ namespace ScraperFramework.Utils
 
             if (_rootNode[0] == null) // if key is null
             {
-                newNode.MakeBlack(); // the root node is black
                 _rootNode[0] = newNode;
                 _rootNode[1] = newNode;
                 _nodeCount += 1; // increment node count
@@ -223,7 +222,7 @@ namespace ScraperFramework.Utils
                 prev.SetRightNode(newNode);
             }
 
-            // TODO (zvp) Handle Fix Cases
+            RepairTree(newNode);
         }
 
         /// <summary>
@@ -265,20 +264,69 @@ namespace ScraperFramework.Utils
             {
                 prev.SetRightNode(newNode, false);
             }
+
+            RepairTree(newNode, false);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private void RepairTree()
+        private void RepairTree(Node node, bool key = true)
         {
+            // if uncle is red, repaint
+            if (node.GetUncle(key) != null && node.GetUncle(key).IsRed(key))
+            {
+                node.MakeBlack(key);
+                node.GetUncle(key).MakeBlack(key);
+                node.GetGrandParent(key).MakeRed(key);
+                // grandparent now violates property(2)
+                // root must be a black node
+                RepairTree(node.GetGrandParent(key), key);
+            }
+            else
+            {
+                Node grandParent = node.GetGrandParent(key);
+                if (grandParent != null)
+                {
+                    Node parent = node.GetParent(key);
+                    if (grandParent.GetLeftNode(key) != null && 
+                        grandParent.GetLeftNode(key).GetRightNode(key) == node)
+                    {
+                        RotateLeft(parent, key);
+                        node = node.GetLeftNode(key);
+                    }
+                    else if (grandParent.GetRightNode(key) != null &&
+                        grandParent.GetRightNode(key).GetLeftNode(key) == node)
+                    {
+                        RotateRight(parent, key);
+                        node = node.GetRightNode(key);
+                    }
 
+                    parent = node.GetParent(key);
+                    grandParent = node.GetGrandParent(key);
+                    
+                    // if node is left-left
+                    if (node == parent.GetLeftNode(key))
+                    {
+                        RotateRight(grandParent, key);
+                    }
+                    // right-right
+                    else
+                    {
+                        RotateLeft(grandParent, key);
+                    }
+
+                    // swap colors
+                    parent.MakeBlack(key);
+                    grandParent.MakeRed(key);
+                }
+            }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private void RotateLeft(Node node, bool key = false)
+        private void RotateLeft(Node node, bool key = true)
         {
             Node np = node.GetRightNode(key);
 
@@ -291,6 +339,8 @@ namespace ScraperFramework.Utils
             {
                 np.GetLeftNode(key).SetParent(node, key);
             }
+
+            np.SetParent(node.GetParent(key));
 
             // if node was root, replace
             // it with np
@@ -320,9 +370,45 @@ namespace ScraperFramework.Utils
         /// <summary>
         /// 
         /// </summary>
-        private void RotateRight(Node node, bool key = false)
+        private void RotateRight(Node node, bool key = true)
         {
-            
+            Node np = node.GetLeftNode(key);
+
+            // set np's right node as node's left node
+            node.SetLeftNode(np.GetRightNode(key), key);
+
+            // update np right's parent node if
+            // it is not null
+            if (np.GetRightNode(key) != null)
+            {
+                np.GetRightNode(key).SetParent(node, key);
+            }
+
+            np.SetParent(node.GetParent(key));
+
+            // if node was root, replace
+            // it with np
+            if (node.GetParent(key) == null)
+            {
+                _rootNode[(key) ? 0 : 1] = np;
+            }
+            // if node was a left node, replace the parent's
+            // left node with np
+            else if (node.GetParent().GetLeftNode() == node)
+            {
+                node.GetParent().SetLeftNode(np);
+            }
+            // if node was a right node, replace the parent's
+            // right node with np
+            else
+            {
+                node.GetParent().SetRightNode(np);
+            }
+
+            // put node as np's right node
+            np.SetRightNode(node);
+            // update node's parent node to np
+            node.SetParent(np);
         }
 
         /// <summary>
@@ -332,8 +418,8 @@ namespace ScraperFramework.Utils
         {
             private enum Color
             {
-                Red,
-                Black
+                Black,
+                Red
             }
 
             public TKey Key { get; private set; }
