@@ -159,6 +159,7 @@
     <Compile Include="Sync\ISyncer.cs" />
     <Compile Include="Sync\ISyncTask.cs" />
     <Compile Include="Utils\AsyncManualResetEvent.cs" />
+    <Compile Include="Utils\DoubleOrderedMap.cs" />
     <Compile Include="Utils\PerformanceLogger.cs" />
   </ItemGroup>
   <ItemGroup>
