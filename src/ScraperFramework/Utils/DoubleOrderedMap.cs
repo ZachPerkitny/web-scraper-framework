@@ -10,7 +10,7 @@ namespace ScraperFramework.Utils
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    public class DoubleOrderedMap<TKey, TValue> : IDictionary<TKey, TValue>
+    internal class DoubleOrderedMap<TKey, TValue> : IDictionary<TKey, TValue>
         where TKey: IComparable
         where TValue: IComparable
     {
@@ -28,7 +28,15 @@ namespace ScraperFramework.Utils
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public TValue this[TKey key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public TValue this[TKey key]
+        {
+            get
+            {
+                Node node = FindByKey(key);
+                return (node == null) ? default(TValue) : node.Value;
+            }
+            set => throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Gets a collection containing the value in the DoubleOrderedMap
@@ -93,7 +101,8 @@ namespace ScraperFramework.Utils
         /// <returns></returns>
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            throw new NotImplementedException();
+            Node node = FindByKey(item.Key);
+            return node != null && item.Value.CompareTo(node.Value) == 0;
         }
 
         /// <summary>
@@ -104,7 +113,7 @@ namespace ScraperFramework.Utils
         /// <returns></returns>
         public bool ContainsKey(TKey key)
         {
-            throw new NotImplementedException();
+            return FindByKey(key) != null;
         }
 
         /// <summary>
@@ -275,14 +284,14 @@ namespace ScraperFramework.Utils
         private void RepairTree(Node node, bool key = true)
         {
             // case 1 : repaint root node
-            if (node.GetParent() == null)
+            if (node.GetParent(key) == null)
             {
                 node.MakeBlack(key);
                 return;
             }
 
             // case 2 : do nothing
-            if (node.GetParent().IsBlack())
+            if (node.GetParent(key).IsBlack())
             {
                 return;
             }
@@ -294,7 +303,7 @@ namespace ScraperFramework.Utils
                 node.GetParent(key).MakeBlack(key);
                 node.GetUncle(key).MakeBlack(key);
                 node.GetGrandParent(key).MakeRed(key);
-                // grandparent now violates property(2)
+                // grandparent may now violate property(2)
                 // root must be a black node
                 RepairTree(node.GetGrandParent(key), key);
             }
@@ -302,21 +311,23 @@ namespace ScraperFramework.Utils
             {
                 Node grandParent = node.GetGrandParent(key);
                 Node parent = node.GetParent(key);
+                
                 if (grandParent.GetLeftNode(key) != null &&
                     grandParent.GetLeftNode(key).GetRightNode(key) == node)
                 {
                     RotateLeft(parent, key);
+                    parent = node;
                     node = node.GetLeftNode(key);
+                    grandParent = parent.GetParent(key);
                 }
                 else if (grandParent.GetRightNode(key) != null &&
                     grandParent.GetRightNode(key).GetLeftNode(key) == node)
                 {
                     RotateRight(parent, key);
+                    parent = node;
                     node = node.GetRightNode(key);
+                    grandParent = parent.GetParent(key);
                 }
-
-                parent = node.GetParent(key);
-                grandParent = node.GetGrandParent(key);
 
                 // if node is left-left
                 if (node == parent.GetLeftNode(key))
@@ -362,15 +373,15 @@ namespace ScraperFramework.Utils
             }
             // if node was a left node, replace the parent's
             // left node with np
-            else if (node.GetParent().GetLeftNode() == node)
+            else if (node.GetParent(key).GetLeftNode(key) == node)
             {
-                node.GetParent().SetLeftNode(np);
+                node.GetParent(key).SetLeftNode(np);
             }
             // if node was a right node, replace the parent's
             // right node with np
             else
             {
-                node.GetParent().SetRightNode(np);
+                node.GetParent(key).SetRightNode(np);
             }
 
             // put node as np's left node
@@ -406,21 +417,49 @@ namespace ScraperFramework.Utils
             }
             // if node was a left node, replace the parent's
             // left node with np
-            else if (node.GetParent().GetLeftNode() == node)
+            else if (node.GetParent(key).GetLeftNode(key) == node)
             {
-                node.GetParent().SetLeftNode(np);
+                node.GetParent(key).SetLeftNode(np);
             }
             // if node was a right node, replace the parent's
             // right node with np
             else
             {
-                node.GetParent().SetRightNode(np);
+                node.GetParent(key).SetRightNode(np);
             }
 
             // put node as np's right node
             np.SetRightNode(node);
             // update node's parent node to np
             node.SetParent(np);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private Node FindByKey(TKey key)
+        {
+            Node node = _rootNode[0];
+            while (node != null)
+            {
+                int cmp = node.Key.CompareTo(key);
+                if (cmp == 0)
+                {
+                    return node;
+                }
+                else if (cmp < 0)
+                {
+                    node = node.GetLeftNode();
+                }
+                else // cmp > 0
+                {
+                    node = node.GetRightNode();
+                }
+            }
+
+            return node;
         }
 
         /// <summary>
@@ -542,11 +581,11 @@ namespace ScraperFramework.Utils
 
                 if (this == parent.GetLeftNode(key))
                 {
-                    return parent.GetRightNode();
+                    return parent.GetRightNode(key);
                 }
                 else
                 {
-                    return parent.GetLeftNode();
+                    return parent.GetLeftNode(key);
                 }
             }
 
@@ -583,7 +622,7 @@ namespace ScraperFramework.Utils
                     return null;
                 }
 
-                return parent.GetSibling();
+                return parent.GetSibling(key);
             }
 
             /// <summary>
