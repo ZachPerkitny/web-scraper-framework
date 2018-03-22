@@ -44,30 +44,12 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public ProxyMultiplier Select(int proxyMultiplierId)
-        {
-            using (Transaction transaction = _engine.GetTransaction())
-            {
-                DBreezeObject<ProxyMultiplier> obj = transaction
-                    .Select<byte[], byte[]>(_table, 1.ToIndex(proxyMultiplierId))
-                    .ObjectGet<ProxyMultiplier>();
-
-                if (obj != null)
-                {
-                    ProxyMultiplier entity = obj.Entity;
-                    return entity;
-                }
-
-                return null;
-            }
-        }
-
         public ProxyMultiplier Select(int searchEngineId, int regionId, int proxyId)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
                 DBreezeObject<ProxyMultiplier> obj = transaction
-                    .Select<byte[], byte[]>(_table, 2.ToIndex(searchEngineId, regionId, proxyId))
+                    .Select<byte[], byte[]>(_table, 1.ToIndex(searchEngineId, regionId, proxyId))
                     .ObjectGet<ProxyMultiplier>();
 
                 if (obj != null)
@@ -87,8 +69,8 @@ namespace ScraperFramework.Data.Concrete
                 List<ProxyMultiplier> entities = new List<ProxyMultiplier>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
                     .SelectForwardFromTo<byte[], byte[]>(
-                    _table, 1.ToIndex(int.MinValue), true,
-                    1.ToIndex(int.MaxValue), true);
+                    _table, 1.ToIndex(int.MinValue, int.MinValue, int.MinValue), true,
+                    1.ToIndex(int.MaxValue, int.MaxValue, int.MaxValue), true);
 
                 foreach (Row<byte[], byte[]> row in rows)
                 {
@@ -156,7 +138,7 @@ namespace ScraperFramework.Data.Concrete
                 // from disk.
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
                     .SelectBackwardStartFrom<byte[], byte[]>(
-                    _table, 3.ToIndex(long.MaxValue), true);
+                    _table, 2.ToIndex(long.MaxValue), true);
 
                 if (rows.Any())
                 {
@@ -177,28 +159,17 @@ namespace ScraperFramework.Data.Concrete
         /// <param name="proxyMultiplier"></param>
         private void Insert(Transaction transaction, ProxyMultiplier proxyMultiplier)
         {
-            bool newEntity = proxyMultiplier.ID == 0;
-            if (newEntity)
-            {
-                proxyMultiplier.ID = transaction.ObjectGetNewIdentity<int>(_table);
-            }
-
             transaction.ObjectInsert(_table, new DBreezeObject<ProxyMultiplier>
             {
-                NewEntity = newEntity,
                 Entity = proxyMultiplier,
                 Indexes = new List<DBreezeIndex>
                     {
-                        new DBreezeIndex(1, proxyMultiplier.ID)
+                        new DBreezeIndex(1, proxyMultiplier.SearchEngineID, proxyMultiplier.RegionID, 
+                        proxyMultiplier.ProxyID)
                         {
                             PrimaryIndex = true
                         },
-                        new DBreezeIndex(2, proxyMultiplier.SearchEngineID, proxyMultiplier.RegionID, 
-                        proxyMultiplier.ProxyID)
-                        {
-                            AddPrimaryToTheEnd = false
-                        },
-                        new DBreezeIndex(3, proxyMultiplier.RowRevision)
+                        new DBreezeIndex(2, proxyMultiplier.RowRevision)
                         {
                             AddPrimaryToTheEnd = false
                         }

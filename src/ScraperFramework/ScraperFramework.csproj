@@ -151,6 +151,7 @@
     <Compile Include="ScraperFactory.cs" />
     <Compile Include="ScraperQueue.cs" />
     <Compile Include="Sync\KeywordSyncTask.cs" />
+    <Compile Include="Sync\ProxyMultiplierSyncTask.cs" />
     <Compile Include="Sync\ProxySyncTask.cs" />
     <Compile Include="Sync\SearchEngineSyncTask.cs" />
     <Compile Include="Sync\SearchStringSyncTask.cs" />

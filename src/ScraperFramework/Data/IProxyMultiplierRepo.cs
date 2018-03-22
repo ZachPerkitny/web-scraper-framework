@@ -20,13 +20,6 @@ namespace ScraperFramework.Data
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="proxyMultiplierId"></param>
-        /// <returns></returns>
-        ProxyMultiplier Select(int proxyMultiplierId);
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="searchEngineId"></param>
         /// <param name="regionId"></param>
         /// <param name="proxyId"></param>

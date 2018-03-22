@@ -256,7 +256,7 @@ namespace ScraperFramework.Utils
             }
             
             newNode.SetParent(prev, false);
-            newNode.MakeRed(); // newly inserted nodes are colored red
+            newNode.MakeRed(false); // newly inserted nodes are colored red
             if (newNode.Value.CompareTo(prev.Value) < 0)
             {
                 prev.SetLeftNode(newNode, false);
@@ -276,6 +276,56 @@ namespace ScraperFramework.Utils
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        private void RotateLeft(Node node, bool key = false)
+        {
+            Node np = node.GetRightNode(key);
+
+            // set np's left node as node's right node
+            node.SetRightNode(np.GetLeftNode(key), key);
+
+            // update np left's parent node if
+            // it is not null
+            if (np.GetLeftNode(key) != null)
+            {
+                np.GetLeftNode(key).SetParent(node, key);
+            }
+
+            // if node was root, replace
+            // it with np
+            if (node.GetParent(key) == null)
+            {
+                _rootNode[(key) ? 0 : 1] = np;
+            }
+            // if node was a left node, replace the parent's
+            // left node with np
+            else if (node.GetParent().GetLeftNode() == node)
+            {
+                node.GetParent().SetLeftNode(np);
+            }
+            // if node was a right node, replace the parent's
+            // right node with np
+            else
+            {
+                node.GetParent().SetRightNode(np);
+            }
+
+            // put node as np's left node
+            np.SetLeftNode(node);
+            // update node's parent node to np
+            node.SetParent(np);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RotateRight(Node node, bool key = false)
+        {
+            
+        }
+
+        /// <summary>
         /// RBT Node
         /// </summary>
         private class Node
@@ -286,10 +336,11 @@ namespace ScraperFramework.Utils
                 Black
             }
 
-            private Color _color; // each node is either red or black
-
             public TKey Key { get; private set; }
+
             public TValue Value { get; private set; }
+
+            private Color[] _color; // each node is either red or black
 
             private Node[] _left;
             private Node[] _right;
@@ -306,25 +357,47 @@ namespace ScraperFramework.Utils
                 Key = key;
                 Value = value;
 
+                _color = new Color[2];
+
                 _left = new Node[2];
                 _right = new Node[2];
                 _parent = new Node[2];
             }
 
             /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="key"></param>
+            /// <returns></returns>
+            public bool IsRed(bool key = true)
+            {
+                return _color[(key) ? 0 : 1] == Color.Red;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="key"></param>
+            /// <returns></returns>
+            public bool IsBlack(bool key = true)
+            {
+                return _color[(key) ? 0 : 1] == Color.Black;
+            }
+
+            /// <summary>
             /// Marks the Node as Red
             /// </summary>
-            public void MakeRed()
+            public void MakeRed(bool key = true)
             {
-                _color = Color.Red;
+                _color[(key) ? 0 : 1] = Color.Red;
             }
 
             /// <summary>
             /// Marks the Node as black
             /// </summary>
-            public void MakeBlack()
+            public void MakeBlack(bool key = true)
             {
-                _color = Color.Black;
+                _color[(key) ? 0 : 1] = Color.Black;
             }
 
             /// <summary>
@@ -345,6 +418,74 @@ namespace ScraperFramework.Utils
             public Node GetRightNode(bool key = true)
             {
                 return _right[(key) ? 0 : 1];
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="key"></param>
+            public Node GetParent(bool key = true)
+            {
+                return _parent[(key) ? 0 : 1];
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="key"></param>
+            /// <returns></returns>
+            public Node GetSibling(bool key = true)
+            {
+                Node parent = GetParent(key);
+                if (parent == null)
+                {
+                    return null;
+                }
+
+                if (this == parent.GetLeftNode(key))
+                {
+                    return parent.GetRightNode();
+                }
+                else
+                {
+                    return parent.GetLeftNode();
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="key"></param>
+            public Node GetGrandParent(bool key = true)
+            {
+                Node parent = GetParent(key);
+                if (parent == null)
+                {
+                    return null;
+                }
+
+                return parent.GetParent(key);
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="key"></param>
+            /// <returns></returns>
+            public Node GetUncle(bool key = true)
+            {
+                if (GetGrandParent(key) == null)
+                {
+                    return null;
+                }
+
+                Node parent = GetParent(key);
+                if (parent == null)
+                {
+                    return null;
+                }
+
+                return parent.GetSibling();
             }
 
             /// <summary>
