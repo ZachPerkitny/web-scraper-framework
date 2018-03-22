@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ScraperFramework.Utils
 {
+    /// <summary>
+    /// Red Black Tree Implementation of a Map. Based off of 
+    /// Java's DoubleOrderedMap, hence the name.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
     internal class DoubleOrderedMap<TKey, TValue> : IDictionary<TKey, TValue>
         where TKey: IComparable
         where TValue: IComparable
@@ -186,22 +189,32 @@ namespace ScraperFramework.Utils
             // find where to insert the node
             Node prev = null;
             Node node = _rootNode[0];
+
             while (node != null)
             {
+                // set prev node
                 prev = node;
-                if (newNode.Value.CompareTo(node.Value) < 0)
+
+                int cmp = newNode.Key.CompareTo(node.Key);
+                if (cmp < 0)
                 {
                     node = node.GetLeftNode();
                 }
-                else
+                else if (cmp > 0)
                 {
                     node = node.GetRightNode();
                 }
+                else
+                {
+                    // todo (zvp): proper error
+                    throw new Exception();
+                }
             }
-            
+
+            InsertValue(newNode);
             newNode.SetParent(prev);
             newNode.MakeRed(); // newly inserted nodes are colored red
-            if (newNode.Value.CompareTo(prev.Value) < 0)
+            if (newNode.Key.CompareTo(prev.Key) < 0)
             {
                 prev.SetLeftNode(newNode);
             }
@@ -211,6 +224,47 @@ namespace ScraperFramework.Utils
             }
 
             // TODO (zvp) Handle Fix Cases
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="newNode"></param>
+        private void InsertValue(Node newNode)
+        {
+            Node prev = null;
+            Node node = _rootNode[1]; // value node
+
+            while (node != null)
+            {
+                prev = node;
+
+                int cmp = newNode.Value.CompareTo(node.Value);
+                if (cmp < 0)
+                {
+                    node = node.GetLeftNode(false);
+                }
+                else if (cmp > 0)
+                {
+                    node = node.GetRightNode(false);
+                }
+                else
+                {
+                    // todo (zvp): proper error
+                    throw new Exception();
+                }
+            }
+            
+            newNode.SetParent(prev, false);
+            newNode.MakeRed(); // newly inserted nodes are colored red
+            if (newNode.Value.CompareTo(prev.Value) < 0)
+            {
+                prev.SetLeftNode(newNode, false);
+            }
+            else
+            {
+                prev.SetRightNode(newNode, false);
+            }
         }
 
         /// <summary>
