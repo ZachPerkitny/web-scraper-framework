@@ -35,6 +35,7 @@ namespace ScraperFramework
                     await RequestMoreCrawlDescriptions();
                 }
 
+                // TODO: Add Throttle
                 crawlDescription = _queue.Dequeue();
             }
             finally

@@ -13,30 +13,34 @@ namespace Driver
         {
             Log.Logger = SetupLogger();
 
-            var x = new DoubleOrderedMap<int, int>
-            {
-                { 1, 5 },
-                { 2, 6 },
-                { 4, 7 },
-                { 8, 12 }
-            };
+            //var x = new DoubleOrderedMap<int, int>();
 
-            Log.Information(x.Count.ToString());
-
-            //var scraperBuilder = new ScraperBuilder(config =>
+            //for (int i = 0; i < 8; i++)
             //{
-            //    config.DBreezeDataFolderName = ConfigurationManager.AppSettings["DBreezeDataFolderName"];
-            //    config.Scrapers = int.Parse(ConfigurationManager.AppSettings["Scrapers"]);
-            //    config.SyncInterval = int.Parse(ConfigurationManager.AppSettings["SyncInterval"]);
-            //    config.ScraperConnectionString = ConfigurationManager.AppSettings["ScraperConnectionString"];
-            //});
+            //    x.Add(i, i);
+            //}
 
-            //ICoordinator controller = scraperBuilder.Build();
-            //controller.Start();
+            //foreach (var y in x)
+            //{
+            //    Console.WriteLine("{0} {1}", y.Key, y.Value);
+            //}
 
-            //Console.ReadLine();
-            //controller.Dispose();
-            //Console.ReadLine();
+            //Log.Information(x.Count.ToString());
+
+            var scraperBuilder = new ScraperBuilder(config =>
+            {
+                config.DBreezeDataFolderName = ConfigurationManager.AppSettings["DBreezeDataFolderName"];
+                config.Scrapers = int.Parse(ConfigurationManager.AppSettings["Scrapers"]);
+                config.SyncInterval = int.Parse(ConfigurationManager.AppSettings["SyncInterval"]);
+                config.ScraperConnectionString = ConfigurationManager.AppSettings["ScraperConnectionString"];
+            });
+
+            ICoordinator controller = scraperBuilder.Build();
+            controller.Start();
+
+            Console.ReadLine();
+            controller.Dispose();
+            Console.ReadLine();
         }
 
         private static ILogger SetupLogger()

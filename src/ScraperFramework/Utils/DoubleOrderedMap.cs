@@ -125,7 +125,7 @@ namespace ScraperFramework.Utils
         /// <returns></returns>
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            throw new NotImplementedException();
+            return new Enumerator(this);
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace ScraperFramework.Utils
                 }
             }
 
-            InsertValue(newNode);
+           // InsertValue(newNode);
             newNode.SetParent(prev);
             newNode.MakeRed(); // newly inserted nodes are colored red
             if (newNode.Key.CompareTo(prev.Key) < 0)
@@ -223,6 +223,7 @@ namespace ScraperFramework.Utils
             }
 
             RepairTree(newNode);
+            _nodeCount += 1; // increment node count
         }
 
         /// <summary>
@@ -273,10 +274,24 @@ namespace ScraperFramework.Utils
         /// </summary>
         private void RepairTree(Node node, bool key = true)
         {
-            // if uncle is red, repaint
-            if (node.GetUncle(key) != null && node.GetUncle(key).IsRed(key))
+            // case 1 : repaint root node
+            if (node.GetParent() == null)
             {
                 node.MakeBlack(key);
+                return;
+            }
+
+            // case 2 : do nothing
+            if (node.GetParent().IsBlack())
+            {
+                return;
+            }
+            
+            // if uncle is red, repaint
+            if (node.GetUncle(key) != null
+                && node.GetUncle(key).IsRed(key))
+            {
+                node.GetParent(key).MakeBlack(key);
                 node.GetUncle(key).MakeBlack(key);
                 node.GetGrandParent(key).MakeRed(key);
                 // grandparent now violates property(2)
@@ -286,40 +301,37 @@ namespace ScraperFramework.Utils
             else
             {
                 Node grandParent = node.GetGrandParent(key);
-                if (grandParent != null)
+                Node parent = node.GetParent(key);
+                if (grandParent.GetLeftNode(key) != null &&
+                    grandParent.GetLeftNode(key).GetRightNode(key) == node)
                 {
-                    Node parent = node.GetParent(key);
-                    if (grandParent.GetLeftNode(key) != null && 
-                        grandParent.GetLeftNode(key).GetRightNode(key) == node)
-                    {
-                        RotateLeft(parent, key);
-                        node = node.GetLeftNode(key);
-                    }
-                    else if (grandParent.GetRightNode(key) != null &&
-                        grandParent.GetRightNode(key).GetLeftNode(key) == node)
-                    {
-                        RotateRight(parent, key);
-                        node = node.GetRightNode(key);
-                    }
-
-                    parent = node.GetParent(key);
-                    grandParent = node.GetGrandParent(key);
-                    
-                    // if node is left-left
-                    if (node == parent.GetLeftNode(key))
-                    {
-                        RotateRight(grandParent, key);
-                    }
-                    // right-right
-                    else
-                    {
-                        RotateLeft(grandParent, key);
-                    }
-
-                    // swap colors
-                    parent.MakeBlack(key);
-                    grandParent.MakeRed(key);
+                    RotateLeft(parent, key);
+                    node = node.GetLeftNode(key);
                 }
+                else if (grandParent.GetRightNode(key) != null &&
+                    grandParent.GetRightNode(key).GetLeftNode(key) == node)
+                {
+                    RotateRight(parent, key);
+                    node = node.GetRightNode(key);
+                }
+
+                parent = node.GetParent(key);
+                grandParent = node.GetGrandParent(key);
+
+                // if node is left-left
+                if (node == parent.GetLeftNode(key))
+                {
+                    RotateRight(grandParent, key);
+                }
+                // right-right
+                else
+                {
+                    RotateLeft(grandParent, key);
+                }
+
+                // swap colors
+                parent.MakeBlack(key);
+                grandParent.MakeRed(key);
             }
         }
 
@@ -603,6 +615,62 @@ namespace ScraperFramework.Utils
             {
                 _parent[(key) ? 0 : 1] = parent;
             }
+        }
+
+        public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>
+        {
+            private readonly DoubleOrderedMap<TKey, TValue> _doubleOrderedMap;
+            private Node _node;
+            private KeyValuePair<TKey, TValue> _current;
+            private Stack<Node> _stack;
+
+            internal Enumerator(DoubleOrderedMap<TKey, TValue> doubleOrderedMap)
+            {
+                _doubleOrderedMap = doubleOrderedMap;
+                _current = new KeyValuePair<TKey, TValue>();
+                _node = _doubleOrderedMap._rootNode[0];
+                _stack = new Stack<Node>();
+            }
+
+            public KeyValuePair<TKey, TValue> Current
+            {
+                get { return _current; }
+            }
+
+            object IEnumerator.Current => throw new NotImplementedException();
+
+            public bool MoveNext()
+            {
+                while (true)
+                {
+                    if (_node != null)
+                    {
+                        _stack.Push(_node);
+                        _node = _node.GetLeftNode();
+                    }
+                    else
+                    {
+                        if (_stack.Count == 0)
+                        {
+                            return false;
+                        }
+
+                        Node node = _stack.Pop();
+                        _current = new KeyValuePair<TKey, TValue>(node.Key, node.Value);
+                        _node = node.GetRightNode();
+                        return true;
+                    }
+                }
+            }
+
+            public void Reset()
+            {
+                _node = _doubleOrderedMap._rootNode[0];
+                _stack = new Stack<Node>();
+                _current = new KeyValuePair<TKey, TValue>();
+            }
+
+            public void Dispose() { }
         }
     }
 }
