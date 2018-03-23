@@ -4,7 +4,9 @@ using System.Net;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using FlatFileDB.Tables;
+using System.Runtime.CompilerServices;
 
 namespace FlatFileDB
 {
@@ -18,16 +20,68 @@ namespace FlatFileDB
         private readonly MemoryBuffer _buffer;
         private readonly Table<T> _table;
 
+        private FileStream _bufferStream;
+        private long _bufferPos;
+
+        private Timer _flushTimer;
+
+        private readonly byte[] _rowSeparator;
+
+        private bool _disposed = false;
+
         public FlatFileEngine(FlatFileConfiguration config)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _buffer = new MemoryBuffer();
             _table = Table<T>.Create();
+            _bufferStream = new FileStream(_config.FileName,
+                FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            _bufferPos = _bufferStream.Length;
+            _rowSeparator = _config.Encoding.GetBytes(_config.RowSeparator);
+            
+            if (_config.FlushInterval > 0)
+            {
+                _flushTimer = new Timer
+                {
+                    AutoReset = true,
+                    Enabled = _config.AutoStartTimer,
+                    Interval = _config.FlushInterval
+                };
+                _flushTimer.Elapsed += OnTimerCallback;
+            }
         }
 
         public IEnumerable<T> Read()
         {
-            throw new NotImplementedException();
+            byte[] data = new byte[_bufferStream.Length];
+            int toRead = (int)_bufferStream.Length;
+            int read = 0;
+
+            while (toRead > 0)
+            {
+                int n = _bufferStream.Read(data, read, toRead);
+
+                if (n == 0)
+                {
+                    break;
+                }
+
+                toRead -= n;
+                read += n;
+            }
+
+            string[] rows = _config.Encoding.GetString(data)
+                .Split(new string [] { _config.RowSeparator  }, StringSplitOptions.None);
+
+            // TODO(zvp): What about the header ?
+            List<T> entities = new List<T>();
+            for (int i = 1; i < rows.Length; i++)
+            {
+                entities.Add(_table.ParseRow(rows[i]));
+            }
+
+
+            return entities;
         }
 
         public Task<IEnumerable<T>> ReadAsync()
@@ -35,55 +89,96 @@ namespace FlatFileDB
             throw new NotImplementedException();
         }
 
+        public void Write(T record)
+        {
+            WriteHeader();
+            WriteRecord(record);
+
+            if (_config.AutoFlush)
+            {
+                Flush();
+            }
+        }
+
         public void Write(IEnumerable<T> records)
         {
-            if (_table.IncludeHeader)
-            {
-                byte[] header = _config.Encoding.GetBytes(
-                    _table.BuildHeader());
-                _buffer.Write(header);
-            }
+            WriteHeader();
 
             foreach (T record in records)
             {
-                Write(record);
+                WriteRecord(record);
+            }
+
+            if (_config.AutoFlush)
+            {
+                Flush();
+            }
+        }
+
+        public async Task WriteAsync(T record)
+        {
+            WriteHeader();
+            WriteRecord(record);
+
+            if (_config.AutoFlush)
+            {
+                await FlushAsync();
+            }
+        }
+
+        public async Task WriteAsync(IEnumerable<T> records)
+        {
+            WriteHeader();
+
+            foreach (T record in records)
+            {
+                WriteRecord(record);
+            }
+
+            if (_config.AutoFlush)
+            {
+                await FlushAsync();
             }
         }
 
         public void Flush()
         {
-            Flush(_config.FileName);
-        }
-
-        public void Flush(string fileName)
-        {
-            string buffer = _config.Encoding.GetString(_buffer.Read());
-
             // write to file synchronously
-            StreamWriter sw = new StreamWriter(fileName);
-            sw.Write(buffer);
-            sw.Close();
+            byte[] data = _buffer.Read();
+            _bufferStream.Position = _bufferPos;
+            _bufferStream.Write(data, 0, data.Length);
+            _bufferStream.Flush();
+
+            // increment position
+            _bufferPos += data.Length;
 
             // clear memory buffer
-            _buffer.Clear();
+            FlushBuffer();
         }
 
-        public Task FlushAsync()
+        public async Task FlushAsync()
         {
-            return FlushAsync(_config.FileName);
-        }
-
-        public async Task FlushAsync(string fileName)
-        {
-            string buffer = _config.Encoding.GetString(_buffer.Read());
-
             // write to file
-            StreamWriter sw = new StreamWriter(fileName);
-            await sw.WriteAsync(buffer);
-            sw.Close();
+            byte[] data = _buffer.Read();
+            _bufferStream.Position = _bufferPos;
+            await _bufferStream.WriteAsync(data, 0, data.Length);
+            await _bufferStream.FlushAsync();
+
+            // increment position
+            _bufferPos += data.Length;
 
             // clear memory buffer
-            _buffer.Clear();
+            FlushBuffer();
+        }
+
+        public void StartFlushTimer()
+        {
+            _flushTimer.Start();
+        }
+
+        public void StopFlushTimer()
+        {
+            _flushTimer.Stop();
         }
 
         public async Task UploadWithFTP(string ftpUri, NetworkCredential networkCredentials)
@@ -109,16 +204,60 @@ namespace FlatFileDB
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="record"></param>
-        protected void Write(T record)
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _bufferStream.Close();
+                    _bufferStream.Dispose();
+                    _bufferStream = null;
+                }
+
+                _disposed = true;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void WriteRecord(T record)
         {
             byte[] serializedRecord = _config.Encoding.GetBytes(
                 _table.BuildRow(record));
-
             _buffer.Write(serializedRecord);
+            _buffer.Write(_rowSeparator);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void WriteHeader()
+        {
+            // clean slate, just write the header
+            if (_table.IncludeHeader && _buffer.Count == 0 &&
+                _bufferPos == 0)
+            {
+                byte[] header = _config.Encoding.GetBytes(
+                    _table.BuildHeader());
+                _buffer.Write(header);
+                _buffer.Write(_rowSeparator);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void FlushBuffer()
+        {
+            // clear memory buffer
+            _buffer.Clear();
+            _bufferPos = 0;
+        }
+
+        private async void OnTimerCallback(object sender, ElapsedEventArgs e)
+        {
+            await FlushAsync();
         }
     }
 }

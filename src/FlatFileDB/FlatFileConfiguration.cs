@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace FlatFileDB
 {
@@ -10,6 +11,12 @@ namespace FlatFileDB
         /// buffer has exceeded over a constant limit.
         /// </summary>
         public bool AutoFlush { get; set; }
+
+        /// <summary>
+        /// Indicates whether the flush timer should
+        /// be enabled on initialization
+        /// </summary>
+        public bool AutoStartTimer { get; set; }
 
         /// <summary>
         /// Specifies the character encoding to
@@ -27,5 +34,10 @@ namespace FlatFileDB
         /// memory buffer should be flushed to disk.
         /// </summary>
         public int FlushInterval { get; set; }
+
+        /// <summary>
+        /// Character used to seperate table rows
+        /// </summary>
+        public string RowSeparator { get; set; } = Environment.NewLine;
     }
 }

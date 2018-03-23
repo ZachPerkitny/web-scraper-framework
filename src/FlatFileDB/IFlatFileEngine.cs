@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FlatFileDB
 {
-    public interface IFlatFileEngine<T>
+    public interface IFlatFileEngine<T> : IDisposable
     {
         /// <summary>
         /// Event raised when the FlatFile is opened
@@ -36,11 +36,31 @@ namespace FlatFileDB
         Task<IEnumerable<T>> ReadAsync();
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="record"></param>
+        void Write(T record);
+
+        /// <summary>
         /// Writes the records to an internal
         /// memory buffer.
         /// </summary>
         /// <param name="records"></param>
         void Write(IEnumerable<T> records);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="record"></param>
+        /// <returns></returns>
+        Task WriteAsync(T record);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="records"></param>
+        /// <returns></returns>
+        Task WriteAsync(IEnumerable<T> records);
 
         /// <summary>
         /// Flushes the contents of the memory buffer
@@ -51,25 +71,20 @@ namespace FlatFileDB
 
         /// <summary>
         /// Flushes the contents of the memory buffer
-        /// to the specified file name.
-        /// </summary>
-        /// <param name="fileName"></param>
-        void Flush(string fileName);
-
-        /// <summary>
-        /// Flushes the contents of the memory buffer
         /// asynchronously to the file name specified
         /// in the configuration object.
         /// </summary>
         Task FlushAsync();
 
         /// <summary>
-        /// Flushes the contents of the memory buffer
-        /// asynchronously to the specified file name.
+        /// 
         /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        Task FlushAsync(string fileName);
+        void StartFlushTimer();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void StopFlushTimer();
 
         /// <summary>
         /// Uploads the flat file to the specified
