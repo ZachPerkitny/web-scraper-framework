@@ -50,15 +50,15 @@ namespace ScraperFramework
             _syncer.StartSyncTimer(true);
 
             Log.Information("Starting Scrapers");
-            for (int i = 0; i < _config.Scrapers; i++)
+            for (int i = 0; i < 1; i++)
             {
                 _scrapers.Add(_scraperFactory.Create(_manualResetEvent, _cancellationTokenSource.Token));
             }
 
-            //_scraperTasks = _scrapers.Select(scraper => Task.Factory.StartNew(async () =>
-            //{
-            //    //await scraper.Start();
-            //}, TaskCreationOptions.LongRunning)).ToList();
+            _scraperTasks = _scrapers.Select(scraper => Task.Factory.StartNew(async () =>
+            {
+                await scraper.Start();
+            }, TaskCreationOptions.LongRunning)).ToList();
         }
 
         public void Pause()

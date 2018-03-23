@@ -15,7 +15,7 @@ namespace ScraperFramework.Data.Entities
         public int RegionID { get; set; }
 
         [ProtoMember(4)]
-        public int Multiplier { get; set; }
+        public double Multiplier { get; set; }
 
         [ProtoMember(5)]
         public byte[] RowRevision { get; set; }

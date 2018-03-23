@@ -47,16 +47,22 @@ namespace ScraperFramework.Configuration
                 .RegisterType<IInternationalUULERepo, InternationalUULERepo>()
                 .RegisterType<IKeywordRepo, KeywordRepo>()
                 .RegisterType<ILocalUULERepo, LocalUULERepo>()
-                .RegisterType<IProxyMultiplierRepo, ProxyMultiplierRepo>()
-                .RegisterType<IProxyRepo, ProxyRepo>()
+                .RegisterType<IProxyMultiplierRepo, ProxyMultiplierRepo>("DBreezeProxyMultiplierRepo")
+                .RegisterType<IProxyMultiplierRepo, CachedProxyMultiplierRepo>(
+                    new InjectionConstructor(
+                        new ResolvedParameter<IProxyMultiplierRepo>("DBreezeProxyMultiplierRepo")))
+                .RegisterType<IProxyRepo, ProxyRepo>("DBreezeProxyRepo")
+                .RegisterType<IProxyRepo, CachedProxyRepo>(
+                    new InjectionConstructor(
+                        new ResolvedParameter<IProxyRepo>("DBreezeProxyRepo")))
                 .RegisterType<ISearchEngineRepo, SearchEngineRepo>()
                 .RegisterType<ISearchStringRepo, SearchStringRepo>()
                 .RegisterType<ISpecialKeywordRepo, SpecialKeywordRepo>()
                 // start weird
-                .RegisterType<UserAgentPipe>()
+                //.RegisterType<UserAgentPipe>()
                 .RegisterType<SearchUrlPipe>()
                 .RegisterType<PipeLine<PipelinedCrawlDescription>>(
-                    new InjectionFactory(c => (new CrawlDescriptionPipeline(Container.Resolve<IProxyRepo>()))
+                    new InjectionFactory(c => (new CrawlDescriptionPipeline(Container.Resolve<IProxyManager>()))
                         .Connect(Container.Resolve<SearchUrlPipe>())
                         .Connect(Container.Resolve<UserAgentPipe>())))
                 .RegisterType<KeywordSyncTask>()
@@ -74,7 +80,9 @@ namespace ScraperFramework.Configuration
                         .AddSyncTask(Container.Resolve<SearchStringSyncTask>())
                         .AddSyncTask(Container.Resolve<SpecialKeywordSyncTask>())))
                 // end weird
-                .RegisterType<IScraperQueue, ScraperQueue>()
+                .RegisterType<ICrawlLogger, CrawlLogger>(new PerResolveLifetimeManager())
+                .RegisterType<IProxyManager, ProxyManager>(new PerResolveLifetimeManager())
+                .RegisterType<IScraperQueue, ScraperQueue>(new PerResolveLifetimeManager())
                 .RegisterType<IScraperFactory, ScraperFactory>()
                 .RegisterType<ICoordinator, Coordinator>();
 

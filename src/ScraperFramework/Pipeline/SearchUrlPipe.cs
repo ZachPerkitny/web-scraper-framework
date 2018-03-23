@@ -20,8 +20,7 @@ namespace ScraperFramework.Pipeline
 
         public override PipelinedCrawlDescription Flow(PipelinedCrawlDescription pipelinedCrawlDescription)
         {
-            IEnumerable<CrawlDescription> crawlDescriptions = pipelinedCrawlDescription.CrawlDescriptions;
-            foreach (CrawlDescription crawlDescription in crawlDescriptions)
+            foreach (CrawlDescription crawlDescription in pipelinedCrawlDescription.CrawlDescriptions)
             {
                 SearchString searchString = _searchStringRepo.Select(
                     crawlDescription.SearchEngineID, crawlDescription.RegionID);

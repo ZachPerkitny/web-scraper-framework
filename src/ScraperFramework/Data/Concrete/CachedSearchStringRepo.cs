@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ScraperFramework.Data.Entities;
 
 namespace ScraperFramework.Data.Concrete
@@ -36,7 +35,7 @@ namespace ScraperFramework.Data.Concrete
                     searchString = base.Select(searchEngineId, regionId);
                     if (searchString != null)
                     {
-                        _cache.Add(key, searchString);
+                        _cache[key] = searchString;
                     }
                 }
             }
@@ -50,7 +49,7 @@ namespace ScraperFramework.Data.Concrete
             {
                 if (_filledCache)
                 {
-                    return _cache.Values.ToList();
+                    return _cache.Values;
                 }
                 else
                 {
@@ -61,7 +60,7 @@ namespace ScraperFramework.Data.Concrete
                         Tuple<int, int> key = new Tuple<int, int>(
                             searchString.SearchEngineID, searchString.RegionID);
 
-                        _cache.Add(key, searchString);
+                        _cache[key] = searchString;
                     }
 
                     _filledCache = true;
@@ -78,7 +77,7 @@ namespace ScraperFramework.Data.Concrete
             lock (_locker)
             {
                 Tuple<int, int> key = new Tuple<int, int>(searchString.SearchEngineID, searchString.RegionID);
-                _cache.Add(key, searchString);
+                _cache[key] = searchString;
             }
         }
 
@@ -91,7 +90,7 @@ namespace ScraperFramework.Data.Concrete
                 foreach (SearchString searchString in searchStrings)
                 {
                     Tuple<int, int> key = new Tuple<int, int>(searchString.SearchEngineID, searchString.RegionID);
-                    _cache.Add(key, searchString);
+                    _cache[key] = searchString;
                 }
             }
         }

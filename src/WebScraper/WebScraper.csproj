@@ -94,7 +94,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ScraperFramework.Shared\ScraperFramework.Shared.csproj">
+    <ProjectReference Include="..\ScraperFramework.Shared\ScraperFramework.Shared.csproj">
       <Project>{e8eb55f3-712d-4a3f-bc67-6d4b31887cb8}</Project>
       <Name>ScraperFramework.Shared</Name>
     </ProjectReference>
