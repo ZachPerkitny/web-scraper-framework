@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScraperFramework", "src\Scr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlatFileDB", "src\FlatFileDB\FlatFileDB.csproj", "{76CEC65B-B000-4CB2-AB4B-81B9B94BF950}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScraperFramework.Shared", "ScraperFramework.Shared\ScraperFramework.Shared.csproj", "{E8EB55F3-712D-4A3F-BC67-6D4B31887CB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScraperFramework.Shared", "src\ScraperFramework.Shared\ScraperFramework.Shared.csproj", "{E8EB55F3-712D-4A3F-BC67-6D4B31887CB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
