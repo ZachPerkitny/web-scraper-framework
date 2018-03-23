@@ -1,19 +1,19 @@
 ﻿namespace FlatFileDB.Serializer
 {
-    interface ISerializer
+    public interface ISerializer
     {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="buffer"></param>
+        /// <param name="data"></param>
         /// <returns></returns>
-        object Deserialize(string buffer);
+        object Deserialize(string data);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        string Serialize(object obj);
+        string Serialize(object entity);
     }
 }

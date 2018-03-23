@@ -22,7 +22,18 @@ namespace FlatFileDB.Columns
 
         public string Name { get; private set; }
 
-        public ISerializer Serializer { get; private set; }
+        public ISerializer Serializer
+        {
+            get
+            {
+                if (Field.IsSerializedColumn())
+                {
+                    return Field.GetSerializer();
+                }
+
+                return SerializerUtils.GetSerializerForType(Field.FieldType);
+            }
+        }
 
         public abstract object Deserialize(string col);
 

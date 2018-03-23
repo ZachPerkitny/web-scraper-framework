@@ -118,7 +118,7 @@ namespace ScraperFramework.Utils
 
         /// <summary>
         /// Copies the Elements of the DoubleOrderedMap to
-        /// any array
+        /// an array
         /// </summary>
         /// <param name="array"></param>
         /// <param name="arrayIndex"></param>

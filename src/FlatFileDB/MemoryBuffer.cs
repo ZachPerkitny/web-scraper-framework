@@ -110,7 +110,7 @@ namespace FlatFileDB
             lock (_locker)
             {
                 // deep copy buffer
-                byte[] copy = new byte[Capacity];
+                byte[] copy = new byte[_count];
                 Buffer.BlockCopy(_buffer, 0, copy, 0, _count);
 
                 return copy;

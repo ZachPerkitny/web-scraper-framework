@@ -36,32 +36,11 @@ namespace FlatFileDB
         Task<IEnumerable<T>> ReadAsync();
 
         /// <summary>
-        /// Writes the record to an internal
-        /// memory buffer. If the size of the
-        /// memory buffer exceeds a constant,
-        /// it will flush the contents to disk.
-        /// </summary>
-        void Write(T record);
-
-        /// <summary>
         /// Writes the records to an internal
-        /// memory buffer. If the size of the
-        /// memory buffer exceeds a constant,
-        /// it will flush the contents to disk.
+        /// memory buffer.
         /// </summary>
         /// <param name="records"></param>
         void Write(IEnumerable<T> records);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        Task WriteAsync(T record);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="records"></param>
-        Task WriteAsync(IEnumerable<T> records);
 
         /// <summary>
         /// Flushes the contents of the memory buffer
@@ -97,7 +76,7 @@ namespace FlatFileDB
         /// FTP Uri using the credentials provided
         /// </summary>
         /// <param name="ftpUri"></param>
-        /// <param name="networkCredential"></param>
-        Task UploadWithFTP(string ftpUri, NetworkCredential networkCredential);
+        /// <param name="networkCredentials"></param>
+        Task UploadWithFTP(string ftpUri, NetworkCredential networkCredentials);
     }
 }

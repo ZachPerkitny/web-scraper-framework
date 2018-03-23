@@ -15,7 +15,7 @@ namespace FlatFileDB
         /// Specifies the character encoding to
         /// use.
         /// </summary>
-        public Encoding Encoding { get; set; }
+        public Encoding Encoding { get; set; } = Encoding.UTF8;
 
         /// <summary>
         /// File to flush to.

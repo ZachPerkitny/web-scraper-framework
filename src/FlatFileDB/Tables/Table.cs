@@ -27,7 +27,8 @@ namespace FlatFileDB.Tables
                 {
                     List<IColumn> columns = new List<IColumn>();
 
-                    FieldInfo[] fields = tableType.GetFields();
+                    FieldInfo[] fields = tableType.GetFields(
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                     for (int i = 0; i < fields.Length; i++)
                     {
                         columns.Add(DelimitedColumn.Create(
@@ -80,7 +81,25 @@ namespace FlatFileDB.Tables
 
         public string BuildHeader()
         {
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+            string delimiter = (IsDelimitedTable) ? 
+                typeof(T).GetDelimiter() : "\t";
+
+            List<string> columnNames = Columns
+                .Select(col => col.Name).ToList();
+            for (int i = 0; i < columnNames.Count; i++)
+            {
+                if (i == columnNames.Count - 1)
+                {
+                    sb.Append(columnNames[i]);
+                }
+                else
+                {
+                    sb.AppendFormat("{0}{1}", columnNames[i], delimiter);
+                }
+            }
+
+            return sb.ToString();
         }
 
         public string BuildRow(T entity)
