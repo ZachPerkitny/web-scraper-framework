@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Pipes;
 using Newtonsoft.Json;
 using Serilog;
-using WebScraper.Pocos;
+using ScraperFramework.Shared.Pocos;
 
 namespace WebScraper
 {

@@ -72,10 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enum\CrawlResultID.cs" />
     <Compile Include="Extractors\BingExtractor.cs" />
-    <Compile Include="Pocos\CrawlDescription.cs" />
-    <Compile Include="Pocos\CrawlResult.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scraper.cs" />
@@ -95,6 +92,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ScraperFramework.Shared\ScraperFramework.Shared.csproj">
+      <Project>{e8eb55f3-712d-4a3f-bc67-6d4b31887cb8}</Project>
+      <Name>ScraperFramework.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

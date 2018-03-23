@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using WebScraper.Pocos;
+using ScraperFramework.Shared.Pocos;
 
 namespace ScraperFramework.Pocos
 {
-    class PipelinedCrawlDescription
+    internal class PipelinedCrawlDescription
     {
         public IEnumerable<CrawlDescription> CrawlDescriptions { get; set; }
 

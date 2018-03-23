@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ScraperFramework.Pipeline;
 using ScraperFramework.Pocos;
-using WebScraper.Pocos;
+using ScraperFramework.Shared.Pocos;
 
 namespace ScraperFramework
 {

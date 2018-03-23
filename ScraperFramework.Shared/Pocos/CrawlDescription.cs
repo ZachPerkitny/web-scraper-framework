@@ -1,4 +1,4 @@
-﻿namespace WebScraper.Pocos
+﻿namespace ScraperFramework.Shared.Pocos
 {
     public class CrawlDescription
     {

@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Dynamic;
 using System.Threading.Tasks;
 using CefSharp;
 using CefSharp.OffScreen;
-using WebScraper.Pocos;
+using ScraperFramework.Shared.Pocos;
 
 namespace WebScraper.Extractors
 {

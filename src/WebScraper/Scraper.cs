@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using CefSharp;
 using CefSharp.OffScreen;
 using Serilog;
-using WebScraper.Enum;
+using ScraperFramework.Shared.Enum;
+using ScraperFramework.Shared.Pocos;
 using WebScraper.Extractors;
-using WebScraper.Pocos;
 
 namespace WebScraper
 {

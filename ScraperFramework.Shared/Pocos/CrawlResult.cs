@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using WebScraper.Enum;
+using ScraperFramework.Shared.Enum;
 
-namespace WebScraper.Pocos
+namespace ScraperFramework.Shared.Pocos
 {
     public class AdResult
     {

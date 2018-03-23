@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ScraperFramework.Data;
 using ScraperFramework.Data.Entities;
 using ScraperFramework.Pocos;
-using WebScraper.Pocos;
+using ScraperFramework.Shared.Pocos;
 
 namespace ScraperFramework.Pipeline
 {
