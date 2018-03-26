@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using ScraperFramework.Data;
 using ScraperFramework.Data.Entities;
 using ScraperFramework.Pocos;

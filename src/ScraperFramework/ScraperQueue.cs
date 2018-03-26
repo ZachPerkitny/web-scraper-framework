@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using ScraperFramework.Pipeline;
 using ScraperFramework.Pocos;
 using ScraperFramework.Shared.Pocos;
@@ -51,11 +52,15 @@ namespace ScraperFramework
             PipelinedCrawlDescription pipelinedCrawlDescription = _pipeline.Drain();
             while (!pipelinedCrawlDescription.CrawlDescriptions.Any())
             {
-                int delay = (pipelinedCrawlDescription.NextAvailability - DateTime.Now).Milliseconds;
+                // 1.15 is to ensure some proxy is returned on next requests
+                int delay = (int)(pipelinedCrawlDescription.NextAvailability - DateTime.Now).TotalMilliseconds;
+
+                Log.Information("No Crawl Descriptions Available. Draining again in {0}ms.", (delay < 0) ? 0 : delay);
                 if (delay > 0)
                 {
                     await Task.Delay(delay);
                 }
+
                 pipelinedCrawlDescription = _pipeline.Drain();
             }
 

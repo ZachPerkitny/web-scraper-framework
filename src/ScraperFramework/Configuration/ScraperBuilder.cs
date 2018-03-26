@@ -61,11 +61,12 @@ namespace ScraperFramework.Configuration
                 .RegisterType<ISpecialKeywordRepo, SpecialKeywordRepo>()
                 // start weird
                 //.RegisterType<UserAgentPipe>()
+                .RegisterType<KeywordPipe>()
                 .RegisterType<SearchUrlPipe>()
                 .RegisterType<PipeLine<PipelinedCrawlDescription>>(
                     new InjectionFactory(c => (new CrawlDescriptionPipeline(Container.Resolve<IProxyManager>()))
-                        .Connect(Container.Resolve<SearchUrlPipe>())
-                        .Connect(Container.Resolve<UserAgentPipe>())))
+                        .Connect(Container.Resolve<KeywordPipe>())
+                        .Connect(Container.Resolve<SearchUrlPipe>())))
                 .RegisterType<KeywordSyncTask>()
                 .RegisterType<KeywordScrapeDetailSyncTask>(
                     new InjectionConstructor(_config.ScraperNo, 

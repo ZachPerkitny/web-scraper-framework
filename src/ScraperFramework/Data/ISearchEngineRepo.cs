@@ -22,7 +22,7 @@ namespace ScraperFramework.Data
         /// </summary>
         /// <param name="searchEngineId"></param>
         /// <returns></returns>
-        SearchEngine Select(int searchEngineId);
+        SearchEngine Select(short searchEngineId);
 
         /// <summary>
         /// 

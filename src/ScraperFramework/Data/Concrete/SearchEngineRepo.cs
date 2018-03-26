@@ -43,7 +43,7 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public SearchEngine Select(int searchEngineId)
+        public SearchEngine Select(short searchEngineId)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
@@ -63,25 +63,26 @@ namespace ScraperFramework.Data.Concrete
 
         public IEnumerable<SearchEngine> SelectMany(int searchEngineGroup)
         {
-            using (Transaction transaction = _engine.GetTransaction())
-            {
-                List<SearchEngine> entities = new List<SearchEngine>();
-                IEnumerable<Row<byte[], byte[]>> rows = transaction.SelectForwardFromTo<byte[], byte[]>(
-                    _table, 2.ToIndex(searchEngineGroup, int.MinValue), true,
-                    2.ToIndex(searchEngineGroup, int.MaxValue), true);
+            //using (Transaction transaction = _engine.GetTransaction())
+            //{
+            //    List<SearchEngine> entities = new List<SearchEngine>();
+            //    IEnumerable<Row<byte[], byte[]>> rows = transaction.SelectForwardFromTo<byte[], byte[]>(
+            //        _table, 2.ToIndex(searchEngineGroup, int.MinValue), true,
+            //        2.ToIndex(searchEngineGroup, int.MaxValue), true);
 
-                foreach (Row<byte[], byte[]> row in rows)
-                {
-                    DBreezeObject<SearchEngine> obj = row.ObjectGet<SearchEngine>();
-                    if (obj != null)
-                    {
-                        SearchEngine entity = obj.Entity;
-                        entities.Add(entity);
-                    }
-                }
+            //    foreach (Row<byte[], byte[]> row in rows)
+            //    {
+            //        DBreezeObject<SearchEngine> obj = row.ObjectGet<SearchEngine>();
+            //        if (obj != null)
+            //        {
+            //            SearchEngine entity = obj.Entity;
+            //            entities.Add(entity);
+            //        }
+            //    }
 
-                return entities;
-            }
+            //    return entities;
+            //}
+            throw new NotImplementedException();
         }
 
         public IEnumerable<SearchEngine> SelectAll()
@@ -91,8 +92,8 @@ namespace ScraperFramework.Data.Concrete
                 List<SearchEngine> entities = new List<SearchEngine>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
                     .SelectForwardFromTo<byte[], byte[]>(_table, 
-                    1.ToIndex(int.MinValue), true,
-                    1.ToIndex(int.MaxValue), true);
+                    1.ToIndex(short.MinValue), true,
+                    1.ToIndex(short.MaxValue), true);
 
                 foreach (Row<byte[], byte[]> row in rows)
                 {
@@ -184,7 +185,7 @@ namespace ScraperFramework.Data.Concrete
             bool newEntity = searchEngine.ID == 0;
             if (newEntity)
             {
-                searchEngine.ID = transaction.ObjectGetNewIdentity<int>(_table);
+                searchEngine.ID = transaction.ObjectGetNewIdentity<short>(_table);
             }
 
             DBreezeObjectInsertResult<SearchEngine> res = 

@@ -150,6 +150,7 @@
     <Compile Include="IScraperFactory.cs" />
     <Compile Include="IScraperQueue.cs" />
     <Compile Include="Pipeline\CrawlDescriptionPipeline.cs" />
+    <Compile Include="Pipeline\KeywordPipe.cs" />
     <Compile Include="Pipeline\Pipe.cs" />
     <Compile Include="Pipeline\SearchUrlPipe.cs" />
     <Compile Include="Pipeline\PipeLine.cs" />

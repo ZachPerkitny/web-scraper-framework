@@ -13,7 +13,7 @@ namespace ScraperFramework
         private const int CAPTCHA_DELAY = 6;
         private const int BLOCK_DELAY = 20;
 
-        private const int START_LOWER_BOUND = 0;
+        private const int START_LOWER_BOUND = 10;
         private const int START_UPPER_BOUND = 600;
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace ScraperFramework
         private readonly object _locker = new object();
 
         // Tuple <SEID, RID, ProxyID>
-        private readonly Dictionary<Tuple<int, int, int>, ProxyStatus> _proxyStatuses;
+        private readonly Dictionary<Tuple<short, short, int>, ProxyStatus> _proxyStatuses;
         
         private bool _addedInitStatuses = false;
 
@@ -44,7 +44,7 @@ namespace ScraperFramework
             _proxyMultiplierRepo = proxyMultiplierRepo ?? throw new ArgumentNullException(nameof(proxyMultiplierRepo));
             _searchEngineRepo = searchEngineRepo ?? throw new ArgumentNullException(nameof(searchEngineRepo));
 
-            _proxyStatuses = new Dictionary<Tuple<int, int, int>, ProxyStatus>();
+            _proxyStatuses = new Dictionary<Tuple<short, short, int>, ProxyStatus>();
         }
 
         public IEnumerable<Proxy> GetAvailableProxies()
@@ -56,8 +56,11 @@ namespace ScraperFramework
                     InitializeProxyStatuses();
                 }
 
+                DateTime now = DateTime.Now;
                 List<Proxy> proxies = _proxyStatuses
-                    .Where(p => !p.Value.IsLocked && p.Value.NextAvailability <= DateTime.Now)
+                    .Where(p => 
+                        !p.Value.IsLocked && 
+                        p.Value.NextAvailability <= now)
                     .Select(p =>
                     {
                         Data.Entities.Proxy proxy = _proxyRepo.Select(p.Key.Item3); // proxy id
@@ -75,7 +78,7 @@ namespace ScraperFramework
                 // lock proxies until marked as used
                 foreach (Proxy proxy in proxies)
                 {
-                    Tuple<int, int, int> key = new Tuple<int, int, int>(
+                    Tuple<short, short, int> key = new Tuple<short, short, int>(
                         proxy.SearchEngineID, proxy.RegionID, proxy.ProxyID);
 
                     _proxyStatuses[key].IsLocked = true;
@@ -94,11 +97,20 @@ namespace ScraperFramework
                     InitializeProxyStatuses();
                 }
 
-                return _proxyStatuses.Min(p => p.Value.NextAvailability);
+                DateTime min = DateTime.MaxValue;
+                foreach (ProxyStatus proxy in _proxyStatuses.Values)
+                {
+                    if (proxy.NextAvailability < min)
+                    {
+                        min = proxy.NextAvailability;
+                    }
+                }
+
+                return min;
             }
         }
 
-        public void MarkAsUsed(int searchEngineId, int regionId, int proxyId, 
+        public void MarkAsUsed(short searchEngineId, short regionId, int proxyId, 
             CrawlResultID crawlResultID)
         {
             lock (_locker)
@@ -108,7 +120,7 @@ namespace ScraperFramework
                     InitializeProxyStatuses();
                 }
 
-                Tuple<int, int, int> key = new Tuple<int, int, int>(
+                Tuple<short, short, int> key = new Tuple<short, short, int>(
                     searchEngineId, regionId, proxyId);
 
                 if (_proxyStatuses.ContainsKey(key))
@@ -156,13 +168,16 @@ namespace ScraperFramework
             {
                 foreach (var proxy in proxies)
                 {
-                    Tuple<int, int, int> key = new Tuple<int, int, int>(
+                    Tuple<short, short, int> key = new Tuple<short, short, int>(
                         searchEngine.ID, proxy.RegionID, proxy.ID);
 
                     _proxyStatuses.Add(key, new ProxyStatus
                     {
                         IsLocked = false,
-                        NextAvailability = DateTime.Now.AddSeconds(
+                        // 0 ms
+                        NextAvailability = new DateTime(
+                            DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
+                            DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second, 0).AddSeconds(
                             (new Random()).Next(START_LOWER_BOUND, START_UPPER_BOUND))
                     });
                 }

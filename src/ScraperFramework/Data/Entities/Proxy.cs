@@ -15,7 +15,7 @@ namespace ScraperFramework.Data.Entities
         public int Port { get; set; }
 
         [ProtoMember(4)]
-        public int RegionID { get; set; }
+        public short RegionID { get; set; }
 
         [ProtoMember(5)]
         public int Status { get; set; }

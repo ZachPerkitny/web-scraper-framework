@@ -43,7 +43,7 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public KeywordScrapeDetail Select(int searchEngineId, int regionId, int cityId, int keywordId)
+        public KeywordScrapeDetail Select(short searchEngineId, short regionId, short cityId, int keywordId)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
@@ -62,7 +62,32 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public IEnumerable<KeywordScrapeDetail> SelectMany(int searchEngineId, int regionId, int cityId, int count)
+        public int SelectNext(short searchEngineId, short regionId, short cityId)
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                IEnumerable<Row<byte[], byte[]>> rows = transaction
+                    .SelectForwardStartFrom<byte[], byte[]>(
+                    _table, 3.ToIndex(long.MinValue, short.MinValue, searchEngineId, 
+                        regionId, cityId, int.MinValue), true);
+                
+                /* 
+                * index  
+                * --------------------------------------------------------------------------
+                * n        DateTime   Priority   SeID       RID        CityID     KeywordID
+                * (1 byte) (8 bytes), (2 bytes), (2 bytes), (2 bytes), (2 bytes), (4 bytes)
+                * Skip 16 bytes to grab keywordid from key without reading value from disk
+                */ 
+                if (rows.Any())
+                {
+                    //return BitConverter.ToInt32(rows.First().Key, 17); 
+                }
+
+                return 0;
+            }
+        }
+
+        public IEnumerable<KeywordScrapeDetail> SelectMany(short searchEngineId, short regionId, short cityId)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
@@ -70,8 +95,7 @@ namespace ScraperFramework.Data.Concrete
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
                     .SelectForwardFromTo<byte[], byte[]>(_table,
                     1.ToIndex(searchEngineId, regionId, cityId, int.MinValue), true,
-                    1.ToIndex(searchEngineId, regionId, cityId, int.MaxValue), true)
-                    .Take(count);
+                    1.ToIndex(searchEngineId, regionId, cityId, int.MaxValue), true);
 
                 foreach (Row<byte[], byte[]> row in rows)
                 {
@@ -88,7 +112,7 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public void UpdateLastCrawl(int searchEngineId, int regionId, int cityId, int keywordId, DateTime lastCrawl)
+        public void UpdateLastCrawl(short searchEngineId, short regionId, short cityId, int keywordId, DateTime lastCrawl)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
@@ -189,6 +213,10 @@ namespace ScraperFramework.Data.Concrete
                     new DBreezeIndex(2, keywordScrapeDetail.RowRevision)
                     {
                         AddPrimaryToTheEnd = false
+                    },
+                    new DBreezeIndex(3, keywordScrapeDetail.LastCrawl, keywordScrapeDetail.Priority)
+                    {
+                        AddPrimaryToTheEnd = true
                     }
                     // TODO(zvp): Add Priority Index
                 }

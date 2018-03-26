@@ -26,6 +26,6 @@ namespace ScraperFramework
         /// <param name="regionId"></param>
         /// <param name="proxyId"></param>
         /// <param name="crawlResultID"></param>
-        void MarkAsUsed(int searchEngineId, int regionId, int proxyId, CrawlResultID crawlResultID);
+        void MarkAsUsed(short searchEngineId, short regionId, int proxyId, CrawlResultID crawlResultID);
     }
 }

@@ -8,8 +8,8 @@
 
         public int Port { get; set; } 
 
-        public int SearchEngineID { get; set; }
+        public short SearchEngineID { get; set; }
 
-        public int RegionID { get; set; }
+        public short RegionID { get; set; }
     }
 }

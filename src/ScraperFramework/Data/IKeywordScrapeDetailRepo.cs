@@ -26,7 +26,16 @@ namespace ScraperFramework.Data
         /// <param name="cityId"></param>
         /// <param name="keywordId"></param>
         /// <returns></returns>
-        KeywordScrapeDetail Select(int searchEngineId, int regionId, int cityId, int keywordId);
+        KeywordScrapeDetail Select(short searchEngineId, short regionId, short cityId, int keywordId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="searchEngineId"></param>
+        /// <param name="regionId"></param>
+        /// <param name="cityId"></param>
+        /// <returns></returns>
+        int SelectNext(short searchEngineId, short regionId, short cityId);
 
         /// <summary>
         /// 
@@ -36,7 +45,7 @@ namespace ScraperFramework.Data
         /// <param name="cityId"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        IEnumerable<KeywordScrapeDetail> SelectMany(int searchEngineId, int regionId, int cityId, int count);
+        IEnumerable<KeywordScrapeDetail> SelectMany(short searchEngineId, short regionId, short cityId);
 
         /// <summary>
         /// 
@@ -46,7 +55,7 @@ namespace ScraperFramework.Data
         /// <param name="cityId"></param>
         /// <param name="keywordId"></param>
         /// <param name="lastCrawl"></param>
-        void UpdateLastCrawl(int searchEngineId, int regionId, int cityId, int keywordId, DateTime lastCrawl);
+        void UpdateLastCrawl(short searchEngineId, short regionId, short cityId, int keywordId, DateTime lastCrawl);
 
         /// <summary>
         /// 

@@ -6,7 +6,7 @@ namespace ScraperFramework.Data.Entities
     public class SearchEngine
     {
         [ProtoMember(1)]
-        public int ID { get; set; }
+        public short ID { get; set; }
 
         [ProtoMember(2)]
         public bool IsMobile { get; set; }

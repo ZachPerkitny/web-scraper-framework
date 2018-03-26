@@ -7,16 +7,16 @@ namespace ScraperFramework.Data.Entities
     public class KeywordScrapeDetail
     {
         [ProtoMember(1)]
-        public int SearchEngineID { get; set; }
+        public short SearchEngineID { get; set; }
 
         [ProtoMember(2)]
-        public int RegionID { get; set; }
+        public short RegionID { get; set; }
 
         [ProtoMember(3)]
-        public int CityID { get; set; } = 0;
+        public short CityID { get; set; } = 0;
 
         [ProtoMember(4)]
-        public int Priority { get; set; }
+        public short Priority { get; set; }
 
         [ProtoMember(5)]
         public bool IsActive { get; set; }
