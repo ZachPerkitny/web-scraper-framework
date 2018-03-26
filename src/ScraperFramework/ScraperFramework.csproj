@@ -109,6 +109,7 @@
     <Compile Include="Data\Concrete\CachedProxyMultiplierRepo.cs" />
     <Compile Include="Data\Concrete\CachedProxyRepo.cs" />
     <Compile Include="Data\Concrete\CachedSearchStringRepo.cs" />
+    <Compile Include="Data\Concrete\KeywordScrapeDetailRepo.cs" />
     <Compile Include="Data\Concrete\SpecialKeywordRepo.cs" />
     <Compile Include="Data\ConnectionFactory.cs" />
     <Compile Include="Data\Concrete\DataStore.cs" />
@@ -119,6 +120,8 @@
     <Compile Include="Data\Concrete\KeywordRepo.cs" />
     <Compile Include="Data\Concrete\SearchEngineRepo.cs" />
     <Compile Include="Data\Concrete\SearchStringRepo.cs" />
+    <Compile Include="Data\Entities\KeywordScrapeDetail.cs" />
+    <Compile Include="Data\IKeywordScrapeDetailRepo.cs" />
     <Compile Include="Data\ISpecialKeywordRepo.cs" />
     <Compile Include="Data\ProxyMultiplierRepoDecorator.cs" />
     <Compile Include="Data\ProxyRepoDecorator.cs" />
@@ -160,6 +163,7 @@
     <Compile Include="Scraper.cs" />
     <Compile Include="ScraperFactory.cs" />
     <Compile Include="ScraperQueue.cs" />
+    <Compile Include="Sync\KeywordScrapeDetailSyncTask.cs" />
     <Compile Include="Sync\KeywordSyncTask.cs" />
     <Compile Include="Sync\ProxyMultiplierSyncTask.cs" />
     <Compile Include="Sync\ProxySyncTask.cs" />

@@ -49,9 +49,13 @@ namespace ScraperFramework
         private async Task RequestMoreCrawlDescriptions()
         {
             PipelinedCrawlDescription pipelinedCrawlDescription = _pipeline.Drain();
-            if (!pipelinedCrawlDescription.CrawlDescriptions.Any())
+            while (!pipelinedCrawlDescription.CrawlDescriptions.Any())
             {
-                await Task.Delay((pipelinedCrawlDescription.NextAvailability - DateTime.Now).Milliseconds);
+                int delay = (pipelinedCrawlDescription.NextAvailability - DateTime.Now).Milliseconds;
+                if (delay > 0)
+                {
+                    await Task.Delay(delay);
+                }
                 pipelinedCrawlDescription = _pipeline.Drain();
             }
 

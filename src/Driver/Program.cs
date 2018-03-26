@@ -14,6 +14,7 @@ namespace Driver
 
             var scraperBuilder = new ScraperBuilder(config =>
             {
+                config.ScraperNo = int.Parse(ConfigurationManager.AppSettings["ScraperNo"]);
                 config.DBreezeDataFolderName = ConfigurationManager.AppSettings["DBreezeDataFolderName"];
                 config.Scrapers = int.Parse(ConfigurationManager.AppSettings["Scrapers"]);
                 config.SyncInterval = int.Parse(ConfigurationManager.AppSettings["SyncInterval"]);

@@ -54,6 +54,44 @@ namespace ScraperFramework.Data.Concrete
             return SelectMany<Proxy>(sql);
         }
 
+        public Task<IEnumerable<KeywordScrapeDetail>> SelectKeywordScrapeDetails(int scraperNo)
+        {
+            string sql = @"SELECT SearchEngineID
+                                ,RegionID
+                                ,CityID
+                                ,Priority
+                                ,IsActive
+                                ,KeywordID
+                                ,RowRevision
+                           FROM [dbo].[KeywordScrapeDetail]
+                           WHERE ScraperNo = @ScraperNo";
+
+            return SelectMany<KeywordScrapeDetail>(sql, new
+            {
+                ScraperNo = scraperNo
+            });
+        }
+
+        public Task<IEnumerable<KeywordScrapeDetail>> SelectKeywordScrapeDetails(int scraperNo, byte[] rowRevision)
+        {
+            string sql = @"SELECT SearchEngineID
+                                ,RegionID
+                                ,CityID
+                                ,Priority
+                                ,IsActive
+                                ,KeywordID
+                                ,RowRevision
+                           FROM [dbo].[KeywordScrapeDetail]
+                           WHERE ScraperNo = @ScraperNo
+                           AND @RowVersion < RowRevision";
+
+            return SelectMany<KeywordScrapeDetail>(sql, new
+            {
+                RowVersion = rowRevision,
+                ScraperNo = scraperNo
+            });
+        }
+
         public Task<IEnumerable<Proxy>> SelectProxies(byte[] rowVersion)
         {
             string sql = @"SELECT ProxyID AS ID

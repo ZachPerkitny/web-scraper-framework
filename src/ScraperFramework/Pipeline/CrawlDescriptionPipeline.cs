@@ -35,6 +35,7 @@ namespace ScraperFramework.Pipeline
                         ProxyID = proxy.ProxyID,
                         IP = proxy.IP,
                         Port = proxy.Port,
+                        SearchEngineID = proxy.SearchEngineID,
                         RegionID = proxy.RegionID
                     });
                 }

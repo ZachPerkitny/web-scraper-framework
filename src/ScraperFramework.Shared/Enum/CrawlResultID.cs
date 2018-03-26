@@ -4,6 +4,7 @@
     {
         Success = 1,
         Failure,
-        Captcha
+        Captcha,
+        Block
     }
 }

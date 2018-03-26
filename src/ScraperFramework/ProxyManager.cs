@@ -9,6 +9,13 @@ namespace ScraperFramework
 {
     class ProxyManager : IProxyManager
     {
+        private const int FAILURE_DELAY = 2;
+        private const int CAPTCHA_DELAY = 6;
+        private const int BLOCK_DELAY = 20;
+
+        private const int START_LOWER_BOUND = 0;
+        private const int START_UPPER_BOUND = 600;
+
         /// <summary>
         /// Represents the state of a proxy
         /// </summary>
@@ -22,6 +29,8 @@ namespace ScraperFramework
         private readonly IProxyRepo _proxyRepo;
         private readonly IProxyMultiplierRepo _proxyMultiplierRepo;
         private readonly ISearchEngineRepo _searchEngineRepo;
+
+        private readonly object _locker = new object();
 
         // Tuple <SEID, RID, ProxyID>
         private readonly Dictionary<Tuple<int, int, int>, ProxyStatus> _proxyStatuses;
@@ -40,87 +49,104 @@ namespace ScraperFramework
 
         public IEnumerable<Proxy> GetAvailableProxies()
         {
-            if (!_addedInitStatuses)
+            lock (_locker)
             {
-                InitializeProxyStatuses();
-            }
-
-            List<Proxy> proxies = _proxyStatuses
-                .Where(p => !p.Value.IsLocked && p.Value.NextAvailability <= DateTime.Now)
-                .Select(p =>
+                if (!_addedInitStatuses)
                 {
-                    Data.Entities.Proxy proxy = _proxyRepo.Select(p.Key.Item3); // proxy id
+                    InitializeProxyStatuses();
+                }
 
-                    return new Proxy
+                List<Proxy> proxies = _proxyStatuses
+                    .Where(p => !p.Value.IsLocked && p.Value.NextAvailability <= DateTime.Now)
+                    .Select(p =>
                     {
-                        ProxyID = proxy.ID,
-                        IP = proxy.IP,
-                        Port = proxy.Port,
-                        SearchEngineID = p.Key.Item1,
-                        RegionID = p.Key.Item2
-                    };
-                })
-                .ToList();
-            
+                        Data.Entities.Proxy proxy = _proxyRepo.Select(p.Key.Item3); // proxy id
+                        return new Proxy
+                        {
+                            ProxyID = proxy.ID,
+                            IP = proxy.IP,
+                            Port = proxy.Port,
+                            SearchEngineID = p.Key.Item1,
+                            RegionID = p.Key.Item2
+                        };
+                    })
+                    .ToList();
 
-            // lock proxies here in case
-            // it throws an exception inside
-            // the delegate passed to the select
-            // extension, the proxy will be stuck
-            // in limbo otherwise
-            // TODO(zvp): Lock Timeout
-            foreach (Proxy proxy in proxies)
-            {
-                Tuple<int, int, int> key = new Tuple<int, int, int>(
-                    proxy.SearchEngineID, proxy.RegionID, proxy.ProxyID);
+                // lock proxies until marked as used
+                foreach (Proxy proxy in proxies)
+                {
+                    Tuple<int, int, int> key = new Tuple<int, int, int>(
+                        proxy.SearchEngineID, proxy.RegionID, proxy.ProxyID);
 
-                _proxyStatuses[key].IsLocked = true;
+                    _proxyStatuses[key].IsLocked = true;
+                }
+
+                return proxies;
             }
-
-            return proxies;
         }
 
         public DateTime GetNextAvailability()
         {
-            if (!_addedInitStatuses)
+            lock (_locker)
             {
-                InitializeProxyStatuses();
-            }
+                if (!_addedInitStatuses)
+                {
+                    InitializeProxyStatuses();
+                }
 
-            return _proxyStatuses.Min(p => p.Value.NextAvailability);
+                return _proxyStatuses.Min(p => p.Value.NextAvailability);
+            }
         }
 
         public void MarkAsUsed(int searchEngineId, int regionId, int proxyId, 
             CrawlResultID crawlResultID)
         {
-            Tuple<int, int, int> key = new Tuple<int, int, int>(
-                searchEngineId, regionId, proxyId);
-
-            if (_proxyStatuses.ContainsKey(key))
+            lock (_locker)
             {
-                ProxyStatus status = _proxyStatuses[key];
-                status.IsLocked = false; // unlock proxy
-
-                // update next availability based on crawl result
-                double multipler = _proxyMultiplierRepo.Select(
-                    searchEngineId, regionId, proxyId).Multiplier;
-                switch (crawlResultID)
+                if (!_addedInitStatuses)
                 {
-                    case CrawlResultID.Success:
-                        status.NextAvailability = DateTime.Now.AddSeconds(multipler);
-                        break;
-                    case CrawlResultID.Failure:
-                        // waht
-                        status.NextAvailability = DateTime.Now.AddSeconds(multipler * 2);
-                        break;
-                    case CrawlResultID.Captcha:
-                        // waht
-                        status.NextAvailability = DateTime.Now.AddSeconds(multipler * 4);
-                        break;
+                    InitializeProxyStatuses();
                 }
+
+                Tuple<int, int, int> key = new Tuple<int, int, int>(
+                    searchEngineId, regionId, proxyId);
+
+                if (_proxyStatuses.ContainsKey(key))
+                {
+                    ProxyStatus status = _proxyStatuses[key];
+                    status.IsLocked = false; // unlock proxy
+
+                    // update next availability based on crawl result
+                    switch (crawlResultID)
+                    {
+                        case CrawlResultID.Success:
+                        {
+                            double multipler = _proxyMultiplierRepo.Select(
+                                searchEngineId, regionId, proxyId).Multiplier;
+                            status.NextAvailability = DateTime.Now.AddSeconds(multipler);
+                            break;
+                        }
+                        case CrawlResultID.Failure:
+                            status.NextAvailability = DateTime.Now.AddMinutes(
+                                FAILURE_DELAY);
+                            break;
+                        case CrawlResultID.Captcha:
+                            status.NextAvailability = DateTime.Now.AddMinutes(
+                                CAPTCHA_DELAY);
+                            break;
+                        case CrawlResultID.Block:
+                            status.NextAvailability = DateTime.Now.AddMinutes(
+                                BLOCK_DELAY);
+                            break;
+                    }
+                }
+                // TODO(zvp): Log it not existing ?
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void InitializeProxyStatuses()
         {
             // create search engine, region, proxy tuples
@@ -136,7 +162,8 @@ namespace ScraperFramework
                     _proxyStatuses.Add(key, new ProxyStatus
                     {
                         IsLocked = false,
-                        NextAvailability = DateTime.Now
+                        NextAvailability = DateTime.Now.AddSeconds(
+                            (new Random()).Next(START_LOWER_BOUND, START_UPPER_BOUND))
                     });
                 }
             }

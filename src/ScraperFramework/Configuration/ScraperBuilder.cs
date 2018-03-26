@@ -46,6 +46,7 @@ namespace ScraperFramework.Configuration
                 .RegisterType<IDataStore, DataStore>()
                 .RegisterType<IInternationalUULERepo, InternationalUULERepo>()
                 .RegisterType<IKeywordRepo, KeywordRepo>()
+                .RegisterType<IKeywordScrapeDetailRepo, KeywordScrapeDetailRepo>()
                 .RegisterType<ILocalUULERepo, LocalUULERepo>()
                 .RegisterType<IProxyMultiplierRepo, ProxyMultiplierRepo>("DBreezeProxyMultiplierRepo")
                 .RegisterType<IProxyMultiplierRepo, CachedProxyMultiplierRepo>(
@@ -66,6 +67,9 @@ namespace ScraperFramework.Configuration
                         .Connect(Container.Resolve<SearchUrlPipe>())
                         .Connect(Container.Resolve<UserAgentPipe>())))
                 .RegisterType<KeywordSyncTask>()
+                .RegisterType<KeywordScrapeDetailSyncTask>(
+                    new InjectionConstructor(_config.ScraperNo, 
+                    typeof(IDataStore), typeof(IKeywordScrapeDetailRepo)))
                 .RegisterType<ProxyMultiplierSyncTask>()
                 .RegisterType<ProxySyncTask>() 
                 .RegisterType<SearchEngineSyncTask>()
@@ -74,6 +78,7 @@ namespace ScraperFramework.Configuration
                 .RegisterType<ISyncer>(
                     new InjectionFactory(c => (new Syncer(_config.SyncInterval))
                         .AddSyncTask(Container.Resolve<KeywordSyncTask>())
+                        .AddSyncTask(Container.Resolve<KeywordScrapeDetailSyncTask>())
                         .AddSyncTask(Container.Resolve<ProxyMultiplierSyncTask>())
                         .AddSyncTask(Container.Resolve<ProxySyncTask>())
                         .AddSyncTask(Container.Resolve<SearchEngineSyncTask>())

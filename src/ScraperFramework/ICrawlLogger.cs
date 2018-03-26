@@ -7,7 +7,8 @@ namespace ScraperFramework
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="crawlDescription"></param>
         /// <param name="crawlResult"></param>
-        void LogCrawl(CrawlResult crawlResult);
+        void LogCrawl(CrawlDescription crawlDescription, CrawlResult crawlResult);
     }
 }

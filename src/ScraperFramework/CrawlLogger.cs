@@ -1,13 +1,32 @@
 ﻿using System;
+using ScraperFramework.Data;
 using ScraperFramework.Shared.Pocos;
 
 namespace ScraperFramework
 {
     class CrawlLogger : ICrawlLogger
     {
-        public void LogCrawl(CrawlResult crawlResult)
+        private readonly IProxyManager _proxyManager;
+        private readonly IKeywordScrapeDetailRepo _keywordScrapeDetailRepo;
+
+        public CrawlLogger(IProxyManager proxyManager, IKeywordScrapeDetailRepo keywordScrapeDetailRepo)
         {
-            throw new NotImplementedException();
+            _proxyManager = proxyManager ?? throw new ArgumentNullException(nameof(proxyManager));
+            _keywordScrapeDetailRepo = keywordScrapeDetailRepo ?? throw new ArgumentNullException(nameof(keywordScrapeDetailRepo));
+        }
+
+        public void LogCrawl(CrawlDescription crawlDescription, CrawlResult crawlResult)
+        {
+            // mark proxy as used to unlock for later usage
+            _proxyManager.MarkAsUsed(crawlDescription.SearchEngineID, crawlDescription.RegionID, 
+                crawlDescription.ProxyID, crawlResult.CrawlResultID);
+
+            // update last crawl
+            _keywordScrapeDetailRepo.UpdateLastCrawl(
+                crawlDescription.SearchEngineID, crawlDescription.RegionID,
+                crawlDescription.CityID, crawlDescription.KeywordID, DateTime.Now);
+
+            // TODO(zvp): Write to flat files
         }
     }
 }

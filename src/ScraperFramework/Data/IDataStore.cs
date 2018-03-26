@@ -22,6 +22,21 @@ namespace ScraperFramework.Data
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="scraperNo"></param>
+        /// <returns></returns>
+        Task<IEnumerable<KeywordScrapeDetail>> SelectKeywordScrapeDetails(int scraperNo);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="scraperNo"></param>
+        /// <param name="rowRevision"></param>
+        /// <returns></returns>
+        Task<IEnumerable<KeywordScrapeDetail>> SelectKeywordScrapeDetails(int scraperNo, byte[] rowRevision);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         Task<IEnumerable<Proxy>> SelectProxies();
 

@@ -2,6 +2,8 @@
 {
     public class ScraperConfig
     {
+        public int ScraperNo { get; set; }
+
         public int Scrapers { get; set; }
 
         public string DBreezeDataFolderName { get; set; }
