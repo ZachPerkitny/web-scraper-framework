@@ -9,11 +9,14 @@ namespace ScraperFramework
 {
     class ProxyManager : IProxyManager
     {
+        private const int SUCCESS_FALLBACK_DELAY = 1;
         private const int FAILURE_DELAY = 2;
         private const int CAPTCHA_DELAY = 6;
         private const int BLOCK_DELAY = 20;
 
-        private const int START_LOWER_BOUND = 10;
+        private const int DELAY_JITTER = 500;
+
+        private const int START_LOWER_BOUND = 0;
         private const int START_UPPER_BOUND = 600;
 
         /// <summary>
@@ -29,6 +32,7 @@ namespace ScraperFramework
         private readonly IProxyRepo _proxyRepo;
         private readonly IProxyMultiplierRepo _proxyMultiplierRepo;
         private readonly ISearchEngineRepo _searchEngineRepo;
+        private readonly ISearchStringRepo _searchStringRepo;
 
         private readonly Random _random = new Random();
 
@@ -40,11 +44,12 @@ namespace ScraperFramework
         private bool _addedInitStatuses = false;
 
         public ProxyManager(IProxyRepo proxyRepo, IProxyMultiplierRepo proxyMultiplierRepo, 
-            ISearchEngineRepo searchEngineRepo)
+            ISearchEngineRepo searchEngineRepo, ISearchStringRepo searchStringRepo)
         {
             _proxyRepo = proxyRepo ?? throw new ArgumentNullException(nameof(proxyRepo));
             _proxyMultiplierRepo = proxyMultiplierRepo ?? throw new ArgumentNullException(nameof(proxyMultiplierRepo));
             _searchEngineRepo = searchEngineRepo ?? throw new ArgumentNullException(nameof(searchEngineRepo));
+            _searchStringRepo = searchStringRepo ?? throw new ArgumentNullException(nameof(searchStringRepo));
 
             _proxyStatuses = new Dictionary<Tuple<short, short, int>, ProxyStatus>();
         }
@@ -53,6 +58,7 @@ namespace ScraperFramework
         {
             lock (_locker)
             {
+                // TODO(zvp): Should we handle this differently ?
                 if (!_addedInitStatuses)
                 {
                     InitializeProxyStatuses();
@@ -84,14 +90,14 @@ namespace ScraperFramework
         {
             lock (_locker)
             {
+                // TODO(zvp): Should we handle this differently ?
                 if (!_addedInitStatuses)
                 {
                     InitializeProxyStatuses();
                 }
 
                 Proxy proxy = _proxyStatuses
-                    .Where(p => p.Key.Item1 == searchEngineId &&
-                        (p.Key.Item2 == regionId || p.Key.Item2 == 0) &&
+                    .Where(p => IsProxyForSearchEngineRegionPair(p.Key, searchEngineId, regionId) &&
                         IsProxyAvailable(p.Value))
                     .Select(p => GetProxyFromKey(p.Key))
                     .FirstOrDefault();
@@ -118,21 +124,15 @@ namespace ScraperFramework
         {
             lock (_locker)
             {
+                // TODO(zvp): Should we handle this differently ?
                 if (!_addedInitStatuses)
                 {
                     InitializeProxyStatuses();
                 }
 
-                DateTime min = DateTime.MaxValue;
-                foreach (ProxyStatus proxy in _proxyStatuses.Values)
-                {
-                    if (proxy.NextAvailability < min)
-                    {
-                        min = proxy.NextAvailability;
-                    }
-                }
-
-                return min;
+                return _proxyStatuses
+                    .Where(p => !p.Value.IsLocked)
+                    .Min(p => p.Value.NextAvailability);
             }
         }
 
@@ -140,26 +140,30 @@ namespace ScraperFramework
         {
             lock (_locker)
             {
+                // TODO(zvp): Should we handle this differently ?
                 if (!_addedInitStatuses)
                 {
                     InitializeProxyStatuses();
                 }
 
-                IEnumerable<ProxyStatus> proxies = _proxyStatuses.Where(
-                    p => p.Key.Item1 == searchEngineId &&
-                    (p.Key.Item2 == regionId || p.Key.Item2 == 0))
-                    .Select(p => p.Value);
+                return _proxyStatuses.Where(p => !p.Value.IsLocked && IsProxyForSearchEngineRegionPair(p.Key, searchEngineId, regionId))
+                    .Min(p => p.Value.NextAvailability);
+            }
+        }
 
-                DateTime min = DateTime.MaxValue;
-                foreach (ProxyStatus proxy in proxies)
+        public DateTime GetNextAvailability(IEnumerable<Tuple<short, short>> searchEngineRegionPairs)
+        {
+            lock (_locker)
+            {
+                // TODO(zvp): Should we handle this differently ?
+                if (!_addedInitStatuses)
                 {
-                    if (proxy.NextAvailability < min)
-                    {
-                        min = proxy.NextAvailability;
-                    }
+                    InitializeProxyStatuses();
                 }
 
-                return min;
+                return _proxyStatuses
+                    .Where(p => !p.Value.IsLocked && searchEngineRegionPairs.Any(s => IsProxyForSearchEngineRegionPair(p.Key, s.Item1, s.Item2)))
+                    .Min(p => p.Value.NextAvailability);
             }
         }
 
@@ -167,6 +171,7 @@ namespace ScraperFramework
         {
             lock (_locker)
             {
+                // TODO(zvp): Should we handle this differently ?
                 if (!_addedInitStatuses)
                 {
                     InitializeProxyStatuses();
@@ -190,6 +195,7 @@ namespace ScraperFramework
         {
             lock (_locker)
             {
+                // TODO(zvp): Should we handle this differently ?
                 if (!_addedInitStatuses)
                 {
                     InitializeProxyStatuses();
@@ -208,9 +214,26 @@ namespace ScraperFramework
                     {
                         case CrawlResultID.Success:
                         {
-                            double multipler = _proxyMultiplierRepo.Select(
-                                searchEngineId, regionId, proxyId).Multiplier;
-                            status.NextAvailability = DateTime.Now.AddSeconds(multipler);
+                            Data.Entities.ProxyMultiplier multipler = _proxyMultiplierRepo.Select(
+                                searchEngineId, regionId, proxyId);
+                            if (multipler != null)
+                            {
+                                status.NextAvailability = DateTime.Now.AddSeconds(multipler.Multiplier);
+                            }
+                            else
+                            {
+                                Data.Entities.SearchString searchString = _searchStringRepo
+                                    .Select(searchEngineId, regionId);
+                                if (searchString != null)
+                                {
+                                    status.NextAvailability = DateTime.Now.AddSeconds(searchString.DelayMultiplier);
+                                }
+                                else
+                                {
+                                    status.NextAvailability = DateTime.Now.AddMinutes(SUCCESS_FALLBACK_DELAY);
+                                }
+                            }
+                            
                             break;
                         }
                         case CrawlResultID.Failure:
@@ -240,7 +263,17 @@ namespace ScraperFramework
         /// <param name="proxyStatus"></param>
         /// <returns></returns>
         private bool IsProxyAvailable(ProxyStatus proxyStatus)
-            => !proxyStatus.IsLocked && proxyStatus.NextAvailability <= DateTime.Now;
+            => !proxyStatus.IsLocked && 
+            proxyStatus.NextAvailability <= DateTime.Now.AddMilliseconds(_random.Next(-DELAY_JITTER, DELAY_JITTER));
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="searchEngineId"></param>
+        /// <param name="regionId"></param>
+        /// <returns></returns>
+        private bool IsProxyForSearchEngineRegionPair(Tuple<short, short, int> key, short searchEngineId, short regionId)
+            => key.Item1 == searchEngineId && (key.Item2 == regionId || key.Item2 == 0);
 
         /// <summary>
         /// 

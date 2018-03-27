@@ -20,6 +20,8 @@
 
         public int Port { get; set; }
 
+        public short ProxyRegion { get; set; }
+
         public string UserAgent { get; set; }
 
         public string SearchString { get; set; }

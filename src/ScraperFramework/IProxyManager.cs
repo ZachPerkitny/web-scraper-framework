@@ -43,6 +43,13 @@ namespace ScraperFramework
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="searchEngineRegions"></param>
+        /// <returns></returns>
+        DateTime GetNextAvailability(IEnumerable<Tuple<short, short>> searchEngineRegionPairs);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="searchEngineId"></param>
         /// <param name="regionId"></param>
         /// <param name="proxyId"></param>

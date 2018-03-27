@@ -23,7 +23,8 @@ namespace ScraperFramework
 
             // update last crawl
             _keywordScrapeDetailRepo.UpdateLastCrawl(
-                crawlDescription.SearchEngineID, crawlDescription.RegionID,
+                crawlDescription.SearchEngineID,
+                crawlDescription.RegionID,
                 crawlDescription.CityID, crawlDescription.KeywordID, DateTime.Now);
 
             // TODO(zvp): Write to flat files

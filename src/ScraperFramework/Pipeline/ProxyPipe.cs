@@ -16,6 +16,7 @@ namespace ScraperFramework.Pipeline
 
         public override PipelinedCrawlDescription Flow(PipelinedCrawlDescription pipelinedCrawlDescription)
         {
+            List<Tuple<short, short>> droppedCrawlDescriptions = new List<Tuple<short, short>>();
             LinkedListNode<CrawlDescription> node = pipelinedCrawlDescription.CrawlDescriptions.First;
             while (node != null)
             {
@@ -29,18 +30,16 @@ namespace ScraperFramework.Pipeline
                     node.Value.ProxyID = proxy.ProxyID;
                     node.Value.IP = proxy.IP;
                     node.Value.Port = proxy.Port;
+                    node.Value.ProxyRegion = proxy.RegionID;
                 }
                 else
                 {
+                    // save dropped (seid, regionid) pairs to calculate next availability
+                    droppedCrawlDescriptions.Add(new Tuple<short, short>(
+                        node.Value.SearchEngineID, node.Value.RegionID));
                     // drop it
                     pipelinedCrawlDescription.CrawlDescriptions.Remove(node);
-                    // set next availability
-                    DateTime nextAvailability = _proxyManager.GetNextAvailability(
-                        node.Value.SearchEngineID, node.Value.RegionID);
-                    if (nextAvailability < pipelinedCrawlDescription.NextAvailability)
-                    {
-                        pipelinedCrawlDescription.NextAvailability = nextAvailability;
-                    }
+
                 }
 
                 node = next;
@@ -49,6 +48,7 @@ namespace ScraperFramework.Pipeline
             // if we removed all nodes because of a lack of proxies, return early
             if (pipelinedCrawlDescription.CrawlDescriptions.Count == 0)
             {
+                pipelinedCrawlDescription.NextAvailability = _proxyManager.GetNextAvailability(droppedCrawlDescriptions);
                 return pipelinedCrawlDescription;
             }
 

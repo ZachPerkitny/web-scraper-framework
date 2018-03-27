@@ -13,6 +13,8 @@ namespace ScraperFramework.Pipeline
     /// </summary>
     internal class KeywordDrivenPipeline : PipeLine<PipelinedCrawlDescription>
     {
+        private const int BATCH_SIZE = 5000;
+
         private readonly IKeywordScrapeDetailRepo _keywordScrapeDetailRepo;
         private readonly IKeywordRepo _keywordRepo;
 
@@ -29,7 +31,7 @@ namespace ScraperFramework.Pipeline
                 CrawlDescriptions = new LinkedList<CrawlDescription>()
             };
 
-            IEnumerable<KeywordScrapeDetail> keywordsToScrape = _keywordScrapeDetailRepo.SelectNext(5000);
+            IEnumerable<KeywordScrapeDetail> keywordsToScrape = _keywordScrapeDetailRepo.SelectNext(BATCH_SIZE);
             if (keywordsToScrape.Any())
             {
                 foreach (KeywordScrapeDetail keywordScrapeDetail in keywordsToScrape)

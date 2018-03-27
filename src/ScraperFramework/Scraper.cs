@@ -29,6 +29,7 @@ namespace ScraperFramework
 
         public async Task Start()
         {
+            int c = 0;
             while (!_cancellationToken.IsCancellationRequested)
             {
                 // pause (let it finish current scrape)
@@ -37,12 +38,14 @@ namespace ScraperFramework
                 CrawlDescription crawlDescription = await _scraperQueue.Dequeue();
                 CrawlResult crawlResult = null;
 
-                Log.Information("Crawling {0}", crawlDescription.Keyword);
                 _crawlLogger.LogCrawl(crawlDescription, new CrawlResult
                 {
                     CrawlResultID = Shared.Enum.CrawlResultID.Success
                 });
-                return;
+                c += 1;
+                Log.Information("Crawled Keyword: {0}, Proxy: {1}, SearchString: {2}, Count: {3}",
+                    crawlDescription.Keyword, crawlDescription.IP, crawlDescription.SearchString, c);
+                continue;
 
                 // pause (let it finish dequeue)
                 await _manualResetEvent.WaitAsync();

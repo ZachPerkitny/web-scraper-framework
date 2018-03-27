@@ -50,7 +50,7 @@ namespace ScraperFramework
             _syncer.StartSyncTimer(true);
 
             Log.Information("Starting Scrapers");
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < _config.Scrapers; i++)
             {
                 _scrapers.Add(_scraperFactory.Create(_manualResetEvent, _cancellationTokenSource.Token));
             }
