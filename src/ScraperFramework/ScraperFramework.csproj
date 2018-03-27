@@ -145,10 +145,12 @@
     <Compile Include="Data\IProxyRepo.cs" />
     <Compile Include="Data\IKeywordRepo.cs" />
     <Compile Include="ICrawlLogger.cs" />
+    <Compile Include="IKeywordManager.cs" />
     <Compile Include="IProxyManager.cs" />
     <Compile Include="IScraper.cs" />
     <Compile Include="IScraperFactory.cs" />
     <Compile Include="IScraperQueue.cs" />
+    <Compile Include="KeywordManager.cs" />
     <Compile Include="Pipeline\KeywordDrivenPipeline.cs" />
     <Compile Include="Pipeline\Pipe.cs" />
     <Compile Include="Pipeline\ProxyPipe.cs" />
@@ -156,6 +158,7 @@
     <Compile Include="Pipeline\PipeLine.cs" />
     <Compile Include="Pipeline\UserAgentPipe.cs" />
     <Compile Include="Pocos\CrawlStats.cs" />
+    <Compile Include="Pocos\Keyword.cs" />
     <Compile Include="Pocos\PipelinedCrawlDescription.cs" />
     <Compile Include="Pocos\Proxy.cs" />
     <Compile Include="FlatFile\PPCRecord.cs" />

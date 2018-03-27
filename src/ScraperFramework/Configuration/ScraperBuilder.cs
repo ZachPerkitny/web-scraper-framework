@@ -65,7 +65,7 @@ namespace ScraperFramework.Configuration
                 .RegisterType<SearchUrlPipe>()
                 .RegisterType<PipeLine<PipelinedCrawlDescription>>(
                     new InjectionFactory(c => (new KeywordDrivenPipeline(
-                        Container.Resolve<IKeywordScrapeDetailRepo>(), Container.Resolve<IKeywordRepo>()))
+                        Container.Resolve<IKeywordManager>()))
                         .Connect(Container.Resolve<ProxyPipe>())
                         .Connect(Container.Resolve<SearchUrlPipe>())))
                 .RegisterType<KeywordSyncTask>()
@@ -88,6 +88,7 @@ namespace ScraperFramework.Configuration
                         .AddSyncTask(Container.Resolve<SpecialKeywordSyncTask>())))
                 // end weird
                 .RegisterType<ICrawlLogger, CrawlLogger>(new PerThreadLifetimeManager())
+                .RegisterType<IKeywordManager, KeywordManager>(new PerThreadLifetimeManager())
                 .RegisterType<IProxyManager, ProxyManager>(new PerThreadLifetimeManager())
                 .RegisterType<IScraperQueue, ScraperQueue>(new PerThreadLifetimeManager())
                 .RegisterType<IScraperFactory, ScraperFactory>()

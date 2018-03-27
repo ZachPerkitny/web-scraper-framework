@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ScraperFramework.Data;
-using ScraperFramework.Data.Entities;
 using ScraperFramework.Pocos;
 using ScraperFramework.Shared.Pocos;
 
@@ -13,15 +11,13 @@ namespace ScraperFramework.Pipeline
     /// </summary>
     internal class KeywordDrivenPipeline : PipeLine<PipelinedCrawlDescription>
     {
-        private const int BATCH_SIZE = 5000;
+        private const int BATCH_SIZE = 250;
 
-        private readonly IKeywordScrapeDetailRepo _keywordScrapeDetailRepo;
-        private readonly IKeywordRepo _keywordRepo;
+        private readonly IKeywordManager _keywordManager;
 
-        public KeywordDrivenPipeline(IKeywordScrapeDetailRepo keywordScrapeDetailRepo, IKeywordRepo keywordRepo)
+        public KeywordDrivenPipeline(IKeywordManager keywordManager)
         {
-            _keywordScrapeDetailRepo = keywordScrapeDetailRepo ?? throw new ArgumentNullException(nameof(keywordScrapeDetailRepo));
-            _keywordRepo = keywordRepo ?? throw new ArgumentNullException(nameof(keywordRepo));
+            _keywordManager = keywordManager ?? throw new ArgumentNullException(nameof(keywordManager));
         }
 
         public override PipelinedCrawlDescription Drain()
@@ -31,23 +27,19 @@ namespace ScraperFramework.Pipeline
                 CrawlDescriptions = new LinkedList<CrawlDescription>()
             };
 
-            IEnumerable<KeywordScrapeDetail> keywordsToScrape = _keywordScrapeDetailRepo.SelectNext(BATCH_SIZE);
+            IEnumerable<Keyword> keywordsToScrape = _keywordManager.GetKeywordsToCrawl(BATCH_SIZE);
             if (keywordsToScrape.Any())
             {
-                foreach (KeywordScrapeDetail keywordScrapeDetail in keywordsToScrape)
+                foreach (Keyword keyword in keywordsToScrape)
                 {
-                    Keyword keyword = _keywordRepo.Select(keywordScrapeDetail.KeywordID);
-                    if (keyword != null)
+                    pipelinedCrawlDescription.CrawlDescriptions.AddLast(new CrawlDescription
                     {
-                        pipelinedCrawlDescription.CrawlDescriptions.AddLast(new CrawlDescription
-                        {
-                            SearchEngineID = keywordScrapeDetail.SearchEngineID,
-                            RegionID = keywordScrapeDetail.RegionID,
-                            CityID = keywordScrapeDetail.CityID,
-                            Keyword = keyword.Value,
-                            KeywordID = keyword.ID
-                        });
-                    }
+                        Keyword = keyword.KeywordValue,
+                        KeywordID = keyword.KeywordID,
+                        SearchEngineID = keyword.SearchEngineID,
+                        RegionID = keyword.RegionID,
+                        CityID = keyword.CityID
+                    });
                 }
             }
             else

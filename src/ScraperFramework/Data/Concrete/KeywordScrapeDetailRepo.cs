@@ -66,10 +66,12 @@ namespace ScraperFramework.Data.Concrete
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
+                transaction.SynchronizeTables(_table);
+
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
                     .SelectForwardFromTo<byte[], byte[]>(
-                    _table, 3.ToIndex(long.MinValue, short.MinValue), true,
-                    3.ToIndex(long.MaxValue, short.MaxValue), true)
+                    _table, 3.ToIndex(long.MinValue, short.MinValue, short.MinValue, short.MinValue, short.MinValue, int.MinValue), true,
+                    3.ToIndex(long.MaxValue, short.MaxValue, short.MaxValue, short.MaxValue, short.MaxValue, int.MaxValue), true)
                     .Take(count);
 
                 List<KeywordScrapeDetail> entities = new List<KeywordScrapeDetail>();
@@ -81,6 +83,11 @@ namespace ScraperFramework.Data.Concrete
                     {
                         entities.Add(obj.Entity);
                     }
+                }
+
+                if (entities.Count() > 1006)
+                {
+                    Environment.Exit(1);
                 }
 
                 return entities;
@@ -116,6 +123,8 @@ namespace ScraperFramework.Data.Concrete
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
+                transaction.SynchronizeTables(_table);
+
                 DBreezeObject<KeywordScrapeDetail> obj = transaction
                     .Select<byte[], byte[]>(_table, 1.ToIndex(
                         searchEngineId, regionId, cityId, keywordId))
@@ -127,7 +136,7 @@ namespace ScraperFramework.Data.Concrete
                 }
 
                 obj.Entity.LastCrawl = lastCrawl;
-                Insert(transaction, obj.Entity);
+                Insert(transaction, obj.Entity, false);
 
                 transaction.Commit();
             }
@@ -198,10 +207,12 @@ namespace ScraperFramework.Data.Concrete
         /// </summary>
         /// <param name="transaction"></param>
         /// <param name="keywordScrapeDetail"></param>
-        private void Insert(Transaction transaction, KeywordScrapeDetail keywordScrapeDetail)
+        /// <param name="newEntity"></param>
+        private void Insert(Transaction transaction, KeywordScrapeDetail keywordScrapeDetail, bool newEntity = true)
         {
             transaction.ObjectInsert(_table, new DBreezeObject<KeywordScrapeDetail>
             {
+                NewEntity = newEntity,
                 Entity = keywordScrapeDetail,
                 Indexes = new List<DBreezeIndex>
                 {
