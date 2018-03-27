@@ -149,9 +149,9 @@
     <Compile Include="IScraper.cs" />
     <Compile Include="IScraperFactory.cs" />
     <Compile Include="IScraperQueue.cs" />
-    <Compile Include="Pipeline\CrawlDescriptionPipeline.cs" />
-    <Compile Include="Pipeline\KeywordPipe.cs" />
+    <Compile Include="Pipeline\KeywordDrivenPipeline.cs" />
     <Compile Include="Pipeline\Pipe.cs" />
+    <Compile Include="Pipeline\ProxyPipe.cs" />
     <Compile Include="Pipeline\SearchUrlPipe.cs" />
     <Compile Include="Pipeline\PipeLine.cs" />
     <Compile Include="Pipeline\UserAgentPipe.cs" />

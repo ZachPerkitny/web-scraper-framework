@@ -34,8 +34,9 @@ namespace ScraperFramework.Data
         /// <param name="searchEngineId"></param>
         /// <param name="regionId"></param>
         /// <param name="cityId"></param>
+        /// <param name="count"></param>
         /// <returns></returns>
-        int SelectNext(short searchEngineId, short regionId, short cityId);
+        IEnumerable<KeywordScrapeDetail> SelectNext(int count);
 
         /// <summary>
         /// 

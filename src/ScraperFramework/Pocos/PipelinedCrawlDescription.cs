@@ -6,7 +6,7 @@ namespace ScraperFramework.Pocos
 {
     internal class PipelinedCrawlDescription
     {
-        public List<CrawlDescription> CrawlDescriptions { get; set; }
+        public LinkedList<CrawlDescription> CrawlDescriptions { get; set; }
 
         public DateTime NextAvailability { get; set; } = DateTime.Now;
     }

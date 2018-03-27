@@ -14,13 +14,15 @@ namespace ScraperFramework
     class Scraper : IScraper
     {
         private readonly IScraperQueue _scraperQueue;
+        private readonly ICrawlLogger _crawlLogger;
         private readonly AsyncManualResetEvent _manualResetEvent;
         private readonly CancellationToken _cancellationToken;
 
-        public Scraper(IScraperQueue scraperQueue, AsyncManualResetEvent manualResetEvent,
+        public Scraper(IScraperQueue scraperQueue, ICrawlLogger crawlLogger, AsyncManualResetEvent manualResetEvent,
             CancellationToken cancellationToken)
         {
             _scraperQueue = scraperQueue ?? throw new ArgumentNullException(nameof(scraperQueue));
+            _crawlLogger = crawlLogger ?? throw new ArgumentNullException(nameof(crawlLogger));
             _manualResetEvent = manualResetEvent ?? throw new ArgumentNullException(nameof(manualResetEvent));
             _cancellationToken = cancellationToken;
         }
@@ -34,6 +36,13 @@ namespace ScraperFramework
 
                 CrawlDescription crawlDescription = await _scraperQueue.Dequeue();
                 CrawlResult crawlResult = null;
+
+                Log.Information("Crawling {0}", crawlDescription.Keyword);
+                _crawlLogger.LogCrawl(crawlDescription, new CrawlResult
+                {
+                    CrawlResultID = Shared.Enum.CrawlResultID.Success
+                });
+                return;
 
                 // pause (let it finish dequeue)
                 await _manualResetEvent.WaitAsync();

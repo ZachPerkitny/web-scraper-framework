@@ -62,28 +62,28 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public int SelectNext(short searchEngineId, short regionId, short cityId)
+        public IEnumerable<KeywordScrapeDetail> SelectNext(int count)
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
-                    .SelectForwardStartFrom<byte[], byte[]>(
-                    _table, 3.ToIndex(long.MinValue, short.MinValue, searchEngineId, 
-                        regionId, cityId, int.MinValue), true);
-                
-                /* 
-                * index  
-                * --------------------------------------------------------------------------
-                * n        DateTime   Priority   SeID       RID        CityID     KeywordID
-                * (1 byte) (8 bytes), (2 bytes), (2 bytes), (2 bytes), (2 bytes), (4 bytes)
-                * Skip 16 bytes to grab keywordid from key without reading value from disk
-                */ 
-                if (rows.Any())
+                    .SelectForwardFromTo<byte[], byte[]>(
+                    _table, 3.ToIndex(long.MinValue, short.MinValue), true,
+                    3.ToIndex(long.MaxValue, short.MaxValue), true)
+                    .Take(count);
+
+                List<KeywordScrapeDetail> entities = new List<KeywordScrapeDetail>();
+                foreach (Row<byte[], byte[]> row in rows)
                 {
-                    //return BitConverter.ToInt32(rows.First().Key, 17); 
+                    DBreezeObject<KeywordScrapeDetail> obj = row.ObjectGet<KeywordScrapeDetail>();
+
+                    if (obj != null)
+                    {
+                        entities.Add(obj.Entity);
+                    }
                 }
 
-                return 0;
+                return entities;
             }
         }
 

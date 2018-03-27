@@ -61,11 +61,12 @@ namespace ScraperFramework.Configuration
                 .RegisterType<ISpecialKeywordRepo, SpecialKeywordRepo>()
                 // start weird
                 //.RegisterType<UserAgentPipe>()
-                .RegisterType<KeywordPipe>()
+                .RegisterType<ProxyPipe>()
                 .RegisterType<SearchUrlPipe>()
                 .RegisterType<PipeLine<PipelinedCrawlDescription>>(
-                    new InjectionFactory(c => (new CrawlDescriptionPipeline(Container.Resolve<IProxyManager>()))
-                        .Connect(Container.Resolve<KeywordPipe>())
+                    new InjectionFactory(c => (new KeywordDrivenPipeline(
+                        Container.Resolve<IKeywordScrapeDetailRepo>(), Container.Resolve<IKeywordRepo>()))
+                        .Connect(Container.Resolve<ProxyPipe>())
                         .Connect(Container.Resolve<SearchUrlPipe>())))
                 .RegisterType<KeywordSyncTask>()
                 .RegisterType<KeywordScrapeDetailSyncTask>(
@@ -86,9 +87,9 @@ namespace ScraperFramework.Configuration
                         .AddSyncTask(Container.Resolve<SearchStringSyncTask>())
                         .AddSyncTask(Container.Resolve<SpecialKeywordSyncTask>())))
                 // end weird
-                .RegisterType<ICrawlLogger, CrawlLogger>(new PerResolveLifetimeManager())
-                .RegisterType<IProxyManager, ProxyManager>(new PerResolveLifetimeManager())
-                .RegisterType<IScraperQueue, ScraperQueue>(new PerResolveLifetimeManager())
+                .RegisterType<ICrawlLogger, CrawlLogger>(new PerThreadLifetimeManager())
+                .RegisterType<IProxyManager, ProxyManager>(new PerThreadLifetimeManager())
+                .RegisterType<IScraperQueue, ScraperQueue>(new PerThreadLifetimeManager())
                 .RegisterType<IScraperFactory, ScraperFactory>()
                 .RegisterType<ICoordinator, Coordinator>();
 

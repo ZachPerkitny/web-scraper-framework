@@ -30,6 +30,8 @@ namespace ScraperFramework
         private readonly IProxyMultiplierRepo _proxyMultiplierRepo;
         private readonly ISearchEngineRepo _searchEngineRepo;
 
+        private readonly Random _random = new Random();
+
         private readonly object _locker = new object();
 
         // Tuple <SEID, RID, ProxyID>
@@ -47,7 +49,7 @@ namespace ScraperFramework
             _proxyStatuses = new Dictionary<Tuple<short, short, int>, ProxyStatus>();
         }
 
-        public IEnumerable<Proxy> GetAvailableProxies()
+        public IEnumerable<Proxy> GetAvailableProxies(bool autoLock)
         {
             lock (_locker)
             {
@@ -58,35 +60,59 @@ namespace ScraperFramework
 
                 DateTime now = DateTime.Now;
                 List<Proxy> proxies = _proxyStatuses
-                    .Where(p => 
-                        !p.Value.IsLocked && 
-                        p.Value.NextAvailability <= now)
-                    .Select(p =>
-                    {
-                        Data.Entities.Proxy proxy = _proxyRepo.Select(p.Key.Item3); // proxy id
-                        return new Proxy
-                        {
-                            ProxyID = proxy.ID,
-                            IP = proxy.IP,
-                            Port = proxy.Port,
-                            SearchEngineID = p.Key.Item1,
-                            RegionID = p.Key.Item2
-                        };
-                    })
+                    .Where(p => IsProxyAvailable(p.Value))
+                    .Select(p => GetProxyFromKey(p.Key))
                     .ToList();
 
-                // lock proxies until marked as used
-                foreach (Proxy proxy in proxies)
+                if (autoLock)
                 {
-                    Tuple<short, short, int> key = new Tuple<short, short, int>(
-                        proxy.SearchEngineID, proxy.RegionID, proxy.ProxyID);
+                    // lock proxies until marked as used
+                    foreach (Proxy proxy in proxies)
+                    {
+                        Tuple<short, short, int> key = new Tuple<short, short, int>(
+                            proxy.SearchEngineID, proxy.RegionID, proxy.ProxyID);
 
-                    _proxyStatuses[key].IsLocked = true;
+                        _proxyStatuses[key].IsLocked = true;
+                    }
                 }
 
                 return proxies;
             }
         }
+
+        public Proxy GetAvailableProxy(short searchEngineId, short regionId, bool autoLock = true)
+        {
+            lock (_locker)
+            {
+                if (!_addedInitStatuses)
+                {
+                    InitializeProxyStatuses();
+                }
+
+                Proxy proxy = _proxyStatuses
+                    .Where(p => p.Key.Item1 == searchEngineId &&
+                        (p.Key.Item2 == regionId || p.Key.Item2 == 0) &&
+                        IsProxyAvailable(p.Value))
+                    .Select(p => GetProxyFromKey(p.Key))
+                    .FirstOrDefault();
+
+                if (proxy != null)
+                {
+                    if (autoLock)
+                    {
+                        Tuple<short, short, int> key = new Tuple<short, short, int>(
+                            proxy.SearchEngineID, proxy.RegionID, proxy.ProxyID);
+
+                        _proxyStatuses[key].IsLocked = true;
+                    }
+
+                    return proxy;
+                }
+
+                return null;
+            }
+        }
+
 
         public DateTime GetNextAvailability()
         {
@@ -110,7 +136,56 @@ namespace ScraperFramework
             }
         }
 
-        public void MarkAsUsed(short searchEngineId, short regionId, int proxyId, 
+        public DateTime GetNextAvailability(short searchEngineId, short regionId)
+        {
+            lock (_locker)
+            {
+                if (!_addedInitStatuses)
+                {
+                    InitializeProxyStatuses();
+                }
+
+                IEnumerable<ProxyStatus> proxies = _proxyStatuses.Where(
+                    p => p.Key.Item1 == searchEngineId &&
+                    (p.Key.Item2 == regionId || p.Key.Item2 == 0))
+                    .Select(p => p.Value);
+
+                DateTime min = DateTime.MaxValue;
+                foreach (ProxyStatus proxy in proxies)
+                {
+                    if (proxy.NextAvailability < min)
+                    {
+                        min = proxy.NextAvailability;
+                    }
+                }
+
+                return min;
+            }
+        }
+
+        public void Lock(short searchEngineId, short regionId, int proxyId)
+        {
+            lock (_locker)
+            {
+                if (!_addedInitStatuses)
+                {
+                    InitializeProxyStatuses();
+                }
+
+                Tuple<short, short, int> key = new Tuple<short, short, int>(
+                    searchEngineId, regionId, proxyId);
+                if (_proxyStatuses.ContainsKey(key))
+                {
+                    _proxyStatuses[key].IsLocked = true;
+                }
+                else
+                {
+                    // throw ?
+                }
+            }
+        }
+
+        public void UnLock(short searchEngineId, short regionId, int proxyId, 
             CrawlResultID crawlResultID)
         {
             lock (_locker)
@@ -152,18 +227,59 @@ namespace ScraperFramework
                             break;
                     }
                 }
-                // TODO(zvp): Log it not existing ?
+                else
+                {
+                    // throw ?
+                }
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="proxyStatus"></param>
+        /// <returns></returns>
+        private bool IsProxyAvailable(ProxyStatus proxyStatus)
+            => !proxyStatus.IsLocked && proxyStatus.NextAvailability <= DateTime.Now;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private Proxy GetProxyFromKey(Tuple<short, short, int> key)
+        {
+            Data.Entities.Proxy proxy = _proxyRepo.Select(key.Item3); // proxy id
+            return new Proxy
+            {
+                ProxyID = proxy.ID,
+                IP = proxy.IP,
+                Port = proxy.Port,
+                SearchEngineID = key.Item1,
+                RegionID = key.Item2
+            };
+        }
+
+        /// <summary>
+        /// All methods that make use of the _proxyStatus dictionary
+        /// should call this method prior.
+        /// </summary>
         private void InitializeProxyStatuses()
         {
             // create search engine, region, proxy tuples
             IEnumerable<Data.Entities.SearchEngine> searchEngines = _searchEngineRepo.SelectAll();
-            IEnumerable<Data.Entities.Proxy> proxies = _proxyRepo.SelectAll();
+            List<Data.Entities.Proxy> proxies = _proxyRepo.SelectAll().ToList();
+
+            // shuffle
+            int n = proxies.Count();
+            for (int i = n - 1; i >= 1; i--)
+            {
+                int j = _random.Next(0, i);
+                Data.Entities.Proxy temp = proxies[i];
+                proxies[i] = proxies[j];
+                proxies[j] = temp;
+            }
+
             foreach (var searchEngine in searchEngines)
             {
                 foreach (var proxy in proxies)
@@ -174,11 +290,11 @@ namespace ScraperFramework
                     _proxyStatuses.Add(key, new ProxyStatus
                     {
                         IsLocked = false,
-                        // 0 ms
+                        // forces slow start, but proxies will now be naturally distributed
                         NextAvailability = new DateTime(
                             DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
                             DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second, 0).AddSeconds(
-                            (new Random()).Next(START_LOWER_BOUND, START_UPPER_BOUND))
+                            _random.Next(START_LOWER_BOUND, START_UPPER_BOUND))
                     });
                 }
             }

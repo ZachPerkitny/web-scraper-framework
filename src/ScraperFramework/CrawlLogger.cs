@@ -18,7 +18,7 @@ namespace ScraperFramework
         public void LogCrawl(CrawlDescription crawlDescription, CrawlResult crawlResult)
         {
             // mark proxy as used to unlock for later usage
-            _proxyManager.MarkAsUsed(crawlDescription.SearchEngineID, crawlDescription.RegionID, 
+            _proxyManager.UnLock(crawlDescription.SearchEngineID, crawlDescription.RegionID, 
                 crawlDescription.ProxyID, crawlResult.CrawlResultID);
 
             // update last crawl
