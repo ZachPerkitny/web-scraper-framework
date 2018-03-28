@@ -16,7 +16,16 @@ namespace ScraperFramework.Pipeline
 
         public override PipelinedCrawlDescription Flow(PipelinedCrawlDescription pipelinedCrawlDescription)
         {
-            List<Tuple<short, short>> droppedCrawlDescriptions = new List<Tuple<short, short>>();
+            // exit early if no proxies are available
+            DateTime nextAvailability = _proxyManager.GetNextAvailability();
+            if (nextAvailability > DateTime.Now)
+            {
+                pipelinedCrawlDescription.CrawlDescriptions.Clear();
+                pipelinedCrawlDescription.NextAvailability = nextAvailability;
+                return pipelinedCrawlDescription;
+            }
+
+            HashSet<Tuple<short, short>> droppedCrawlDescriptions = new HashSet<Tuple<short, short>>();
             LinkedListNode<CrawlDescription> node = pipelinedCrawlDescription.CrawlDescriptions.First;
             while (node != null)
             {

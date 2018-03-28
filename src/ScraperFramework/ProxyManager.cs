@@ -139,8 +139,9 @@ namespace ScraperFramework
                     InitializeProxyStatuses();
                 }
 
-                return GetNextAvailability(
-                    _proxyStatuses.Select(p => p.Key));
+                return _proxyStatuses
+                    .Select(p => GetNextAvailabilityFor(p.Key.Item1, p.Key.Item2))
+                    .Min();
             }
         }
 
@@ -155,7 +156,7 @@ namespace ScraperFramework
                 }
 
                 return searchEngineRegionPairs
-                    .Select(key => GetNextAvailability(key.Item1, key.Item2))
+                    .Select(p => GetNextAvailabilityFor(p.Item1, p.Item2))
                     .Min();
             }
         }
@@ -170,17 +171,7 @@ namespace ScraperFramework
                     InitializeProxyStatuses();
                 }
 
-                Tuple<short, short> key = new Tuple<short, short>(searchEngineId, regionId);
-                if (!_proxyStatuses.ContainsKey(key))
-                {
-                    return _proxyStatuses[key]
-                        .Where(p => !p.Value.IsLocked)
-                        .Min(p => p.Value.NextAvailability);
-                }
-                else
-                {
-                    return default(DateTime);
-                }
+                return GetNextAvailabilityFor(searchEngineId, regionId);
             }
         }
 
@@ -276,6 +267,33 @@ namespace ScraperFramework
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        private DateTime GetNextAvailabilityFor(short searchEngineId, short regionId)
+        {
+            Tuple<short, short> key = new Tuple<short, short>(searchEngineId, regionId);
+            if (_proxyStatuses.ContainsKey(key))
+            {
+                return _proxyStatuses[key]
+                    .Where(p => !p.Value.IsLocked)
+                    .Min(p => p.Value.NextAvailability);
+            }
+
+            // fallback to global
+            key = new Tuple<short, short>(searchEngineId, 0);
+            if (_proxyStatuses.ContainsKey(key))
+            {
+                return _proxyStatuses[key]
+                    .Where(p => !p.Value.IsLocked)
+                    .Min(p => p.Value.NextAvailability);
+            }
+
+            return default(DateTime);
+            
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="proxyStatus"></param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -320,7 +338,6 @@ namespace ScraperFramework
         /// <param name="searchEngineId"></param>
         /// <param name="regionId"></param>
         /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private IEnumerable<KeyValuePair<int, ProxyStatus>> GetAvailableProxies(short searchEngineId, short regionId)
         {
             if (_proxyStatuses.ContainsKey(new Tuple<short, short>(searchEngineId, regionId)))
