@@ -64,7 +64,7 @@ namespace ScraperFramework
             _scraperTasks = _scrapers.Select(scraper => Task.Factory.StartNew(async () =>
             {
                 await scraper.Start();
-            }, TaskCreationOptions.LongRunning)).ToList();
+            })).ToList();
         }
 
         public void Pause()

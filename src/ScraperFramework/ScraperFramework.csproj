@@ -202,10 +202,6 @@
       <Project>{e8eb55f3-712d-4a3f-bc67-6d4b31887cb8}</Project>
       <Name>ScraperFramework.Shared</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WebScraper\WebScraper.csproj">
-      <Project>{9b544c9e-67f0-4d6b-854d-c711effb40dc}</Project>
-      <Name>WebScraper</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

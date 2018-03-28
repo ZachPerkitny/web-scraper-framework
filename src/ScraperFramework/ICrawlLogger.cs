@@ -1,4 +1,5 @@
-﻿using ScraperFramework.Shared.Pocos;
+﻿using System.Threading.Tasks;
+using ScraperFramework.Shared.Pocos;
 
 namespace ScraperFramework
 {
@@ -9,6 +10,6 @@ namespace ScraperFramework
         /// </summary>
         /// <param name="crawlDescription"></param>
         /// <param name="crawlResult"></param>
-        void LogCrawl(CrawlDescription crawlDescription, CrawlResult crawlResult);
+        Task LogCrawl(CrawlDescription crawlDescription, CrawlResult crawlResult);
     }
 }
