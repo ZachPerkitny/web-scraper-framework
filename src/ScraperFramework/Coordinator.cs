@@ -23,7 +23,7 @@ namespace ScraperFramework
         private readonly List<IScraper> _scrapers = new List<IScraper>();
         private List<Task<Task>> _scraperTasks;
 
-        private bool _disposed = false;
+        private bool _stopped = false;
 
         public Coordinator(IRestFulServer restFulServer, IScraperFactory scraperFactory, ISyncer syncer,
             ScraperConfig config, CancellationTokenSource cancellationTokenSource)
@@ -43,6 +43,12 @@ namespace ScraperFramework
 
         public void Start()
         {
+            if (_stopped)
+            {
+                // TODO(zvp): Throw an error or something
+                return;
+            }
+
             Log.Information("Starting Rest API");
             _restFulServer.Start();
 
@@ -73,25 +79,16 @@ namespace ScraperFramework
 
         public void Stop()
         {
+            //_restFulServer.Stop();
+
+            _syncer.StopSyncTimer();
+            _syncer.Dispose();
+
             _cancellationTokenSource.Cancel();
-        }
+            _cancellationTokenSource.Dispose();
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    _cancellationTokenSource.Cancel();
-                }
-
-                _disposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
+            // prevent calls to start
+            _stopped = true;
         }
     }
 }

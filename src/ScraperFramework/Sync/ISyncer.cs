@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ScraperFramework.Sync
 {
-    public interface ISyncer
+    public interface ISyncer : IDisposable
     {
         /// <summary>
         /// 

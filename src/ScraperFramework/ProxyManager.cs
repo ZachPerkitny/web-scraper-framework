@@ -351,6 +351,7 @@ namespace ScraperFramework
         /// <param name="searchEngineId"></param>
         /// <param name="regionId"></param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private IEnumerable<KeyValuePair<int, ProxyStatus>> GetAvailableProxies(short searchEngineId, short regionId)
         {
             if (_proxyStatuses.ContainsKey(new Tuple<short, short>(searchEngineId, regionId)))

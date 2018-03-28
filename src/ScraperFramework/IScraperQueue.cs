@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using ScraperFramework.Shared.Pocos;
 
 namespace ScraperFramework
 {
-    public interface IScraperQueue
+    public interface IScraperQueue : IDisposable
     {
         /// <summary>
         /// 

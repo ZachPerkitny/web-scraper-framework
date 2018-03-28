@@ -14,6 +14,8 @@ namespace ScraperFramework.Sync
         private readonly System.Timers.Timer _timer = new System.Timers.Timer();
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
+        private bool _disposed = false;
+
         public Syncer() { }
 
         /// <summary>
@@ -152,6 +154,25 @@ namespace ScraperFramework.Sync
             {
                 _semaphore.Release();
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _semaphore.Dispose();
+                    _timer.Dispose();
+                }
+
+                _disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Driver
             controller.Start();
 
             Console.ReadLine();
-            controller.Dispose();
+            controller.Stop();
             Console.ReadLine();
         }
 

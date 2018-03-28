@@ -27,7 +27,7 @@ namespace ScraperFramework.Pipeline
                 CrawlDescriptions = new LinkedList<CrawlDescription>()
             };
 
-            IEnumerable<Keyword> keywordsToScrape = _keywordManager.GetKeywordsToCrawl(BATCH_SIZE);
+            IEnumerable<Keyword> keywordsToScrape = _keywordManager.GetKeywords(BATCH_SIZE);
             if (keywordsToScrape.Any())
             {
                 foreach (Keyword keyword in keywordsToScrape)

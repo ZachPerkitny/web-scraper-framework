@@ -18,6 +18,8 @@ namespace ScraperFramework
         private readonly Queue<CrawlDescription> _queue = new Queue<CrawlDescription>();
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
+        private bool _disposed = false;
+
         public ScraperQueue(PipeLine<PipelinedCrawlDescription> pipeline)
         {
             _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
@@ -47,6 +49,10 @@ namespace ScraperFramework
             return crawlDescription;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private async Task RequestMoreCrawlDescriptions()
         {
             PipelinedCrawlDescription pipelinedCrawlDescription = _pipeline.Drain();
@@ -67,6 +73,31 @@ namespace ScraperFramework
             {
                 _queue.Enqueue(crawl);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _semaphore.Dispose();
+                }
+
+                _disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
         }
     }
 }

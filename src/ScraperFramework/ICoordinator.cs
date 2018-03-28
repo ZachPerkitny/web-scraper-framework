@@ -2,7 +2,7 @@
 
 namespace ScraperFramework
 {
-    public interface ICoordinator : IDisposable
+    public interface ICoordinator
     {
         /// <summary>
         /// 

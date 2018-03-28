@@ -7,7 +7,7 @@ namespace ScraperFramework.Utils
     public class AsyncManualResetEvent
     {
         private TaskCompletionSource<bool> _taskCompletionSource;
-        private object _locker = new object();
+        private readonly object _locker = new object();
 
         /// <summary>
         /// 
