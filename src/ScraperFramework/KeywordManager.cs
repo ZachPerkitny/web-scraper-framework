@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ScraperFramework.Data;
 using ScraperFramework.Pocos;
 
@@ -7,8 +8,15 @@ namespace ScraperFramework
 {
     class KeywordManager : IKeywordManager
     {
+        private const int LIMIT_MULTIPLIER = 4;
+
         private readonly IKeywordScrapeDetailRepo _keywordScrapeDetailRepo;
         private readonly IKeywordRepo _keywordRepo;
+
+        private readonly Queue<Keyword> _keywords = new Queue<Keyword>();
+        private int _keywordCacheLimit = 1000;
+
+        private readonly object _locker = new object();
 
         public KeywordManager(IKeywordScrapeDetailRepo keywordScrapeDetailRepo, IKeywordRepo keywordRepo)
         {
@@ -18,8 +26,37 @@ namespace ScraperFramework
 
         public IEnumerable<Keyword> GetKeywordsToCrawl(int count)
         {
-            // TODO(zvp): Implement this
-            return GetKeywordsFromDB(count);
+            // TODO(zvp): this needs to be refactored, naively
+            // implemented
+            IEnumerable<Keyword> keywords;
+            lock (_locker)
+            {
+                // assume that requests of this size
+                // will continue to occur and increase
+                // cache limit
+                if (count > _keywordCacheLimit)
+                {
+                    // adjust cache size
+                    _keywordCacheLimit = count * LIMIT_MULTIPLIER;
+                }
+
+                if (count > _keywords.Count)
+                {
+                    keywords = GetKeywordsFromCache(_keywords.Count)
+                        .Concat(GetKeywordsFromDB(count - _keywords.Count));
+                }
+                else
+                {
+                    keywords = GetKeywordsFromCache(count);
+                }
+
+                if (_keywords.Count == 0)
+                {
+                    RefillCache();
+                }
+            }
+
+            return keywords;
         }
 
         /// <summary>
@@ -30,7 +67,13 @@ namespace ScraperFramework
         /// <returns></returns>
         private IEnumerable<Keyword> GetKeywordsFromCache(int count)
         {
-            throw new NotImplementedException();
+            List<Keyword> keywords = new List<Keyword>();
+            for (int i = 0; i < count; i++)
+            {
+                keywords.Add(_keywords.Dequeue());
+            }
+
+            return keywords;
         }
         
         /// <summary>
@@ -67,7 +110,11 @@ namespace ScraperFramework
         /// </summary>
         private void RefillCache()
         {
-            throw new NotImplementedException();
+            IEnumerable<Keyword> keywords = GetKeywordsFromDB(_keywordCacheLimit);
+            foreach (Keyword keyword in keywords)
+            {
+                _keywords.Enqueue(keyword);
+            }
         }
     }
 }
