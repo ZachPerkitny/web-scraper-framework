@@ -65,6 +65,13 @@ namespace ScraperFramework
                     InitializeProxyStatuses();
                 }
 
+                // exit early if no proxes are available for the seid/region pair
+                if (GetNextAvailabilityFor(searchEngineId, regionId) > DateTime.Now)
+                {
+                    // empty list, i guess ?
+                    return new List<Proxy>();
+                }
+
                 List<Proxy> proxies = GetAvailableProxies(searchEngineId, regionId)
                     .Select(p => CreateProxyDetails(searchEngineId, regionId, p.Key))
                     .Concat(GetAvailableGlobalProxies(searchEngineId)
@@ -93,6 +100,12 @@ namespace ScraperFramework
                 if (!_addedInitStatuses)
                 {
                     InitializeProxyStatuses();
+                }
+
+                // exit early if no proxes are available for the seid/region pair
+                if (GetNextAvailabilityFor(searchEngineId, regionId) > DateTime.Now)
+                {
+                    return null;
                 }
 
                 int proxyId = GetAvailableProxies(searchEngineId, regionId)

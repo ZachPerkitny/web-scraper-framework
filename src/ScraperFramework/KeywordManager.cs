@@ -34,7 +34,7 @@ namespace ScraperFramework
                 // assume that requests of this size
                 // will continue to occur and increase
                 // cache limit
-                if (count > _keywordCacheLimit)
+                if (count > (_keywordCacheLimit / LIMIT_MULTIPLIER))
                 {
                     // adjust cache size
                     _keywordCacheLimit = count * LIMIT_MULTIPLIER;

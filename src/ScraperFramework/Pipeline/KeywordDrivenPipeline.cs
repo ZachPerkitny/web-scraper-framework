@@ -11,7 +11,7 @@ namespace ScraperFramework.Pipeline
     /// </summary>
     internal class KeywordDrivenPipeline : PipeLine<PipelinedCrawlDescription>
     {
-        private const int BATCH_SIZE = 250;
+        private const int BATCH_SIZE = 1000;
 
         private readonly IKeywordManager _keywordManager;
 
