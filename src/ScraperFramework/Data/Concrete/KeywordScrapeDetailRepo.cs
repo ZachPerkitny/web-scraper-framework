@@ -85,11 +85,6 @@ namespace ScraperFramework.Data.Concrete
                     }
                 }
 
-                if (entities.Count() > 1006)
-                {
-                    Environment.Exit(1);
-                }
-
                 return entities;
             }
         }
@@ -229,7 +224,6 @@ namespace ScraperFramework.Data.Concrete
                     {
                         AddPrimaryToTheEnd = true
                     }
-                    // TODO(zvp): Add Priority Index
                 }
             });
         }

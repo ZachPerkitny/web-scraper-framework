@@ -13,9 +13,11 @@ namespace ScraperFramework
         /// required to prevent the same proxy from getting picked
         /// up.
         /// </summary>
+        /// <param name="searchEngineId"></param>
+        /// <param name="regionId"></param>
         /// <param name="autoLock"></param>
         /// <returns></returns>
-        IEnumerable<Proxy> GetAvailableProxies(bool autoLock = true);
+        IEnumerable<Proxy> GetAvailableProxies(short searchEngineId, short regionId, bool autoLock = true);
 
         /// <summary>
         /// 
@@ -35,17 +37,17 @@ namespace ScraperFramework
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="searchEngineId"></param>
-        /// <param name="regionId"></param>
+        /// <param name="searchEngineRegions"></param>
         /// <returns></returns>
-        DateTime GetNextAvailability(short searchEngineId, short regionId);
+        DateTime GetNextAvailability(IEnumerable<Tuple<short, short>> searchEngineRegionPairs);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="searchEngineRegions"></param>
+        /// <param name="searchEngineId"></param>
+        /// <param name="regionId"></param>
         /// <returns></returns>
-        DateTime GetNextAvailability(IEnumerable<Tuple<short, short>> searchEngineRegionPairs);
+        DateTime GetNextAvailability(short searchEngineId, short regionId);
 
         /// <summary>
         /// 
