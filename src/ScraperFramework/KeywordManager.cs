@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ScraperFramework.Data;
 using ScraperFramework.Pocos;
 using ScraperFramework.Utils;
@@ -79,11 +80,14 @@ namespace ScraperFramework
         private void FillPriorityQueue()
         {
             IEnumerable<Data.Entities.KeywordScrapeDetail> keywordsToCrawl = _keywordScrapeDetailRepo.SelectToCrawl();
+            IDictionary<int, Data.Entities.Keyword> keywords = _keywordRepo.SelectMany(
+                keywordsToCrawl.Select(k => k.KeywordID));
+
             foreach (Data.Entities.KeywordScrapeDetail keywordScrapeDetail in keywordsToCrawl)
             {
-                Data.Entities.Keyword keyword = _keywordRepo.Select(keywordScrapeDetail.KeywordID);
-                if (keyword != null)
+                if (keywords.ContainsKey(keywordScrapeDetail.KeywordID))
                 {
+                    Data.Entities.Keyword keyword = keywords[keywordScrapeDetail.KeywordID];
                     _keywords.Enqueue(new KeywordNode
                     {
                         Keyword = new Keyword

@@ -26,6 +26,13 @@ namespace ScraperFramework.Data
         Keyword Select(int keywordID);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="keywordIds"></param>
+        /// <returns></returns>
+        IDictionary<int, Keyword> SelectMany(IEnumerable<int> keywordIds);
+
+        /// <summary>
         /// Selects all keywords
         /// </summary>
         /// <returns>All Keywords</returns>

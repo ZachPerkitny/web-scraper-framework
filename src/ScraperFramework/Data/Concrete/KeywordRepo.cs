@@ -61,16 +61,37 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
+        public IDictionary<int, Keyword> SelectMany(IEnumerable<int> keywordIds)
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                Dictionary<int, Keyword> entities = new Dictionary<int, Keyword>();
+                foreach (int keywordId in keywordIds)
+                {
+                    DBreezeObject<Keyword> obj = transaction
+                        .Select<byte[], byte[]>(_table, 1.ToIndex(keywordId))
+                        .ObjectGet<Keyword>();
+
+                    if (obj != null)
+                    {
+                        entities.Add(keywordId, obj.Entity);
+                    }
+                }
+
+                return entities;
+            }
+        }
+
         public IEnumerable<Keyword> SelectAll()
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                List<Keyword> entities = new List<Keyword>();
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
                     .SelectForwardFromTo<byte[], byte[]>(
                     _table, 1.ToIndex(int.MinValue), true,
                     1.ToIndex(int.MaxValue), true);
 
+                List<Keyword> entities = new List<Keyword>();
                 foreach (Row<byte[], byte[]> row in rows)
                 {
                     DBreezeObject<Keyword> obj = row.ObjectGet<Keyword>();
