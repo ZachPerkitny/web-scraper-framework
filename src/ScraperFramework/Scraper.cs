@@ -38,6 +38,17 @@ namespace ScraperFramework
                 CrawlDescription crawlDescription = await _scraperQueue.Dequeue();
                 CrawlResult crawlResult = null;
 
+                await _crawlLogger.LogCrawl(crawlDescription, new CrawlResult
+                {
+                    CrawlResultID = Shared.Enum.CrawlResultID.Success
+                });
+
+                c += 1;
+                Log.Information("Crawled Keyword: {0}, Proxy: {1}, SearchString: {2}, Count: {3}",
+                    crawlDescription.Keyword, crawlDescription.IP, crawlDescription.SearchString, c);
+
+                continue;
+
                 // pause (let it finish dequeue)
                 await _manualResetEvent.WaitAsync();
 

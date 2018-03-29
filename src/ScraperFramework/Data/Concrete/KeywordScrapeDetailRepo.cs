@@ -62,23 +62,19 @@ namespace ScraperFramework.Data.Concrete
             }
         }
 
-        public IEnumerable<KeywordScrapeDetail> SelectNext(int count)
+        public IEnumerable<KeywordScrapeDetail> SelectToCrawl()
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                transaction.SynchronizeTables(_table);
-
                 IEnumerable<Row<byte[], byte[]>> rows = transaction
                     .SelectForwardFromTo<byte[], byte[]>(
-                    _table, 3.ToIndex(long.MinValue, short.MinValue, short.MinValue, short.MinValue, short.MinValue, int.MinValue), true,
-                    3.ToIndex(long.MaxValue, short.MaxValue, short.MaxValue, short.MaxValue, short.MaxValue, int.MaxValue), true)
-                    .Take(count);
+                    _table, 3.ToIndex(DateTime.Today.AddDays(-1), short.MinValue, short.MinValue, short.MinValue, short.MinValue, int.MinValue), true,
+                    3.ToIndex(DateTime.Today, short.MaxValue, short.MaxValue, short.MaxValue, short.MaxValue, int.MaxValue), true);
 
                 List<KeywordScrapeDetail> entities = new List<KeywordScrapeDetail>();
                 foreach (Row<byte[], byte[]> row in rows)
                 {
                     DBreezeObject<KeywordScrapeDetail> obj = row.ObjectGet<KeywordScrapeDetail>();
-
                     if (obj != null)
                     {
                         entities.Add(obj.Entity);
@@ -86,6 +82,34 @@ namespace ScraperFramework.Data.Concrete
                 }
 
                 return entities;
+            }
+        }
+
+        public IEnumerable<int> SelectKeywordIdsToCrawl()
+        {
+            using (Transaction transaction = _engine.GetTransaction())
+            {
+                IEnumerable<Row<byte[], byte[]>> rows = transaction
+                    .SelectForwardFromTo<byte[], byte[]>(
+                    _table, 3.ToIndex(DateTime.Today.AddDays(-1), short.MinValue, short.MinValue, short.MinValue, short.MinValue, int.MinValue), true,
+                    3.ToIndex(DateTime.Today, short.MaxValue, short.MaxValue, short.MaxValue, short.MaxValue, int.MaxValue), true);
+
+                List<int> keywordIds = new List<int>();
+                foreach (Row<byte[], byte[]> row in rows)
+                {
+                    // Index
+                    //      I    Last Crawl  Priority   SEID      RID     CityID    KeywordID
+                    // | 1 byte | 8 bytes  | 2 bytes | 2 bytes| 2 bytes | 2 bytes |  4 bytes  |
+                    // skip 17 bytes to get keywordid from index (take advantage of lazy loading)
+                    byte[] index = row.Key
+                        .Skip(17).ToArray();
+
+                    // u2tw(u) = -uw-1 * 2^w-1 + u
+                    // index big endian, w-1 is also 1
+                    keywordIds.Add(((index[0] << 24) | (index[1] << 16) | (index[2] << 8) | (index[3])) + int.MinValue);
+                }
+
+                return keywordIds;
             }
         }
 
@@ -118,8 +142,6 @@ namespace ScraperFramework.Data.Concrete
         {
             using (Transaction transaction = _engine.GetTransaction())
             {
-                transaction.SynchronizeTables(_table);
-
                 DBreezeObject<KeywordScrapeDetail> obj = transaction
                     .Select<byte[], byte[]>(_table, 1.ToIndex(
                         searchEngineId, regionId, cityId, keywordId))

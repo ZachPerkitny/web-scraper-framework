@@ -31,12 +31,15 @@ namespace ScraperFramework.Data
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="searchEngineId"></param>
-        /// <param name="regionId"></param>
-        /// <param name="cityId"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        IEnumerable<KeywordScrapeDetail> SelectNext(int count);
+        IEnumerable<KeywordScrapeDetail> SelectToCrawl();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<int> SelectKeywordIdsToCrawl();
 
         /// <summary>
         /// 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using ScraperFramework.Data;
 using ScraperFramework.Pocos;
 using ScraperFramework.Shared.Enum;
@@ -19,16 +18,6 @@ namespace ScraperFramework
 
         private const int START_LOWER_BOUND = 0;
         private const int START_UPPER_BOUND = 600;
-
-        /// <summary>
-        /// Represents the state of a proxy
-        /// </summary>
-        private class ProxyStatus
-        {
-            public bool IsLocked { get; set; }
-
-            public DateTime NextAvailability { get; set; }
-        }
 
         private readonly IProxyRepo _proxyRepo;
         private readonly IProxyMultiplierRepo _proxyMultiplierRepo;
@@ -309,7 +298,6 @@ namespace ScraperFramework
         /// </summary>
         /// <param name="proxyStatus"></param>
         /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool IsProxyAvailable(ProxyStatus proxyStatus)
             => !proxyStatus.IsLocked && 
             proxyStatus.NextAvailability <= DateTime.Now.AddMilliseconds(_random.Next(-DELAY_JITTER, DELAY_JITTER));
@@ -320,7 +308,6 @@ namespace ScraperFramework
         /// <param name="searchEngineId"></param>
         /// <param name="regionId"></param>
         /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool IsProxyForSearchEngineRegionPair(Tuple<short, short> key, short searchEngineId, short regionId)
             => key.Item1 == searchEngineId && (key.Item2 == regionId || key.Item2 == 0);
 
@@ -331,7 +318,6 @@ namespace ScraperFramework
         /// <param name="regionId"></param>
         /// <param name="proxyId"></param>
         /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Proxy CreateProxyDetails(short searchEngineId, short regionId, int proxyId)
         {
             Data.Entities.Proxy proxy = _proxyRepo.Select(proxyId); // proxy id
@@ -351,7 +337,6 @@ namespace ScraperFramework
         /// <param name="searchEngineId"></param>
         /// <param name="regionId"></param>
         /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private IEnumerable<KeyValuePair<int, ProxyStatus>> GetAvailableProxies(short searchEngineId, short regionId)
         {
             if (_proxyStatuses.ContainsKey(new Tuple<short, short>(searchEngineId, regionId)))
@@ -368,7 +353,6 @@ namespace ScraperFramework
         /// </summary>
         /// <param name="searchEngineId"></param>
         /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private IEnumerable<KeyValuePair<int, ProxyStatus>> GetAvailableGlobalProxies(short searchEngineId)
         {
             if (_proxyStatuses.ContainsKey(new Tuple<short, short>(searchEngineId, 0)))
@@ -423,6 +407,16 @@ namespace ScraperFramework
             }
 
             _addedInitStatuses = true;
+        }
+
+        /// <summary>
+        /// Represents the state of a proxy
+        /// </summary>
+        private class ProxyStatus
+        {
+            public bool IsLocked { get; set; }
+
+            public DateTime NextAvailability { get; set; }
         }
     }
 }

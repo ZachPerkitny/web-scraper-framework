@@ -11,8 +11,8 @@ namespace ScraperFramework.Utils
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
     internal class DoubleOrderedMap<TKey, TValue> : IDictionary<TKey, TValue>
-        where TKey: IComparable
-        where TValue: IComparable
+        where TKey: IComparable<TKey>
+        where TValue: IComparable<TValue>
     {
         // 0 KEY, 1 VALUE
         private Node[] _rootNode;

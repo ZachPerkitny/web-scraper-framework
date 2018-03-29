@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ScraperFramework.Data;
 using ScraperFramework.Data.Entities;
 using ScraperFramework.Pocos;
@@ -19,37 +20,46 @@ namespace ScraperFramework.Pipeline
 
         public override PipelinedCrawlDescription Flow(PipelinedCrawlDescription pipelinedCrawlDescription)
         {
-            foreach (CrawlDescription crawlDescription in pipelinedCrawlDescription.CrawlDescriptions)
+            LinkedListNode<CrawlDescription> node = pipelinedCrawlDescription.CrawlDescriptions.First;
+            while (node != null)
             {
                 SearchString searchString = _searchStringRepo.Select(
-                    crawlDescription.SearchEngineID, crawlDescription.RegionID);
-
+                    node.Value.SearchEngineID, node.Value.RegionID);
                 if (searchString != null)
                 {
                     string naturalResultParamString = string.Empty;
-                    if (crawlDescription.IsNatural)
+                    if (node.Value.IsNatural)
                     {
                         naturalResultParamString = searchString.NaturalResultParamString;
                     }
 
                     string UULE = string.Empty;
-                    if (crawlDescription.CityID > 0)
+                    if (node.Value.CityID > 0)
                     {
-                        LocalUULE localUULE = _localUULERepo.Select(crawlDescription.CityID);
+                        LocalUULE localUULE = _localUULERepo.Select(node.Value.CityID);
                         if (localUULE != null)
                         {
                             UULE = $"&uule={localUULE.UULE}";
                         }
                     }
 
-                    crawlDescription.SearchString =
+                    node.Value.SearchString =
                         $"{searchString.SearchEngine}{searchString.SearchEngineURL}{naturalResultParamString}{UULE}";
                 }
+                else
+                {
+                    // mark the node for removal, no
+                    // search string exists for the
+                    // seid, reid tuple
+                    pipelinedCrawlDescription.MarkedForRemoval.Add(node);
+                }
+
+                node = node.Next;
             }
 
             if (_connection != null)
             {
-                return _connection.Flow(pipelinedCrawlDescription);
+                _connection.Flow(pipelinedCrawlDescription);
             }
 
             return pipelinedCrawlDescription;

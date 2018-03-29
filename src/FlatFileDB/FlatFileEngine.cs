@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Net;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using FlatFileDB.Tables;
-using System.Runtime.CompilerServices;
 
 namespace FlatFileDB
 {
@@ -224,7 +222,6 @@ namespace FlatFileDB
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void WriteRecord(T record)
         {
             byte[] serializedRecord = _config.Encoding.GetBytes(
@@ -233,7 +230,6 @@ namespace FlatFileDB
             _buffer.Write(_rowSeparator);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void WriteHeader()
         {
             // clean slate, just write the header
@@ -247,7 +243,6 @@ namespace FlatFileDB
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void FlushBuffer()
         {
             // clear memory buffer

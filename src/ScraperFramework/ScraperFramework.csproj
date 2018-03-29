@@ -181,6 +181,7 @@
     <Compile Include="Utils\AsyncManualResetEvent.cs" />
     <Compile Include="Utils\DoubleOrderedMap.cs" />
     <Compile Include="Utils\PerformanceLogger.cs" />
+    <Compile Include="Utils\PriorityQueue.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

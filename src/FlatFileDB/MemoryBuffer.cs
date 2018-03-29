@@ -126,6 +126,7 @@ namespace FlatFileDB
             {
                 // reset count
                 _count = 0;
+                _capacity = _initialCapacity;
 
                 // create new buffer with initial capacity
                 _buffer = new byte[_initialCapacity];
@@ -147,7 +148,7 @@ namespace FlatFileDB
             // and deep copy contents of the old
             // buffer
             byte[] newBuffer = new byte[_capacity];
-            Buffer.BlockCopy(_buffer, 0, newBuffer, 0, Count);
+            Buffer.BlockCopy(_buffer, 0, newBuffer, 0, _count);
             _buffer = newBuffer;
         }
     }

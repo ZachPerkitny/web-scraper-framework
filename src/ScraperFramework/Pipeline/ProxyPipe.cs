@@ -16,14 +16,12 @@ namespace ScraperFramework.Pipeline
 
         public override PipelinedCrawlDescription Flow(PipelinedCrawlDescription pipelinedCrawlDescription)
         {
-            HashSet<Tuple<short, short>> droppedCrawlDescriptions = new HashSet<Tuple<short, short>>();
+            HashSet<Tuple<short, short>> proxyShortages = new HashSet<Tuple<short, short>>();
             LinkedListNode<CrawlDescription> node = pipelinedCrawlDescription.CrawlDescriptions.First;
             while (node != null)
             {
-                LinkedListNode<CrawlDescription> next = node.Next;
                 Proxy proxy = _proxyManager.GetAvailableProxy(
                     node.Value.SearchEngineID, node.Value.RegionID);
-
                 if (proxy != null)
                 {
                     // add proxy to crawl description
@@ -34,27 +32,35 @@ namespace ScraperFramework.Pipeline
                 }
                 else
                 {
-                    // save dropped (seid, regionid) pairs to calculate next availability
-                    droppedCrawlDescriptions.Add(new Tuple<short, short>(
+                    // add the search engine and region so we can
+                    // calculate the next availability
+                    proxyShortages.Add(new Tuple<short, short>(
                         node.Value.SearchEngineID, node.Value.RegionID));
-                    // drop it
-                    pipelinedCrawlDescription.CrawlDescriptions.Remove(node);
-
+                    // mark the node for deletion
+                    pipelinedCrawlDescription.MarkedForRemoval.Add(node);
                 }
 
-                node = next;
+                node = node.Next;
             }
 
-            // if we removed all nodes because of a lack of proxies, return early
-            if (pipelinedCrawlDescription.CrawlDescriptions.Count == 0)
+            // if there are no proxies available for some of the
+            // crawl descriptions
+            if (proxyShortages.Count > 0)
             {
-                pipelinedCrawlDescription.NextAvailability = _proxyManager.GetNextAvailability(droppedCrawlDescriptions);
-                return pipelinedCrawlDescription;
+                DateTime nextAvailability = _proxyManager.GetNextAvailability(proxyShortages);
+                // if some other pipe set the next availability
+                // because of a lack of resources, let it take
+                // precedence if it is greater than the time
+                // a proxy is available
+                if (nextAvailability > pipelinedCrawlDescription.NextAvailability)
+                {
+                    pipelinedCrawlDescription.NextAvailability = nextAvailability;
+                }
             }
 
             if (_connection != null)
             {
-                return _connection.Flow(pipelinedCrawlDescription);
+                _connection.Flow(pipelinedCrawlDescription);
             }
 
             return pipelinedCrawlDescription;

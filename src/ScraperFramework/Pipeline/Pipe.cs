@@ -1,5 +1,9 @@
 ﻿namespace ScraperFramework.Pipeline
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     internal abstract class Pipe<T>
     {
         protected Pipe<T> _connection;

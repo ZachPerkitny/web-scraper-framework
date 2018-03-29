@@ -28,6 +28,6 @@ namespace ScraperFramework.Data.Entities
         public byte[] RowRevision { get; set; }
 
         [ProtoMember(8)]
-        public DateTime LastCrawl { get; set; }
+        public DateTime LastCrawl { get; set; } = DateTime.Today.AddDays(-1);
     }
 }
