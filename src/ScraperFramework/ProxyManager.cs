@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 using ScraperFramework.Data;
 using ScraperFramework.Pocos;
 using ScraperFramework.Shared.Enum;
@@ -370,6 +371,7 @@ namespace ScraperFramework
         /// </summary>
         private void InitializeProxyStatuses()
         {
+            Log.Information("Initializing Proxy Statuses");
             // create search engine, region, proxy tuples
             IEnumerable<Data.Entities.SearchEngine> searchEngines = _searchEngineRepo.SelectAll();
             List<Data.Entities.Proxy> proxies = _proxyRepo.SelectAll().ToList();

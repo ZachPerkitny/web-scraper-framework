@@ -74,7 +74,7 @@ namespace ScraperFramework.Data.Concrete
 
                     if (obj != null)
                     {
-                        entities.Add(keywordId, obj.Entity);
+                        entities[keywordId] = obj.Entity;
                     }
                 }
 

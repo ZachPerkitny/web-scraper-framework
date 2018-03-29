@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 using ScraperFramework.Data;
 using ScraperFramework.Pocos;
 using ScraperFramework.Utils;
@@ -79,6 +80,7 @@ namespace ScraperFramework
         /// </summary>
         private void FillPriorityQueue()
         {
+            Log.Information("Filling Up Keyword Queue");
             IEnumerable<Data.Entities.KeywordScrapeDetail> keywordsToCrawl = _keywordScrapeDetailRepo.SelectToCrawl();
             IDictionary<int, Data.Entities.Keyword> keywords = _keywordRepo.SelectMany(
                 keywordsToCrawl.Select(k => k.KeywordID));
